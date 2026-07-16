@@ -115,7 +115,7 @@ class _BannerSliderState extends State<BannerSlider> {
                         colors: [
                           Colors.black.withOpacity(.75),
                           Colors.black.withOpacity(.35),
-                          Colors.transparent,
+                          const Color.fromRGBO(0, 0, 0, 0),
                         ],
                       ),
                     ),
