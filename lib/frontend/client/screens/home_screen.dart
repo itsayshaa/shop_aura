@@ -51,38 +51,38 @@ class _HomeScreenState extends State<HomeScreen> {
     "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200",
   ];
 
-  final List<Map<String, String>> shopCategories = [
-    {
-      "title": "Shoes",
-      "image":
-          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200",
-    },
-    {
-      "title": "Watch",
-      "image":
-          "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
-    },
-    {
-      "title": "Fashion",
-      "image":
-          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200",
-    },
-    {
-      "title": "Headphones",
-      "image":
-          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
-    },
-    {
-      "title": "Furniture",
-      "image":
-          "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200",
-    },
-    {
-      "title": "Beauty",
-      "image":
-          "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200",
-    },
-  ];
+  // final List<Map<String, String>> shopCategories = [
+  //   {
+  //     "title": "Shoes",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200",
+  //   },
+  //   {
+  //     "title": "Watch",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
+  //   },
+  //   {
+  //     "title": "Fashion",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200",
+  //   },
+  //   {
+  //     "title": "Headphones",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
+  //   },
+  //   {
+  //     "title": "Furniture",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200",
+  //   },
+  //   {
+  //     "title": "Beauty",
+  //     "image":
+  //         "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=1200",
+  //   },
+  // ];
   final List<Map<String, dynamic>> products = [
     {
       "networkImage":
@@ -175,41 +175,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void changeTab(int index) async {
-    if (index == currentIndex) return;
-
-    switch (index) {
-      case 0:
-        setState(() {
-          currentIndex = 0;
-        });
-        break;
-
-      case 1:
-        await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const CategoryScreen()),
-        );
-
-        // Highlight Home again when returning
-        setState(() {
-          currentIndex = 0;
-        });
-        break;
-
-      case 2:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Wishlist page coming soon")),
-        );
-        break;
-
-      case 3:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("My Orders page coming soon")),
-        );
-        break;
-    }
+  void changeTab(int index) {
+  if (index == 1) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const CategoryScreen(),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
 
               /// Shop Categories
-              ShopCategory(categories: shopCategories),
+              // ShopCategory(categories: shopCategories),
 
               const SizedBox(height: 10),
               ShopCategory(
