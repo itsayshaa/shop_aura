@@ -6,6 +6,7 @@ import 'package:shop_aura/frontend/client/widgets/home/home_header.dart';
 import 'package:shop_aura/frontend/client/widgets/home/search_bar_widget.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/widgets/home/shop_category.dart';
+import 'package:shop_aura/frontend/client/widgets/home/product_card.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -82,6 +83,83 @@ class _HomeScreenState extends State<HomeScreen> {
     "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200",
     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
     "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1200",
+  ];
+
+  final List<Map<String, dynamic>> products = [
+    {
+      "networkImage":
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3eSGmhJubfc-dwgA7h0_E3CkzrDgrb47x0-LNHVfkkQ&s=10",
+      "category": "Football",
+      "name": "Lionel Messi",
+      "rating": 9.9,
+      "reviews": 1000,
+      "price": 899990,
+      "oldPrice": 950000,
+      "discount": 11,
+    },
+    {
+      "networkImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4mfqqLzhMIYYm7z6BhDh_XUoWpweK21fVYkK4V9iaISzWYKbj0lPJNdW5&s=10",
+      "category": "Football",
+      "name": "Enzo Fernandez",
+      "rating": 9.8,
+      "reviews": 999,
+      "price": 799990,
+      "oldPrice": 850000,
+      "discount": 12,
+    },
+    {
+      "networkImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbkEHxqrYqL_GoAe5OaddaqKhoj6GmWI9ZLAruaJwFqZcxQWX5ZW-thPys&s=10",
+      "category": "Football",
+      "name": "Rodrigo De Paul",
+      "rating": 9.7,
+      "reviews": 998,
+      "price": 699990,
+      "oldPrice": 775000,
+      "discount": 15,
+    },
+    {
+      "networkImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJc4Ms3E6LWmYQ-r3uki1A8yO8qR3I-bul3180JRJOaKeZ38rhOr9NlrY&s=10",
+      "category": "Football",
+      "name": "Leandro Paredes",
+      "rating": 9.6,
+      "reviews": 997,
+      "price": 599990,
+      "oldPrice": 650000,
+      "discount": 14,
+    },
+    {
+      "networkImage": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSGy4ZDWnsFKlM7HwdOji9ZOOONixFsvidXlFGunNlCeMhVOpqkGQQMho&s=10",
+      "category": "Football",
+      "name": "Lisandro Martinez",
+      "rating": 9.4,
+      "reviews": 995,
+      "price": 499990,
+      "oldPrice":515000,
+      "discount": 11,
+    },
+     {
+      "networkImage":
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4J8QZY7g4x7pPStH_NNk5HC4au6ajp_dUcdyVqdwZ4PbTLt7tnBo630I&s=10",
+      "category": "Football",
+      "name": "julián Álvarez",
+      "rating": 9.7,
+      "reviews": 998,
+      "price": 235000,
+      "oldPrice": 244900,
+      "discount": 10,
+    },
+     {
+      "networkImage":
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTShBWL-C1QiPc_akwFXmrRaXvIWFMyXeksOCQiocLsIYx1Fz7BZXirKhE&s=10",
+      "category": "Football",
+      "name": "Emiliano Martinez.",
+      "rating": 9.5,
+      "reviews": 1001,
+      "price": 275000,
+      "oldPrice": 244900,
+      "discount": 0,
+    },
+
   ];
 
   @override
@@ -180,6 +258,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ],
             ),
+           GridView.builder(
+  shrinkWrap: true,
+  physics: const NeverScrollableScrollPhysics(),
+  padding: const EdgeInsets.all(16),
+  itemCount: products.length,
+  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: 220,
+    childAspectRatio: .55,
+    crossAxisSpacing: 15,
+    mainAxisSpacing: 15,
+  ),
+  itemBuilder: (_, i) {
+    final p = products[i];
+
+    return ProductCard(
+      image: p["networkImage"] as String,
+      category: p["category"] as String,
+      name: p["name"] as String,
+      rating: p["rating"] as double,
+      reviews: p["reviews"] as int,
+      price: p["price"] as int,
+      oldPrice: p["oldPrice"] as int,
+      discount: p["discount"] as int,
+    );
+  },
+),
               const SizedBox(height: 30),
             ],
           ),
