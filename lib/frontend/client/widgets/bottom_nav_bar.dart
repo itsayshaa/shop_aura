@@ -41,9 +41,9 @@ class BottomNavBar extends StatelessWidget {
         ),
 
         NavigationDestination(
-          icon: Icon(Icons.shopping_cart_outlined),
-          selectedIcon: Icon(Icons.shopping_cart_rounded),
-          label: "Cart",
+          icon: Icon(Icons.shopping_bag_outlined),
+          selectedIcon: Icon(Icons.shopping_bag_rounded),
+          label: "My Orders",
         ),
       ],
     );

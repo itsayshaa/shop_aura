@@ -45,6 +45,22 @@ class _HomeHeaderState extends State<HomeHeader> {
               ),
             ),
             child: const Icon(
+            Icons.shopping_cart_outlined,
+              color: AppColors.primary,
+            ),
+          ),
+          SizedBox(width:10),
+          Container(
+            height: 46,
+            width: 46,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: AppColors.border,
+              ),
+            ),
+            child: const Icon(
               Icons.person_outline_rounded,
               color: AppColors.primary,
             ),
