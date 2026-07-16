@@ -5,7 +5,7 @@ import 'package:shop_aura/frontend/client/widgets/home/category_section.dart';
 import 'package:shop_aura/frontend/client/widgets/home/home_header.dart';
 import 'package:shop_aura/frontend/client/widgets/home/search_bar_widget.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-
+import 'package:shop_aura/frontend/client/widgets/home/shop_category.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -160,7 +160,26 @@ class _HomeScreenState extends State<HomeScreen> {
               BannerSlider(
                 banners: banners,
               ),
-
+              const SizedBox(height: 10,),
+ ShopCategory(
+              categories:[
+                {
+                  "title":"Shoes",
+                  "image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200"
+                },{
+                  "title":"Watch",
+                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
+                },
+                {
+                  "title":"Watch",
+                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
+                },
+                {
+                  "title":"Watch",
+                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
+                },
+              ],
+            ),
               const SizedBox(height: 30),
             ],
           ),
