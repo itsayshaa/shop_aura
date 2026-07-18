@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_theme.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 
