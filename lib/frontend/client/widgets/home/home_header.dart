@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-
+import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
 class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});
 
@@ -60,12 +60,16 @@ class _HomeHeaderState extends State<HomeHeader> {
                 color: AppColors.border,
               ),
             ),
-            child: const Icon(
-              Icons.person_outline_rounded,
+            child:  IconButton(
+              icon: Icon(Icons.person_outline_rounded),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginPage()));
+              },
               color: AppColors.primary,
             ),
           ),
         ],
+
       ),
     );
   }

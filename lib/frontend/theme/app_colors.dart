@@ -5,6 +5,7 @@ class AppColors {
 
   // Primary Colors
   static const Color primary = Color(0xFF2E2926);
+  static const Color primaryDark = Color.fromARGB(255, 31, 28, 26);
   static const Color primaryHover = Color(0xFF1E1A16);
 
   // Background
@@ -36,4 +37,10 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color black = Colors.black;
   static const Color transparent = Colors.transparent;
+  
+    static const LinearGradient loginGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primary, primaryDark],
+  );
 }
