@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});
@@ -34,19 +36,66 @@ class _HomeHeaderState extends State<HomeHeader> {
             ),
           ),
 
-          Container(
-            height: 46,
-            width: 46,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.border,
-              ),
-            ),
-            child: const Icon(
-            Icons.shopping_cart_outlined,
-              color: AppColors.primary,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CartScreen()),
+              );
+            },
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  height: 46,
+                  width: 46,
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.border,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.shopping_cart_outlined,
+                    color: AppColors.primary,
+                  ),
+                ),
+
+                // Live item-count badge
+                Positioned(
+                  right: -2,
+                  top: -2,
+                  child: ListenableBuilder(
+                    listenable: CartService.instance,
+                    builder: (context, _) {
+                      final count = CartService.instance.itemCount;
+                      if (count == 0) return const SizedBox.shrink();
+
+                      return Container(
+                        padding: const EdgeInsets.all(4),
+                        constraints: const BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: AppColors.danger,  
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          "$count",
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(width:10),
