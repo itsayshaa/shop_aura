@@ -5,6 +5,7 @@ import 'package:shop_aura/frontend/client/widgets/home/category_header.dart';
 import 'package:shop_aura/frontend/client/widgets/home/category_chip.dart';
 import 'package:shop_aura/frontend/client/widgets/home/category_product_card.dart';
 
+import 'package:shop_aura/frontend/client/screens/product_screen.dart';
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
 
@@ -192,17 +193,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         (context, index) {
                           final product = filteredProducts[index];
 
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: CategoryProductCard(
-                              imageUrl: product["image"],
-                              name: product["name"],
-                              description: product["description"],
-                              price: product["price"].toDouble(),
-                              unit: product["unit"],
-                              onTap: () {},
-                            ),
-                          );
+                         return Padding(
+  padding: const EdgeInsets.only(bottom: 18),
+  child: CategoryProductCard(
+    imageUrl: product["image"],
+    name: product["name"],
+    description: product["description"],
+    price: product["price"].toDouble(),
+    unit: product["unit"],
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const ProductScreen(),
+        ),
+      );
+    },
+  ),
+);
                         },
                         childCount: filteredProducts.length,
                       ),

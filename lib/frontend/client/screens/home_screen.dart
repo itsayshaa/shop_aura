@@ -174,14 +174,26 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void changeTab(int index) {
+void changeTab(int index) {
+  setState(() {
+    currentIndex = index;
+  });
+
   if (index == 1) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const CategoryScreen(),
+        builder: (context) => const CategoryScreen(),
       ),
     );
+  }
+
+  if (index == 2) {
+    // Wishlist Screen (later)
+  }
+
+  if (index == 3) {
+    // Orders Screen (later)
   }
 }
 

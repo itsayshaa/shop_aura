@@ -80,6 +80,7 @@ class _CategorySectionState extends State<CategorySection> {
                           : FontWeight.w500,
                       color: isSelected
                           ? AppColors.primary
+                          
                           : AppColors.textSoft,
                     ),
                   ),
