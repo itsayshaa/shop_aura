@@ -4,6 +4,7 @@ import 'package:shop_aura/frontend/client/widgets/home/product_card.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 import 'package:shop_aura/frontend/client/screens/category_screen.dart';
+import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 import 'package:shop_aura/frontend/client/widgets/bottom_nav_bar.dart';
 import 'package:shop_aura/frontend/client/widgets/home/banner_slider.dart';
@@ -184,6 +185,13 @@ void changeTab(int index) {
       context,
       MaterialPageRoute(
         builder: (context) => const CategoryScreen(),
+      ),
+    );
+  } else if (index == 2) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WishlistScreen(),
       ),
     );
   }
