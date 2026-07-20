@@ -1,11 +1,12 @@
-import 'dart:isolate';
-
 import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
 import 'package:shop_aura/frontend/client/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shop_aura/frontend/client/services/authService.dart';
+
 class LoginPage extends StatefulWidget{
 @override
 State<LoginPage> createState() => _LoginPage();
@@ -17,26 +18,47 @@ class _LoginPage extends State<LoginPage>{
   bool _rememberMe = false;
    bool _isLoading = false;
   // Map<String,dynamic>? Pagedata;
-  Future<void> _handleLogin()async{
-    if(!_formKey.currentState!.validate()) return;
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      _isLoading = true;
-    });    
-    await Future.delayed(
-      const Duration(seconds: 2)
+Future<void> _handleLogin() async {
+  if (!_formKey.currentState!.validate()) return;
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  try {
+    final success = await Authservice.instance.login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
     );
-    if(!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
+
+    if (!mounted) return;
+
+    if (success) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const HomeScreen(),
+        ),
+        (route) => false,
+      );
+    }
+  } catch (e) {
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login Successful"))
+      SnackBar(
+        content: Text(
+          e.toString().replaceFirst('Exception: ', ''),
+        ),
+      ),
     );
-
-
+  } finally {
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
+}
   @override
   Widget build(BuildContext context){
 
@@ -224,6 +246,7 @@ class _LoginPage extends State<LoginPage>{
                                   ),
                                 ),
                               ),
+                              SizedBox(height: 10,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
