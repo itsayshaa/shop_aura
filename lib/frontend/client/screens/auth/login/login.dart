@@ -5,7 +5,7 @@ import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
 import 'package:shop_aura/frontend/client/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:shop_aura/frontend/client/services/authService.dart';
+import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:shop_aura/frontend/client/screens/auth/password/forgot_password.dart';
 
 

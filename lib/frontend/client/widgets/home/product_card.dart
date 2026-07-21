@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/services/wishlist_service.dart';
 
 class ProductCard extends StatelessWidget {
   final String image;
@@ -9,8 +11,6 @@ class ProductCard extends StatelessWidget {
   final int price;
   final int oldPrice;
   final int discount;
-  // final VoidCallback onCart;
-  // final VoidCallback onWishlist;
 
   const ProductCard({
     super.key,
@@ -22,22 +22,16 @@ class ProductCard extends StatelessWidget {
     required this.price,
     required this.oldPrice,
     required this.discount,
-    // required this.onCart,
-    // required this.onWishlist,
   });
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Scale everything off the card's own width, not the screen width,
-        // so this works correctly in a GridView, a ListView, half-width
-        // layouts, tablets, foldables, etc. 160 is the "reference" card
-        // width these sizes were originally tuned for.
         final width = constraints.maxWidth.isFinite
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width / 2;
-        final scale = (width / 160).clamp(0.8, 1.3);
+        final scale = (width / 160).clamp(0.8, 1.3).toDouble();
 
         return Card(
           elevation: 2,
@@ -75,8 +69,8 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      left: 12 * scale,
-                      top: 12 * scale,
+                      left: 0* scale,
+                      top: 0* scale,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 10 * scale,
@@ -97,18 +91,57 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      right: 12 * scale,
-                      top: 12 * scale,
-                      child: CircleAvatar(
-                        radius: 16 * scale,
-                        backgroundColor: Colors.white,
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          iconSize: 16 * scale,
-                          icon: const Icon(Icons.favorite_border),
-                          color: Colors.red,
-                          onPressed: () {},
-                        ),
+                      right: 0* scale,
+                      top: 0* scale,
+                      child: ListenableBuilder(
+                        listenable: WishlistService.instance,
+                        builder: (context, _) {
+                          final isWishlisted = WishlistService.instance
+                              .isWishlisted(name);
+
+                          return CircleAvatar(
+                            radius: 16 * scale,
+                            backgroundColor: Colors.white,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              iconSize: 16 * scale,
+                              icon: Icon(
+                                isWishlisted
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                              ),
+                              color: Colors.red,
+                              onPressed: () {
+                                final nowWishlisted = WishlistService.instance
+                                    .toggle(
+                                      image: image,
+                                      category: category,
+                                      name: name,
+                                      rating: rating,
+                                      reviews: reviews,
+                                      price: price,
+                                      oldPrice: oldPrice,
+                                      discount: discount,
+                                    );
+
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).hideCurrentSnackBar();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      nowWishlisted
+                                          ? "$name added to wishlist"
+                                          : "$name removed from wishlist",
+                                    ),
+                                    duration: const Duration(seconds: 1),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -205,7 +238,24 @@ class ProductCard extends StatelessWidget {
                       width: double.infinity,
                       height: 30 * scale,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          CartService.instance.addToCart(
+                            image: image,
+                            category: category,
+                            name: name,
+                            price: price,
+                            oldPrice: oldPrice,
+                          );
+
+                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("$name added to cart"),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff2E2926),
                           foregroundColor: Colors.white,
