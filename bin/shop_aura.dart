@@ -1,13 +1,9 @@
 import 'dart:io';
 import 'package:shop_aura/backend/database/mongo_service.dart';
-import 'package:shop_aura/backend/controller/authController/authController.dart';
 import 'package:shop_aura/backend/routes/authRoutes/auth.dart';
-
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
-
-
 
 Future<void> main()async{
   await MongoService.connect();

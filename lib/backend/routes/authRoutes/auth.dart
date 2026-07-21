@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shop_aura/backend/controller/authController/authController.dart';
+import 'package:shop_aura/backend/controller/authController/emailController.dart';
 
 class AuthRoutes{
   Router get router{
     final router = Router();
     router.post('/register',registerUser);
     router.post('/login',loginUser);
+    router.post('/forgotpassword',sendOtp);
     router.get('/users',getUser);
     router.get('/',(request)async{
       return Response(

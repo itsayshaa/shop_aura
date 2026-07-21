@@ -6,6 +6,8 @@ import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
 import 'package:shop_aura/frontend/client/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_aura/frontend/client/services/authService.dart';
+import 'package:shop_aura/frontend/client/screens/auth/password/forgot_password.dart';
+
 
 class LoginPage extends StatefulWidget{
 @override
@@ -87,9 +89,6 @@ Future<void> _handleLogin() async {
                   decoration: BoxDecoration(
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.black
-                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.3),
@@ -170,7 +169,7 @@ Future<void> _handleLogin() async {
                             ),
                           ),
                           TextButton(
-                            onPressed: (){},
+                            onPressed: ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ForgotPasswordScreen())),
                               style: TextButton.styleFrom(
                                 splashFactory: NoSplash.splashFactory,
                                 overlayColor: Colors.transparent

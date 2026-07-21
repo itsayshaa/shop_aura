@@ -4,6 +4,7 @@ import 'package:shop_aura/frontend/client/widgets/home/product_card.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 import 'package:shop_aura/frontend/client/screens/category_screen.dart';
+// import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 import 'package:shop_aura/frontend/client/widgets/bottom_nav_bar.dart';
 import 'package:shop_aura/frontend/client/widgets/home/banner_slider.dart';
@@ -11,6 +12,7 @@ import 'package:shop_aura/frontend/client/widgets/home/category_section.dart';
 import 'package:shop_aura/frontend/client/widgets/home/home_header.dart';
 import 'package:shop_aura/frontend/client/widgets/home/search_bar_widget.dart';
 import 'package:shop_aura/frontend/client/widgets/home/shop_category.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -174,26 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-void changeTab(int index) {
-  setState(() {
-    currentIndex = index;
-  });
-
+  void changeTab(int index) {
   if (index == 1) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CategoryScreen(),
+        builder: (_) => const CategoryScreen(),
       ),
     );
-  }
-
-  if (index == 2) {
-    // Wishlist Screen (later)
-  }
-
-  if (index == 3) {
-    // Orders Screen (later)
   }
 }
 
@@ -214,14 +204,13 @@ void changeTab(int index) {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
+              /// Header
               const HomeHeader(),
 
               const SizedBox(height: 12),
 
-              SearchBarWidget(
-                controller: searchController,
-              ),
+              /// Search Bar
+              SearchBarWidget(controller: searchController),
 
               const SizedBox(height: 18),
 
@@ -243,30 +232,57 @@ void changeTab(int index) {
               // ShopCategory(categories: shopCategories),
 
               const SizedBox(height: 10),
-
-              BannerSlider(
-                banners: banners,
+              ShopCategory(
+                categories: [
+                  {
+                    "title": "Shoes",
+                    "image":
+                        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200",
+                  },
+                  {
+                    "title": "Watch",
+                    "image":
+                        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
+                  },
+                  {
+                    "title": "Watch",
+                    "image":
+                        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
+                  },
+                  {
+                    "title": "Watch",
+                    "image":
+                        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
+                  },
+                ],
               ),
-              const SizedBox(height: 10,),
- ShopCategory(
-              categories:[
-                {
-                  "title":"Shoes",
-                  "image":"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1200"
-                },{
-                  "title":"Watch",
-                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: products.length,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 220,
+                  childAspectRatio: .55,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                ),
+                itemBuilder: (_, i) {
+                  final p = products[i];
+
+                  return ProductCard(
+                    image: p["networkImage"] as String,
+                    category: p["category"] as String,
+                    name: p["name"] as String,
+                    rating: p["rating"] as double,
+                    reviews: p["reviews"] as int,
+                    price: p["price"] as int,
+                    oldPrice: p["oldPrice"] as int,
+                    discount: p["discount"] as int,
+                  );
                 },
-                {
-                  "title":"Watch",
-                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
-                },
-                {
-                  "title":"Watch",
-                  "image":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200"
-                },
-              ],
-            ),
+              ),
+
               const SizedBox(height: 30),
             ],
           ),
