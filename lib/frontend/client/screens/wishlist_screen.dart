@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
@@ -30,10 +31,12 @@ class WishlistScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.favorite_border_rounded,
-                    size: 70,
-                    color: AppColors.textSoft,
+                  Lottie.asset(
+                    'assets/lottieanimtion/emptycart/Wishlist.json',
+                    width: 220,
+                    height: 220,
+                    fit: BoxFit.contain,
+                    repeat: true,
                   ),
                   const SizedBox(height: 12),
                   Text(

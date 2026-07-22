@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/client/screens/payment/payment_screen.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,14 +36,31 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.shopping_cart_outlined,
-                    size: 70,
-                    color: AppColors.textSoft,
+                  // Lottie.asset(
+                  //   'assets/lottieanimtion/emptycart/Emptycart.json',
+
+                  //   width: 220,
+                  //   height: 120,
+                  //   fit: BoxFit.contain,
+                  //   repeat: true,
+                  // ),
+                  Lottie.asset(
+                    'assets/lottieanimtion/emptycart/empty.json',
+                    width: 220,
+                    height: 220,
+                    fit: BoxFit.contain,
+                    repeat: true,
                   ),
+                  //  Lottie.asset(
+                  //   'assets/lottieanimtion/emptycart/truck.json',
+                  //   width: 220,
+                  //   height: 220,
+                  //   fit: BoxFit.contain,
+                  //   repeat: true,
+                  // ),
                   const SizedBox(height: 12),
                   Text(
-                    "Enthekilum purchase cheyye",
+                    "Your cart is empty",
                     style: TextStyle(color: AppColors.textSoft, fontSize: 16),
                   ),
                 ],
@@ -54,119 +78,129 @@ class CartScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = items[index];
 
-                    return Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              item.image,
-                              width: 70,
-                              height: 70,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: 1),
+                      duration: Duration(milliseconds: 300 + (index * 60)),
+                      curve: Curves.easeOut,
+                      builder: (context, value, child) {
+                        return Opacity(
+                          opacity: value,
+                          child: Transform.translate(
+                            offset: Offset(0, (1 - value) * 20),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                item.image,
                                 width: 70,
                                 height: 70,
-                                color: AppColors.secondarySoft,
-                                child: const Icon(Icons.image_not_supported),
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  width: 70,
+                                  height: 70,
+                                  color: AppColors.secondarySoft,
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
+                            const SizedBox(width: 12),
 
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.category.toUpperCase(),
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.textSoft,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    item.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "₹${item.price}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Quantity stepper
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  item.category.toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: AppColors.textSoft,
-                                  ),
+                                Row(
+                                  children: [
+                                    _QtyButton(
+                                      icon: Icons.remove,
+                                      onTap: () => cart.decreaseQuantity(index),
+                                    ),
+                                    SizedBox(
+                                      width: 28,
+                                      child: Text(
+                                        "${item.quantity}",
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    _QtyButton(
+                                      icon: Icons.add,
+                                      onTap: () => cart.increaseQuantity(index),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  item.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                TextButton.icon(
+                                  onPressed: () => cart.removeItem(index),
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: const Size(0, 0),
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
                                   ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "₹${item.price}",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
+                                  icon: Icon(
+                                    Icons.delete_outline_rounded,
+                                    size: 25,
+                                    color: AppColors.danger,
+                                  ),
+                                  label: Text(
+                                    "",
+                                    style: TextStyle(
+                                      color: AppColors.danger,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-
-                          // Quantity stepper
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                children: [
-                                  _QtyButton(
-                                    icon: Icons.remove,
-                                    onTap: () =>
-                                        cart.decreaseQuantity(index),
-                                  ),
-                                  SizedBox(
-                                    width: 28,
-                                    child: Text(
-                                      "${item.quantity}",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                  _QtyButton(
-                                    icon: Icons.add,
-                                    onTap: () =>
-                                        cart.increaseQuantity(index),
-                                 
-
-                                  ),
-                                ],
-                              ),
-                              TextButton.icon(
-                                onPressed: () => cart.removeItem(index),
-                                style: TextButton.styleFrom(
-                                  padding: EdgeInsets.zero,
-                                  minimumSize: const Size(0, 0),
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                icon: Icon(
-                                  Icons.delete_outline_rounded,
-                                  size: 25,
-                                  color: AppColors.danger,
-                                ),
-                                label: Text(
-                                  "",
-                                  style: TextStyle(
-                                    color: AppColors.danger,
-                                    fontSize: 12 ,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
@@ -213,9 +247,10 @@ class CartScreen extends StatelessWidget {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Proceeding to checkout..."),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const PaymentScreen(),
                             ),
                           );
                         },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shop_aura/frontend/client/screens/home_screen.dart';
+import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
@@ -20,28 +22,47 @@ class _RegisterPage extends State<RegisterPage> {
   final _confirmPasswordController = TextEditingController();
 
   bool _agreedToTerms = false;
-  bool _isLoading =false;
+  bool _isLoading = false;
   // Map<String,dynamic>? Pagedata;
-  Future<void> _handleRegister()async{
-    if(!_formKey.currentState!.validate()) return;
-    FocusManager.instance.primaryFocus?.unfocus();
-    setState(() {
-      _isLoading = true;
-    });    
-    await Future.delayed(
-      const Duration(seconds: 2)
-    );
-    if(!mounted) return;
-    setState(() {
-      _isLoading = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login Successful"))
-    );
-
-
+  Future<void> _handleRegister() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (!_agreedToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please accept the Terms & Privacu Policy"),
+        ),
+      );
+      return;
+    }
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      final message = await Authservice.instance.register(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Register Successful")));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst("Exception: ", ""))),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -69,7 +90,6 @@ class _RegisterPage extends State<RegisterPage> {
                         decoration: BoxDecoration(
                           color: AppColors.white,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.black),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.3),
@@ -120,68 +140,115 @@ class _RegisterPage extends State<RegisterPage> {
                                 },
                               ),
                               SizedBox(height: 10),
-                              Container(
-                                height: 58,
-                                decoration: BoxDecoration(
-                                  color: AppColors.background,
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: 10),
-                                    Icon(
-                                      Icons.phone_outlined,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(width: 5),
-                                    DropdownButtonHideUnderline(
-                                      child: DropdownButton<String>(
-                                        value: "+91",
-                                        borderRadius: BorderRadius.circular(12),
-                                        items: [
-                                          DropdownMenuItem(
-                                            value: "+91",
-                                            child: Text("+91"),
+                              FormField<String>(
+                                validator: (value) {
+                                  if (_phoneController.text.trim().isEmpty) {
+                                    return "Phone number is required";
+                                  }
+                                  return null;
+                                },
+                                builder: (field) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        height: 58,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.background,
+                                          borderRadius: BorderRadius.circular(
+                                            14,
                                           ),
-                                        ],
-                                        onChanged: (value) {
-                                          if (value == null) return;
-                                        },
-                                      ),
-                                    ),
-                                    Container(
-                                      // margin: EdgeInsets.symmetric(horizontal: 10),
-                                      height: 20,
-                                      width: 1,
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(width: 3),
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: _phoneController,
-                                        keyboardType: TextInputType.number,
-                                        decoration: InputDecoration(
-                                          hintText: "Phone Number",
-                                          border: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          // isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                          filled: true,
-                                          fillColor: AppColors.background,
+                                          border: Border.all(
+                                            color: field.hasError
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                          ),
                                         ),
-                                        validator: (value) {
-                                          if (value == null ||
-                                              value.trim().isEmpty) {
-                                            return "Phone number is required";
-                                          }
-                                          return null;
-                                        },
+                                        child: Row(
+                                          children: [
+                                            const SizedBox(width: 12),
+
+                                            const Icon(
+                                              Icons.phone_outlined,
+                                              color: Colors.black,
+                                            ),
+
+                                            const SizedBox(width: 6),
+
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton<String>(
+                                                value: "+91",
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                items: const [
+                                                  DropdownMenuItem(
+                                                    value: "+91",
+                                                    child: Text("+91"),
+                                                  ),
+                                                ],
+                                                onChanged: (value) {},
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 8),
+
+                                            Container(
+                                              height: 32,
+                                              width: 1,
+                                              color: Colors.grey,
+                                            ),
+
+                                            const SizedBox(width: 10),
+
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _phoneController,
+                                                keyboardType:
+                                                    TextInputType.phone,
+                                                onChanged: (value) {
+                                                  field.didChange(value);
+                                                },
+                                                decoration:
+                                                    const InputDecoration(
+                                                      hintText: "Phone Number",
+                                                      border: InputBorder.none,
+                                                      enabledBorder:
+                                                          InputBorder.none,
+                                                      focusedBorder:
+                                                          InputBorder.none,
+                                                      filled: false,
+                                                      fillColor:
+                                                          AppColors.white,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                    ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(width: 12),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                  ],
-                                ),
+
+                                      // Error is now OUTSIDE the 58px container
+                                      if (field.hasError)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 14,
+                                            top: 5,
+                                          ),
+                                          child: Text(
+                                            field.errorText!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
                               ),
                               SizedBox(height: 10),
                               AuthTextField(
@@ -202,8 +269,8 @@ class _RegisterPage extends State<RegisterPage> {
                                 controller: _confirmPasswordController,
                                 isPassword: true,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty)return "Confirm password is required";
-                                  if (v != _passwordController.text)return "Password Not Matching";
+                                  if (v == null || v.isEmpty) return "Confirm password is required";
+                                  if (v != _passwordController.text) return "Password Not Matching";
                                   return null;
                                 },
                               ),
@@ -225,7 +292,8 @@ class _RegisterPage extends State<RegisterPage> {
                                   "I agree to the Terms & Conditions",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 13,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
@@ -233,7 +301,7 @@ class _RegisterPage extends State<RegisterPage> {
                               GradientButton(
                                 label: "Sign up",
                                 isLoading: _isLoading,
-                                onPressed:_handleRegister,
+                                onPressed: _handleRegister,
                               ),
                               SizedBox(height: 15),
                               Row(
@@ -259,7 +327,7 @@ class _RegisterPage extends State<RegisterPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 15,),
+                              SizedBox(height: 15),
                               SizedBox(
                                 width: double.infinity,
                                 height: 50,
