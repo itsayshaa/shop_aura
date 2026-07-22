@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:dotenv/dotenv.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();

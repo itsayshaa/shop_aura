@@ -1,6 +1,6 @@
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-import 'package:dotenv/dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EmailService {
   static Future<void> sendOtp({
@@ -8,9 +8,8 @@ class EmailService {
     required String otp,
   }) async {
 
-final env = DotEnv()..load();
-final user = env["GMAIL_USER"]?? "";
-final password = env["GMAIL_PASSWORD"] ?? "";
+final user = dotenv.env["GMAIL_USER"]?? "";
+final password = dotenv.env["GMAIL_PASSWORD"] ?? "";
 if(user.isEmpty || password.isEmpty){
   throw Exception('Gmail credentials are missing');
 }

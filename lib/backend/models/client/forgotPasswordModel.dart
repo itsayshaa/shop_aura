@@ -2,8 +2,8 @@ class ForgotPassword{
   String? id;
   String email;
   String otp;
-  String expiresAt;
-  String verified;
+  DateTime expiresAt;
+  bool verified;
 
   ForgotPassword({
     this.id,
@@ -20,5 +20,19 @@ class ForgotPassword{
       "expiresAt":expiresAt,
       "verified":false
     };
+  }
+
+  factory ForgotPassword.fromJson(
+    Map<String,dynamic> json,
+  ){
+    return ForgotPassword(
+      id: json['_id']?.toString(),
+      email: json['email'] ?? '',
+      otp: json['otp'] ?? '',
+      expiresAt: DateTime.parse(
+        json['expiresAt'].toString()
+      ),
+      verified: json['verified'] ?? false
+    );
   }
 }

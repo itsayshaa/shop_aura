@@ -10,8 +10,11 @@ Future<void> main()async{
   final router = Router();
   router.mount('/', AuthRoutes().router.call);
   // router.mount('/', LoginPage())
-  final handler = Pipeline().addMiddleware(corsHeader()).addHandler(router.call);
-
+  final handler = Pipeline()
+    .addMiddleware(logRequests())
+    .addMiddleware(corsHeader())
+    .addHandler(router.call);
+  
   final server = await shelf_io.serve(
     handler,
     InternetAddress.anyIPv4,
