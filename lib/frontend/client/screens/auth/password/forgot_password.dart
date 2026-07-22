@@ -7,6 +7,7 @@ import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
 import 'package:http/http.dart' as http;
+import 'verify_otp.dart';
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -86,7 +87,7 @@ Future<void> _handleSendOtp() async {
         content: Text(message),
       ),
     );
-
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => VerifyOtpScreen(email: _emailController.text.trim(),)));
   } catch (e) {
     if (!mounted) return;
 
