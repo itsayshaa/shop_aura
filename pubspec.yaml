@@ -45,6 +45,7 @@ dependencies:
   flutter_dotenv: ^6.0.1
   mailer: ^7.1.0
   lottie: ^3.5.1
+  http: ^1.2.1
   
 dev_dependencies:
   flutter_test:
@@ -68,6 +69,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/images/splash.png
     - assets/google/google.svg
     - .env
     - assets/lottieanimtion/emptycart/Emptycart.json

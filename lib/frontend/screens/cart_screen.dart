@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/payment/payment_screen.dart';
-
+import 'package:shop_aura/frontend/screens/payment/payment_screen.dart';
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -190,7 +189,7 @@ class _CartScreenState extends State<CartScreen> {
                                     color: AppColors.danger,
                                   ),
                                   label: Text(
-                                    "",
+                                    " ",
                                     style: TextStyle(
                                       color: AppColors.danger,
                                       fontSize: 12,

@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
+import 'package:shop_aura/frontend/screens/auth/login/login.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
-import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
+import 'package:shop_aura/frontend/screens/widgets/auth/auth_text_field.dart';
+import 'package:shop_aura/frontend/screens/widgets/auth/button.dart';
 import 'package:http/http.dart' as http;
 import 'verify_otp.dart';
 class ForgotPasswordScreen extends StatefulWidget {

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:shop_aura/frontend/theme/app_theme.dart';
-import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop_aura/frontend/screens/splash/splash_screen.dart';
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -23,7 +22,7 @@ class _ShopAuraAppState extends State<ShopAuraApp> {
       title: 'Shop Aura',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }

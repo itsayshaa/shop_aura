@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
-import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
+import 'package:shop_aura/frontend/screens/auth/login/login.dart';
+import 'package:shop_aura/frontend/screens/cart_screen.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 
 class HomeHeader extends StatefulWidget {
