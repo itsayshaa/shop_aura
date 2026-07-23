@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/client/widgets/home/product_card.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/product_card.dart';
 
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
-import 'package:shop_aura/frontend/client/screens/category_screen.dart';
-import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
+import 'package:shop_aura/frontend/screens/category_screen.dart';
+import 'package:shop_aura/frontend/screens/wishlist_screen.dart';
 
-import 'package:shop_aura/frontend/client/widgets/bottom_nav_bar.dart';
-import 'package:shop_aura/frontend/client/widgets/home/banner_slider.dart';
-import 'package:shop_aura/frontend/client/widgets/home/category_section.dart';
-import 'package:shop_aura/frontend/client/widgets/home/home_header.dart';
-import 'package:shop_aura/frontend/client/widgets/home/search_bar_widget.dart';
-import 'package:shop_aura/frontend/client/widgets/home/shop_category.dart';
+import 'package:shop_aura/frontend/screens/widgets/bottom_nav_bar.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/banner_slider.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/category_section.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/home_header.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/search_bar_widget.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/shop_category.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

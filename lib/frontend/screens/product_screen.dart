@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
-import 'package:shop_aura/frontend/client/widgets/product/product_action_buttons.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_color_selector.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_description.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_image_gallery.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_info.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_price.dart';
-import 'package:shop_aura/frontend/client/widgets/product/product_size_selector.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_action_buttons.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_color_selector.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_description.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_image_gallery.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_info.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_price.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/product_size_selector.dart';
 
 class ProductScreen extends StatefulWidget {
   const ProductScreen({super.key});

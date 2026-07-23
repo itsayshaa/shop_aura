@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
-import 'package:shop_aura/frontend/client/widgets/home/category_header.dart';
-import 'package:shop_aura/frontend/client/widgets/home/category_chip.dart';
-import 'package:shop_aura/frontend/client/widgets/home/category_product_card.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/category_header.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/category_chip.dart';
+import 'package:shop_aura/frontend/screens/widgets/home/category_product_card.dart';
 
-import 'package:shop_aura/frontend/client/screens/product_screen.dart';
+import 'package:shop_aura/frontend/screens/product_screen.dart';
 class CategoryScreen extends StatefulWidget {
   const CategoryScreen({super.key});
 
