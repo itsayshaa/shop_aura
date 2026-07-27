@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:shop_aura/frontend/models/cart_item_model.dart';
 
-/// Single app-wide cart, mirroring the WishlistService pattern.
 class CartService extends ChangeNotifier {
   CartService._internal();
   static final CartService instance = CartService._internal();
@@ -10,7 +9,6 @@ class CartService extends ChangeNotifier {
 
   List<CartItem> get items => List.unmodifiable(_items);
 
-  /// Total number of units across all cart lines (used for the header badge).
   int get itemCount =>
       _items.fold(0, (sum, item) => sum + item.quantity);
 
@@ -19,7 +17,6 @@ class CartService extends ChangeNotifier {
 
   bool isInCart(String name) => _items.any((item) => item.name == name);
 
-  /// If the item already exists, bump its quantity instead of duplicating it.
   void addToCart({
     required String image,
     required String category,

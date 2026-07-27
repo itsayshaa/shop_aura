@@ -1,28 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/theme/app_theme.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shop_aura/frontend/screens/splash/splash_screen.dart';
-Future<void> main() async{
+import 'package:provider/provider.dart';
+
+import 'frontend/theme/app_theme.dart';
+import 'frontend/client/screens/main_navigation_screen.dart';
+
+import 'frontend/providers/category_provider.dart';
+import 'frontend/providers/product_provider.dart';
+import 'frontend/providers/search_provider.dart';
+
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+
   runApp(const ShopAuraApp());
 }
 
-class ShopAuraApp extends StatefulWidget {
+class ShopAuraApp extends StatelessWidget {
   const ShopAuraApp({super.key});
 
   @override
-  State<ShopAuraApp> createState() => _ShopAuraAppState();
-}
-
-class _ShopAuraAppState extends State<ShopAuraApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shop Aura',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CategoryProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => ProductProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Shop Aura",
+        theme: AppTheme.lightTheme,
+        home: const MainNavigationScreen(),
+      ),
     );
   }
 }
