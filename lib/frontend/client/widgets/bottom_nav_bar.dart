@@ -3,7 +3,7 @@ import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
+  final ValueChanged<int> onTap;
 
   const BottomNavBar({
     super.key,
@@ -18,32 +18,29 @@ class BottomNavBar extends StatelessWidget {
       selectedIndex: currentIndex,
       onDestinationSelected: onTap,
       backgroundColor: AppColors.surface,
-      indicatorColor: AppColors.secondarySoft,
-      labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+      indicatorColor: AppColors.primary.withOpacity(.12),
+      elevation: 8,
 
       destinations: const [
         NavigationDestination(
           icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home_rounded),
+          selectedIcon: Icon(Icons.home),
           label: "Home",
         ),
-
         NavigationDestination(
-          icon: Icon(Icons.category_outlined),
-          selectedIcon: Icon(Icons.category_rounded),
+          icon: Icon(Icons.grid_view_outlined),
+          selectedIcon: Icon(Icons.grid_view_rounded),
           label: "Categories",
         ),
-
         NavigationDestination(
-          icon: Icon(Icons.favorite_border_rounded),
-          selectedIcon: Icon(Icons.favorite_rounded),
+          icon: Icon(Icons.favorite_border),
+          selectedIcon: Icon(Icons.favorite),
           label: "Wishlist",
         ),
-
         NavigationDestination(
-          icon: Icon(Icons.shopping_bag_outlined),
-          selectedIcon: Icon(Icons.shopping_bag_rounded),
-          label: "My Orders",
+          icon: Icon(Icons.shopping_cart_outlined),
+          selectedIcon: Icon(Icons.shopping_cart),
+          label: "Cart",
         ),
       ],
     );

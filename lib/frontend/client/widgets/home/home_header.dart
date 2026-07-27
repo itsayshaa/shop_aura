@@ -18,7 +18,7 @@ class _HomeHeaderState extends State<HomeHeader> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       decoration: const BoxDecoration(
-        color:AppColors.background,
+        color: AppColors.background,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(22),
           bottomRight: Radius.circular(22),
@@ -53,9 +53,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.border,
-                    ),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: const Icon(
                     Icons.shopping_cart_outlined,
@@ -80,7 +78,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           minHeight: 18,
                         ),
                         decoration: const BoxDecoration(
-                          color: AppColors.danger,  
+                          color: AppColors.danger,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
@@ -99,27 +97,27 @@ class _HomeHeaderState extends State<HomeHeader> {
               ],
             ),
           ),
-          SizedBox(width:10),
+          SizedBox(width: 10),
           Container(
             height: 46,
             width: 46,
             decoration: BoxDecoration(
               color: AppColors.surface,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.border,
-              ),
+              border: Border.all(color: AppColors.border),
             ),
-            child:  IconButton(
+            child: IconButton(
               icon: Icon(Icons.person_outline_rounded),
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginPage()));
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                );
               },
               color: AppColors.primary,
             ),
           ),
         ],
-
       ),
     );
   }

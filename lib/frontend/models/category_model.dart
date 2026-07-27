@@ -1,91 +1,69 @@
 class CategoryModel {
   final String id;
   final String name;
-  final String description;
   final String image;
-  final String bannerImage;
-  final bool isActive;
+  final String icon;
+  final String description;
   final int productCount;
-  final int sortOrder;
-  final DateTime? createdAt;
+  final bool isFeatured;
+  final List<String> brands;
 
-  const CategoryModel({
+  CategoryModel({
     required this.id,
     required this.name,
-    required this.description,
     required this.image,
-    required this.bannerImage,
-    required this.isActive,
+    required this.icon,
+    required this.description,
     required this.productCount,
-    required this.sortOrder,
-    this.createdAt,
+    required this.isFeatured,
+    required this.brands,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json['_id']?.toString() ?? '',
+      id: json['_id'] ?? '',
       name: json['name'] ?? '',
-      description: json['description'] ?? '',
       image: json['image'] ?? '',
-      bannerImage: json['bannerImage'] ?? '',
-      isActive: json['isActive'] ?? true,
+      icon: json['icon'] ?? '',
+      description: json['description'] ?? '',
       productCount: json['productCount'] ?? 0,
-      sortOrder: json['sortOrder'] ?? 0,
-      createdAt: json['createdAt'] != null
-          ? DateTime.tryParse(json['createdAt'].toString())
-          : null,
+      isFeatured: json['isFeatured'] ?? false,
+      brands: List<String>.from(json['brands'] ?? []),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "_id": id,
-      "name": name,
-      "description": description,
-      "image": image,
-      "bannerImage": bannerImage,
-      "isActive": isActive,
-      "productCount": productCount,
-      "sortOrder": sortOrder,
-      "createdAt": createdAt?.toIso8601String(),
+      '_id': id,
+      'name': name,
+      'image': image,
+      'icon': icon,
+      'description': description,
+      'productCount': productCount,
+      'isFeatured': isFeatured,
+      'brands': brands,
     };
   }
 
   CategoryModel copyWith({
     String? id,
     String? name,
-    String? description,
     String? image,
-    String? bannerImage,
-    bool? isActive,
+    String? icon,
+    String? description,
     int? productCount,
-    int? sortOrder,
-    DateTime? createdAt,
+    bool? isFeatured,
+    List<String>? brands,
   }) {
     return CategoryModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      description: description ?? this.description,
       image: image ?? this.image,
-      bannerImage: bannerImage ?? this.bannerImage,
-      isActive: isActive ?? this.isActive,
+      icon: icon ?? this.icon,
+      description: description ?? this.description,
       productCount: productCount ?? this.productCount,
-      sortOrder: sortOrder ?? this.sortOrder,
-      createdAt: createdAt ?? this.createdAt,
+      isFeatured: isFeatured ?? this.isFeatured,
+      brands: brands ?? this.brands,
     );
-  }
-
-  @override
-  String toString() {
-    return 'CategoryModel('
-        'id: $id, '
-        'name: $name, '
-        'description: $description, '
-        'image: $image, '
-        'bannerImage: $bannerImage, '
-        'isActive: $isActive, '
-        'productCount: $productCount, '
-        'sortOrder: $sortOrder'
-        ')';
   }
 }

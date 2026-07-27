@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:shop_aura/frontend/models/wishlist_item_model.dart';
-
-/// A single app-wide wishlist, mirroring how CartService is structured.
 class WishlistService extends ChangeNotifier {
   WishlistService._internal();
   static final WishlistService instance = WishlistService._internal();
@@ -16,8 +14,6 @@ class WishlistService extends ChangeNotifier {
     return _items.any((item) => item.name == name);
   }
 
-  /// Adds the item if it isn't already wishlisted, otherwise removes it.
-  /// Returns the new wishlisted state (true = now in wishlist).
   bool toggle({
     required String image,
     required String category,

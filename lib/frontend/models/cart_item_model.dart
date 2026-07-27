@@ -15,22 +15,17 @@ class CartItem {
     this.quantity = 1,
   });
 
-  /// Returns the total price for this cart item
+  
   int get totalPrice => price * quantity;
 
-  /// Increase quantity by 1
   void increaseQuantity() {
     quantity++;
   }
-
-  /// Decrease quantity by 1 (minimum 1)
   void decreaseQuantity() {
     if (quantity > 1) {
       quantity--;
     }
   }
-
-  /// Convert object to JSON
   Map<String, dynamic> toJson() {
     return {
       'image': image,
@@ -41,8 +36,6 @@ class CartItem {
       'quantity': quantity,
     };
   }
-
-  /// Create CartItem from JSON
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       image: json['image'],
@@ -53,8 +46,6 @@ class CartItem {
       quantity: json['quantity'] ?? 1,
     );
   }
-
-  /// Create a copy with updated values
   CartItem copyWith({
     String? image,
     String? category,
