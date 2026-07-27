@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
+import 'package:shop_aura/main.dart';
 import 'new_password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dotenv/dotenv.dart';
 
 
 class VerifyOtpScreen extends StatefulWidget {
@@ -65,7 +66,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     required String email,
     required String otp
   })async{
-    final url = dotenv.env["API_URL"];
+    final url = Apiconfig.baseUrl;
     if(url == null || url.isEmpty){
       throw Exception("Api url is missing");
     }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
 import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
+import 'package:shop_aura/frontend/client/screens/profilescreen.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 
 class HomeHeader extends StatefulWidget {
@@ -18,7 +18,7 @@ class _HomeHeaderState extends State<HomeHeader> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
       decoration: const BoxDecoration(
-        color:AppColors.background,
+        color: AppColors.background,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(22),
           bottomRight: Radius.circular(22),
@@ -26,10 +26,12 @@ class _HomeHeaderState extends State<HomeHeader> {
       ),
       child: Row(
         children: [
-          Expanded(
+
+          // Logo
+          const Expanded(
             child: Text(
               "ShopAura",
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: AppColors.primary,
@@ -37,11 +39,14 @@ class _HomeHeaderState extends State<HomeHeader> {
             ),
           ),
 
+          // Cart
           GestureDetector(
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const CartScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const CartScreen(),
+                ),
               );
             },
             child: Stack(
@@ -63,15 +68,18 @@ class _HomeHeaderState extends State<HomeHeader> {
                   ),
                 ),
 
-                // Live item-count badge
                 Positioned(
                   right: -2,
                   top: -2,
                   child: ListenableBuilder(
                     listenable: CartService.instance,
                     builder: (context, _) {
-                      final count = CartService.instance.itemCount;
-                      if (count == 0) return const SizedBox.shrink();
+                      final count =
+                          CartService.instance.itemCount;
+
+                      if (count == 0) {
+                        return const SizedBox.shrink();
+                      }
 
                       return Container(
                         padding: const EdgeInsets.all(4),
@@ -80,7 +88,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           minHeight: 18,
                         ),
                         decoration: const BoxDecoration(
-                          color: AppColors.danger,  
+                          color: AppColors.danger,
                           shape: BoxShape.circle,
                         ),
                         child: Text(
@@ -99,7 +107,10 @@ class _HomeHeaderState extends State<HomeHeader> {
               ],
             ),
           ),
-          SizedBox(width:10),
+
+          const SizedBox(width: 10),
+
+          // Profile
           Container(
             height: 46,
             width: 46,
@@ -110,16 +121,22 @@ class _HomeHeaderState extends State<HomeHeader> {
                 color: AppColors.border,
               ),
             ),
-            child:  IconButton(
-              icon: Icon(Icons.person_outline_rounded),
-              onPressed: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  LoginPage()));
-              },
+            child: IconButton(
+              icon: const Icon(
+                Icons.person_outline_rounded,
+              ),
               color: AppColors.primary,
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProfileScreen(),
+                  ),
+                );
+              },
             ),
           ),
         ],
-
       ),
     );
   }

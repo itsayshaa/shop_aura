@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop_aura/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
@@ -13,7 +14,7 @@ class Authservice extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   String? get userName => _userName;
   String? get userEmail => _userEmail;
-  String get baseUrl => dotenv.env["API_URL"] ?? "";
+  String baseUrl = Apiconfig.baseUrl;
   Future<bool> login({required String email, required String password})async{
     try{
       final response = await http.post(
@@ -25,20 +26,48 @@ class Authservice extends ChangeNotifier {
         })
       );
       final body = jsonDecode(response.body);
-      if(response.statusCode == 200){
+      if(response.statusCode == 200 || body["success"] == true){
+        final token = body["token"];
+        final userName = body["user"]["name"];
+        final userEmail = body["user"]["email"];
+        final userPhone = body["user"]["phone"];
+        
+        final prefs = await SharedPreferences.getInstance();
+
+        await prefs.setString("jwt_token", token);
+        await prefs.setString("user_name", userName);
+        await prefs.setString("user_email", userEmail);
+        await prefs.setString("user_phone", userPhone);
+
+
         _isLoggedIn = true;
         _userName = body["name"];
         _userEmail = body["email"];
         notifyListeners();
         return true;
       }
-      throw Exception(body["message"]);
+      final message = body["message"] ?? "Invalid email or password";
+      throw Exception(message);
     }catch(e,stackTrace){
-      debugPrint("ERROR : $e");
-      debugPrintStack(stackTrace:stackTrace);
+      print("error $e");
       rethrow;
         }
   }
+
+static Future<bool> isLogged()async{
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString("jwt_token");
+  if(token == null || token.isEmpty){
+    return false;
+  }
+  return true;
+}
+
+static Future<String?> getToken()async{
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString("jwt_token");
+}
+
   Future<bool> register({
     required String name,
     required String email,
@@ -61,5 +90,13 @@ class Authservice extends ChangeNotifier {
     }else{
       throw Exception(body["message"]);
     }
+  }
+
+  static Future<void> logOut()async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("jwt_token");
+    await prefs.remove("user_name");
+    await prefs.remove("user_email");
+    await prefs.remove("user_phone");
   }
 }

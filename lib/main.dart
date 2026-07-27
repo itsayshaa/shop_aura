@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_theme.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shop_aura/frontend/client/screens/auth/login/auth_check_screen.dart';
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -15,7 +16,9 @@ class ShopAuraApp extends StatefulWidget {
   @override
   State<ShopAuraApp> createState() => _ShopAuraAppState();
 }
-
+class Apiconfig{
+  static String get baseUrl=> dotenv.env["API_URL"] ?? "";
+}
 class _ShopAuraAppState extends State<ShopAuraApp> {
   @override
   Widget build(BuildContext context) {
@@ -23,7 +26,7 @@ class _ShopAuraAppState extends State<ShopAuraApp> {
       title: 'Shop Aura',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const HomeScreen(),
+      home: const AuthCheckScreen(),
     );
   }
 }

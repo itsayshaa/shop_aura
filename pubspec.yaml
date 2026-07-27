@@ -42,9 +42,11 @@ dependencies:
   shelf: ^1.4.2
   shelf_router: ^1.1.4
   crypto: ^3.0.7
-  flutter_dotenv: ^6.0.1
   mailer: ^7.1.0
   lottie: ^3.5.1
+  flutter_dotenv: ^6.0.1
+  dart_jsonwebtoken: ^3.4.1
+  shared_preferences: ^2.5.5
   
 dev_dependencies:
   flutter_test:
