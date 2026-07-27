@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/auth/button.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dotenv/dotenv.dart';
 import 'dart:convert';
+
+import 'package:shop_aura/main.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;
@@ -47,7 +49,7 @@ class _ResetPasswordScreenState
   });
 
   try{
-    final url = dotenv.env["API_URL"];
+    final url = Apiconfig.baseUrl;
     if(url == null || url.isEmpty){
       throw Exception("API url is missing");
     }

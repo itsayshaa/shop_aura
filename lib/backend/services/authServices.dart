@@ -1,50 +1,74 @@
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import 'package:shop_aura/backend/database/mongo_service.dart';
-import 'package:shop_aura/backend/models/client/userModel.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:shop_aura/frontend/client/screens/home_screen.dart';
+import 'package:shop_aura/main.dart';
 
 class Authservices {
-  static String hashPassword(String password){
-    return sha256.convert(
-      utf8.encode(password),
-    ).toString();
-  }
-static Future<bool> register(UserModel user) async{
-  final users = MongoService.users;
-  final old = await users.findOne({
-    "email":user.email
-  });
+  static Future<bool> login({
+  required String email,
+  required String password
+  }) async{
+    try{
+      final baseUrl =  Apiconfig.baseUrl;
+      final response = await http.post(
+        Uri.parse("$baseUrl/login"),
+        headers:{"Content-Type":"application/json"},
+        body:jsonEncode({
+          "email":email,
+          "password":password
+        })
+      );
+      final data = jsonDecode(response.body);
+      if(response.statusCode == 200 || data["success"] == true){
+        final token = data["token"];
+        final prefs = await SharedPreferences.getInstance();
 
-  if(old != null){
-    throw Exception("Email already exists");
+        await prefs.setString(
+          "jwt_token",
+          token
+        );
+        await prefs.setString(
+          "user_name", 
+          data["user"]["name"]
+          );
+        await prefs.setString(
+          "user_email",
+          data["user"]["email"]
+        );
+        await prefs.setString(
+          "user_phone",
+          data["user"]["phone"]
+        );
+        return true;
+      }
+      return false;
+    }catch(e){
+      print("Login ereerror $e");
+      return false;
+    }
   }
-  user.password = hashPassword(user.password);
-  await users.insertOne(
-    user.toJson()
-  );
-  return true;
-}
-static Future<Map?> login(
-  String email,
-  String password
-)async{
-  final users = MongoService.users;
-  final user = await users.findOne({
-"email":email
-  });
-  if(user == null){
-    throw Exception("user not found");
-  }
-  if(user["password"] != hashPassword(password)){
-    throw Exception("Invalid Password");
-  }
-  return {
-    "_id": user["_id"].toString(),
-    "name":user["name"],
-    "email":user["email"],
-    "phone":user["phone"]
-  };
-}
 
-// static get LoginPage
+  static Future<bool> isLoggedIn()async{
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("jwt_token");
+    if(token == null || token.isEmpty){
+      return false;
+    }
+    return true;
+  }
+
+  static Future<String?> getToken()async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("jwt_token");
+  }
+  static Future<void> logOut(BuildContext context)async{
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("jwt_token");
+    await prefs.remove("user_name");
+    await prefs.remove("user_email");
+    await prefs.remove("user_phone");
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+  }
 }
