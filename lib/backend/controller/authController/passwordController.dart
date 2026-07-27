@@ -22,8 +22,6 @@ Future<Response> changePassword(Request request) async {
         headers: {"Content-Type": "application/json"},
       );
     }
-
-    // Check password
     if (newPassword == null || newPassword.isEmpty) {
       return Response.badRequest(
         body: jsonEncode({
@@ -61,7 +59,6 @@ Future<Response> changePassword(Request request) async {
       );
     }
 
-    // Update password in USERS collection
     await MongoService.users.updateOne(
       where.eq("email", email),
       modify.set("password", newPassword),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/widgets/auth/auth_text_field.dart';
-import 'package:shop_aura/frontend/client/widgets/auth/button.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/auth/auth_text_field.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/auth/button.dart';
 import 'package:shop_aura/frontend/client/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_aura/frontend/services/authService.dart';

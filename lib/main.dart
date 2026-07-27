@@ -1,32 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'package:shop_aura/frontend/theme/app_theme.dart';
-import 'package:shop_aura/frontend/client/screens/home_screen.dart';
+import 'frontend/theme/app_theme.dart';
+import 'frontend/client/screens/main_navigation_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shop_aura/frontend/client/screens/auth/login/auth_check_screen.dart';
-Future<void> main() async{
+import 'frontend/providers/category_provider.dart';
+import 'frontend/providers/product_provider.dart';
+import 'frontend/providers/search_provider.dart';
+
+void main()async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  await dotenv.load(fileName: ".env");
   runApp(const ShopAuraApp());
-}
-
-class ShopAuraApp extends StatefulWidget {
-  const ShopAuraApp({super.key});
-
-  @override
-  State<ShopAuraApp> createState() => _ShopAuraAppState();
 }
 class Apiconfig{
   static String get baseUrl=> dotenv.env["API_URL"] ?? "";
 }
-class _ShopAuraAppState extends State<ShopAuraApp> {
+class ShopAuraApp extends StatelessWidget {
+  const ShopAuraApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Shop Aura',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: const AuthCheckScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => CategoryProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => ProductProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => SearchProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: "Shop Aura",
+        theme: AppTheme.lightTheme,
+        home: const MainNavigationScreen(),
+      ),
     );
   }
 }

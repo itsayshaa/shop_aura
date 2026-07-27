@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/client/widgets/product/review_card.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/product/review_card.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class ProductReviewSection extends StatelessWidget {
   final List<Map<String, dynamic>> reviews;
 
-  const ProductReviewSection({
-    super.key,
-    required this.reviews,
-  });
+  const ProductReviewSection({super.key, required this.reviews});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +14,9 @@ class ProductReviewSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-
               Text(
                 "Customer Reviews",
                 style: TextStyle(
@@ -38,7 +33,6 @@ class ProductReviewSection extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
             ],
           ),
 
@@ -51,11 +45,13 @@ class ProductReviewSection extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 15),
             itemBuilder: (_, index) {
               return ReviewCard(
-                review: reviews[index],
+                userName: reviews[index]["userName"],
+                review: reviews[index]["review"],
+                rating: (reviews[index]["rating"] as num).toDouble(),
+                date: reviews[index]["date"],
               );
             },
           ),
-
         ],
       ),
     );

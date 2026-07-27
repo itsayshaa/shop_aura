@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:shop_aura/backend/services/authServices.dart';
-import 'package:shop_aura/frontend/client/widgets/profile/edit_details.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/profile/edit_details.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class ProfileScreen extends StatefulWidget {

@@ -58,9 +58,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     shape: BoxShape.circle,
-                    border: Border.all(
-                      color: AppColors.border,
-                    ),
+                    border: Border.all(color: AppColors.border),
                   ),
                   child: const Icon(
                     Icons.shopping_cart_outlined,
@@ -117,9 +115,7 @@ class _HomeHeaderState extends State<HomeHeader> {
             decoration: BoxDecoration(
               color: AppColors.surface,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.border,
-              ),
+              border: Border.all(color: AppColors.border),
             ),
             child: IconButton(
               icon: const Icon(
