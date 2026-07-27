@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class QuantitySelector extends StatelessWidget {
   final int quantity;

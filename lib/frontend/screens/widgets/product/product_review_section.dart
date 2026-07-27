@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/client/widgets/product/review_card.dart';
+import 'package:shop_aura/frontend/screens/widgets/product/review_card.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class ProductReviewSection extends StatelessWidget {

@@ -69,6 +69,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - assets/images/splash.png
     - assets/google/google.svg
     - .env
     - assets/lottieanimtion/emptycart/Emptycart.json
