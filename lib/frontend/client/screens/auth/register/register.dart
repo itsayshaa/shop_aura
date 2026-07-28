@@ -21,9 +21,30 @@ class _RegisterPage extends State<RegisterPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  final FocusNode _phoneFocusNode = FocusNode();
+  bool _isPhoneFocused = false;
+
   bool _agreedToTerms = false;
   bool _isLoading = false;
   // Map<String,dynamic>? Pagedata;
+
+  @override
+  void initState() {
+    super.initState();
+    _phoneFocusNode.addListener(() {
+      setState(() {
+        _isPhoneFocused = _phoneFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _phoneFocusNode.dispose();
+    _phoneController.dispose();
+    super.dispose();
+  }
+
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreedToTerms) {
@@ -123,7 +144,8 @@ class _RegisterPage extends State<RegisterPage> {
                                 controller: _nameController,
                                 keyboardType: TextInputType.text,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty)return "Full name is required";
+                                  if (v == null || v.isEmpty)
+                                    return "Full name is required";
                                   return null;
                                 },
                               ),
@@ -134,8 +156,10 @@ class _RegisterPage extends State<RegisterPage> {
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty)return "Email is required";
-                                  if (!v.contains('@')) return 'Enter Valid Email';
+                                  if (v == null || v.isEmpty)
+                                    return "Email is required";
+                                  if (!v.contains('@'))
+                                    return 'Enter Valid Email';
                                   return null;
                                 },
                               ),
@@ -152,8 +176,12 @@ class _RegisterPage extends State<RegisterPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Container(
-                                        height: 58,
+                                      AnimatedContainer(
+                                        duration: const Duration(
+                                          milliseconds: 200,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        height: 50,
                                         decoration: BoxDecoration(
                                           color: AppColors.background,
                                           borderRadius: BorderRadius.circular(
@@ -161,8 +189,11 @@ class _RegisterPage extends State<RegisterPage> {
                                           ),
                                           border: Border.all(
                                             color: field.hasError
-                                                ? Colors.red
-                                                : Colors.transparent,
+                                                ? AppColors.danger
+                                                : _isPhoneFocused
+                                                ? AppColors.accent
+                                                : AppColors.border,
+                                            width: _isPhoneFocused ? 1 : 1,
                                           ),
                                         ),
                                         child: Row(
@@ -171,16 +202,19 @@ class _RegisterPage extends State<RegisterPage> {
 
                                             const Icon(
                                               Icons.phone_outlined,
-                                              color: Colors.black,
+                                              color: AppColors.textSoft,
                                             ),
 
-                                            const SizedBox(width: 6),
+                                            const SizedBox(width: 8),
 
                                             DropdownButtonHideUnderline(
                                               child: DropdownButton<String>(
                                                 value: "+91",
                                                 borderRadius:
                                                     BorderRadius.circular(12),
+                                                icon: const Icon(
+                                                  Icons.keyboard_arrow_down,
+                                                ),
                                                 items: const [
                                                   DropdownMenuItem(
                                                     value: "+91",
@@ -191,19 +225,19 @@ class _RegisterPage extends State<RegisterPage> {
                                               ),
                                             ),
 
-                                            const SizedBox(width: 8),
+                                            const SizedBox(width: 5),
 
                                             Container(
-                                              height: 32,
+                                              height: 28,
                                               width: 1,
-                                              color: Colors.grey,
+                                              color: AppColors.border,
                                             ),
 
-                                            const SizedBox(width: 10),
 
                                             Expanded(
                                               child: TextField(
                                                 controller: _phoneController,
+                                                focusNode: _phoneFocusNode,
                                                 keyboardType:
                                                     TextInputType.phone,
                                                 onChanged: (value) {
@@ -212,36 +246,42 @@ class _RegisterPage extends State<RegisterPage> {
                                                 decoration:
                                                     const InputDecoration(
                                                       hintText: "Phone Number",
+                                                      hintStyle: TextStyle(
+                                                        color:
+                                                            AppColors.textSoft,
+                                                      ),
+                                                      contentPadding: EdgeInsets.symmetric(
+                                                        horizontal: 0,
+                                                        vertical: 10
+                                                      ),
                                                       border: InputBorder.none,
                                                       enabledBorder:
                                                           InputBorder.none,
                                                       focusedBorder:
                                                           InputBorder.none,
-                                                      filled: false,
-                                                      fillColor:
-                                                          AppColors.white,
-                                                      contentPadding:
-                                                          EdgeInsets.zero,
+                                                      errorBorder:
+                                                          InputBorder.none,
+                                                      disabledBorder:
+                                                          InputBorder.none,
                                                     ),
                                               ),
                                             ),
+                                            SizedBox(width: 10,)
 
-                                            const SizedBox(width: 12),
                                           ],
                                         ),
                                       ),
 
-                                      // Error is now OUTSIDE the 58px container
                                       if (field.hasError)
                                         Padding(
                                           padding: const EdgeInsets.only(
                                             left: 14,
-                                            top: 5,
+                                            top: 6,
                                           ),
                                           child: Text(
                                             field.errorText!,
                                             style: const TextStyle(
-                                              color: Colors.red,
+                                              color: AppColors.danger,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -257,8 +297,10 @@ class _RegisterPage extends State<RegisterPage> {
                                 controller: _passwordController,
                                 isPassword: true,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty)return "password is required";
-                                  if (v.length < 8)return "Minimum 8 character";
+                                  if (v == null || v.isEmpty)
+                                    return "password is required";
+                                  if (v.length < 8)
+                                    return "Minimum 8 character";
                                   return null;
                                 },
                               ),
@@ -269,8 +311,10 @@ class _RegisterPage extends State<RegisterPage> {
                                 controller: _confirmPasswordController,
                                 isPassword: true,
                                 validator: (v) {
-                                  if (v == null || v.isEmpty) return "Confirm password is required";
-                                  if (v != _passwordController.text) return "Password Not Matching";
+                                  if (v == null || v.isEmpty)
+                                    return "Confirm password is required";
+                                  if (v != _passwordController.text)
+                                    return "Password Not Matching";
                                   return null;
                                 },
                               ),
