@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shop_aura/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
@@ -31,14 +32,17 @@ class Authservice extends ChangeNotifier {
         final userName = body["user"]["name"];
         final userEmail = body["user"]["email"];
         final userPhone = body["user"]["phone"];
-        
+
+        final createdAt = body["user"]["createdAt"];
+        DateTime date = DateTime.parse(createdAt);
+        final joinedAt = DateFormat('MMMM d, yyyy').format(date);
         final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString("jwt_token", token);
         await prefs.setString("user_name", userName);
         await prefs.setString("user_email", userEmail);
         await prefs.setString("user_phone", userPhone);
-
+        await prefs.setString("createdAt", joinedAt);
 
         _isLoggedIn = true;
         _userName = body["name"];

@@ -15,7 +15,7 @@ class GradientButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.height = 56,
-    this.gradient = AppColors.loginGradient,
+    this.gradient = AppColors.accentGradient,
   });
 
   @override

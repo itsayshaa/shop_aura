@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+
 import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
-import 'package:shop_aura/frontend/client/screens/home_screen.dart';
-import 'package:shop_aura/backend/services/authServices.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/profile/edit_details.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/backend/services/authServices.dart';
+
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String name = "";
   String email = "";
   String phone = "";
+  String createdAt = "";
 
   @override
   void initState() {
@@ -30,13 +34,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       name = prefs.getString("user_name") ?? "";
       email = prefs.getString("user_email") ?? "";
       phone = prefs.getString("user_phone") ?? "";
-    });
+      createdAt = prefs.getString("createdAt") ?? "";
     if (name.isEmpty || email.isEmpty || phone.isEmpty) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => LoginPage()),
       );
     }
+    });
+
   }
 
   @override
@@ -87,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "Rihaal",
+                          name,
                           style: TextStyle(
                             fontSize: 20,
                             color: AppColors.black,
@@ -96,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "rihaalcp22@gmail.com",
+                          email,
                           style: TextStyle(
                             color: Colors.black45,
                             fontWeight: FontWeight.bold,
@@ -184,6 +190,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                         ),
+                        SizedBox(height: 10,),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                        child:ElevatedButton(
+                          onPressed:()async{await Authservices.logOut(context);},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.danger,
+                            foregroundColor: Colors.white,
+                            elevation: 2,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 14
+                            )
+                          ),
+                          child:Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                              Icon(Icons.logout,color: AppColors.white,size: 24,),
+                              SizedBox(width: 10,),
+                              Text(
+                                "Logout",
+                                style: TextStyle(
+                                  fontSize: 16
+                                ),
+                                )
+                                ]
+                              ),
+                              Icon(Icons.arrow_forward_ios,size: 12,)
+                            ],
+                          ),
+                        ),
+                        ),
                         SizedBox(height: 30),
                       ],
                     ),
@@ -248,10 +289,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: 10,),
-                      Details(icon: Icons.person_outline, title: "Full Name", data: "Rihaal"),
-                      Details(icon: Icons.email_outlined, title: "Email Address", data: "rihaalcp22@gmail.com"),
-                      Details(icon: Icons.phone_iphone_rounded, title: "Phone Number", data: "+918086304692"),
-                      Details(icon: Icons.calendar_today_outlined, title: "joined At", data: "July 14, 2026"),
+                      Details(icon: Icons.person_outline, title: "Full Name", data: name),
+                      Details(icon: Icons.email_outlined, title: "Email Address", data: email),
+                      Details(icon: Icons.phone_iphone_rounded, title: "Phone Number", data: phone),
+                      Details(icon: Icons.calendar_today_outlined, title: "joined At", data: createdAt),
                       Details(icon: Icons.location_on_outlined, title: "Work Address", data: "Perinthalmanna, Pulamanthole, 679323"),
                       SizedBox(height: 10,)
                     ],
