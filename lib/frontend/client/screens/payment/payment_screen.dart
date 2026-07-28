@@ -23,12 +23,10 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  int _currentStep = 0; // 0: Summary, 1: Address, 2: Payment
+  int _currentStep = 0; 
 
-  // ---- Delivery Options ----
   int _deliveryOptionIndex = 0;
 
-  // ---- Address Form ----
   final _addressFormKey = GlobalKey<FormState>();
   final _addressNameCtrl = TextEditingController();
   final _addressPhoneCtrl = TextEditingController();
@@ -37,29 +35,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final _addressZipCtrl = TextEditingController();
   final _addressStateCtrl = TextEditingController();
 
-  // ---- Payment Method ----
   PaymentMethod _selectedMethod = PaymentMethod.card;
 
-  // ---- Card details ----
   final _cardFormKey = GlobalKey<FormState>();
   final _cardNumberCtrl = TextEditingController();
   final _cardNameCtrl = TextEditingController();
   final _cardExpiryCtrl = TextEditingController();
   final _cardCvvCtrl = TextEditingController();
 
-  // ---- UPI ----
   final _upiCtrl = TextEditingController();
 
-  // ---- Promo & Wallet ----
   final _promoCtrl = TextEditingController();
   bool _promoApplied = false;
   bool _useWallet = false;
   final double _walletBalance = 250.0;
 
-  // ---- Terms ----
   bool _acceptedTerms = false;
 
-  // ---- Placing Order ----
   bool _isPlacingOrder = false;
 
   static const double _deliveryFeeStandard = 0;
@@ -136,8 +128,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (!mounted) return;
       
       final double totalPaid = _finalTotal;
-      
-      // Clear cart on successful order
       CartService.instance.clearCart();
 
       Navigator.pushReplacement(
@@ -210,7 +200,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       body: Column(
         children: [
-          // Step progress indicator
           _buildStepperHeader(),
           Expanded(
             child: SingleChildScrollView(

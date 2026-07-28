@@ -43,7 +43,6 @@ class ProductCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ---------------- IMAGE ----------------
               AspectRatio(
                 aspectRatio: 1.1,
                 child: Stack(
@@ -148,7 +147,6 @@ class ProductCard extends StatelessWidget {
                 ),
               ),
 
-              // ---------------- DETAILS ----------------
               Padding(
                 padding: EdgeInsets.fromLTRB(
                   12 * scale,

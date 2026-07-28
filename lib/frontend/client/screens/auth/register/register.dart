@@ -26,7 +26,6 @@ class _RegisterPage extends State<RegisterPage> {
 
   bool _agreedToTerms = false;
   bool _isLoading = false;
-  // Map<String,dynamic>? Pagedata;
 
   @override
   void initState() {

@@ -152,7 +152,6 @@ class WishlistScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Actions: move to cart / remove
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
