@@ -35,14 +35,6 @@ class _CartScreenState extends State<CartScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Lottie.asset(
-                  //   'assets/lottieanimtion/emptycart/Emptycart.json',
-
-                  //   width: 220,
-                  //   height: 120,
-                  //   fit: BoxFit.contain,
-                  //   repeat: true,
-                  // ),
                   Lottie.asset(
                     'assets/lottieanimtion/emptycart/empty.json',
                     width: 220,
@@ -50,13 +42,6 @@ class _CartScreenState extends State<CartScreen> {
                     fit: BoxFit.contain,
                     repeat: true,
                   ),
-                  //  Lottie.asset(
-                  //   'assets/lottieanimtion/emptycart/truck.json',
-                  //   width: 220,
-                  //   height: 220,
-                  //   fit: BoxFit.contain,
-                  //   repeat: true,
-                  // ),
                   const SizedBox(height: 12),
                   Text(
                     "Your cart is empty",
@@ -149,7 +134,6 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
 
-                            // Quantity stepper
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -206,7 +190,6 @@ class _CartScreenState extends State<CartScreen> {
                 ),
               ),
 
-              // Total + checkout bar
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                 decoration: BoxDecoration(

@@ -4,12 +4,15 @@ import 'package:shop_aura/backend/routes/authRoutes/auth.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:shop_aura/backend/routes/categoryRoutes/category.dart';
+import 'package:shop_aura/backend/routes/productRoutes/product.dart';
 
 Future<void> main()async{
   await MongoService.connect();
   final router = Router();
-  router.mount('/', AuthRoutes().router.call);
-  // router.mount('/', LoginPage())
+  router.mount('/auth/', AuthRoutes().router.call);
+  router.mount('/category/',CategoryRoutes().router.call);
+  router.mount('/product/',ProductRoutes().router.call);
   final handler = Pipeline()
     .addMiddleware(logRequests())
     .addMiddleware(corsHeader())

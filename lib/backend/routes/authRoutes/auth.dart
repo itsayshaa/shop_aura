@@ -23,7 +23,7 @@ class AuthRoutes{
         404,
         body: jsonEncode({
           "success":false,
-          "message":"route not found"
+          "message":"route nssot found"
     })
       );
     });

@@ -124,7 +124,6 @@ class _ProductListScreenState
 
                   children: [
 
-                    /// SEARCH BAR
 
                     TextField(
                       controller: _searchController,
@@ -157,7 +156,6 @@ class _ProductListScreenState
 
                     const SizedBox(height: 18),
 
-                    /// FILTER ROW
 
                     Row(
                       children: [

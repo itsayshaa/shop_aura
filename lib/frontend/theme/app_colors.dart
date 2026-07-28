@@ -3,38 +3,22 @@ import 'package:flutter/material.dart';
 class AppColors {
   AppColors._();
 
-  // ─────────────────────────────────────────────
-  // Brand Colors
-  // ─────────────────────────────────────────────
 
   static const Color primary = Color(0xFF7B1E3A);
   static const Color primaryHover = Color(0xFF64182F);
 
-  // ─────────────────────────────────────────────
-  // Backgrounds
-  // ─────────────────────────────────────────────
 
   static const Color background = Color(0xFFFAFAFA);
   static const Color surface = Color(0xFFFFFFFF);
 
-  // ─────────────────────────────────────────────
-  // Secondary
-  // ─────────────────────────────────────────────
-
   static const Color secondary = Color(0xFFF8E9ED);
   static const Color secondarySoft = Color(0xFFFDF5F7);
 
-  // ─────────────────────────────────────────────
-  // Accent
-  // ─────────────────────────────────────────────
 
   static const Color accent = Color(0xFFA02C52);
   static const Color accentHover = Color(0xFF7B1E3A);
   static const Color accentSoft = Color(0xFFF8E9ED);
 
-  // ─────────────────────────────────────────────
-  // Status Colors
-  // ─────────────────────────────────────────────
 
   static const Color success = Color(0xFF22C55E);
   static const Color successBackground = Color(0xFFDCFCE7);
@@ -45,30 +29,17 @@ class AppColors {
   static const Color danger = Color(0xFFEF4444);
   static const Color dangerBackground = Color(0xFFFEE2E2);
 
-  // ─────────────────────────────────────────────
-  // Borders
-  // ─────────────────────────────────────────────
 
   static const Color border = Color(0xFFE5E7EB);
 
-  // ─────────────────────────────────────────────
-  // Text
-  // ─────────────────────────────────────────────
 
   static const Color text = Color(0xFF1F2937);
   static const Color textSoft = Color(0xFF6B7280);
 
-  // ─────────────────────────────────────────────
-  // Basic Colors
-  // ─────────────────────────────────────────────
 
   static const Color white = Colors.white;
   static const Color black = Colors.black;
   static const Color transparent = Colors.transparent;
-
-  // ─────────────────────────────────────────────
-  // Gradients
-  // ─────────────────────────────────────────────
 
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,

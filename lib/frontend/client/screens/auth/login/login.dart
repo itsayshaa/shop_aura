@@ -19,7 +19,6 @@ class _LoginPage extends State<LoginPage>{
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
    bool _isLoading = false;
-  // Map<String,dynamic>? Pagedata;
 Future<void> _handleLogin() async {
   if (!_formKey.currentState!.validate()) return;
 
@@ -149,7 +148,6 @@ Future<void> _handleLogin() async {
                           GestureDetector(
                             onTap: ()=> setState(() => _rememberMe = !_rememberMe),
                             child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Checkbox(
                                   value: _rememberMe,

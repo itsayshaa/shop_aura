@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
-  // final env = DotEnv()..load();
   bool _isLoggedIn = false;
   String? _userName;
   String? _userEmail;
@@ -19,7 +18,7 @@ class Authservice extends ChangeNotifier {
   Future<bool> login({required String email, required String password})async{
     try{
       final response = await http.post(
-        Uri.parse("$baseUrl/login"),
+        Uri.parse("$baseUrl/auth/login"),
         headers: {"Content-Type":"application/json"},
         body: jsonEncode({
           "email":email,
@@ -79,7 +78,7 @@ static Future<String?> getToken()async{
     required String password
   })async{
     final response = await http.post(
-      Uri.parse("$baseUrl/register"),
+      Uri.parse("$baseUrl/auth/register"),
       headers: {"Content-Type":"application/json"},
       body: jsonEncode({
         "name":name,

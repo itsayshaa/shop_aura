@@ -32,7 +32,6 @@ Future<Response> changePassword(Request request) async {
       );
     }
 
-    // Find user
     final user = await MongoService.users.findOne(where.eq("email", email));
 
     if (user == null) {
@@ -43,7 +42,6 @@ Future<Response> changePassword(Request request) async {
       );
     }
 
-    // Check whether OTP was verified
     final verifiedOtp = await MongoService.password.findOne(
       where.eq("email", email).eq("verified", true),
     );
@@ -64,7 +62,6 @@ Future<Response> changePassword(Request request) async {
       modify.set("password", newPassword),
     );
 
-    // Optional: remove OTP record after password reset
     await MongoService.password.deleteOne(where.eq("_id", verifiedOtp["_id"]));
 
     return Response.ok(

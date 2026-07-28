@@ -1,20 +1,27 @@
+
+
 import 'package:dotenv/dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
-class MongoService{
+class MongoService {
   static late Db db;
+
   static late DbCollection users;
   static late DbCollection password;
-  static Future<void> connect() async{
+  static late DbCollection categories;
+  static late DbCollection products;
+  static Future<void> connect() async {
     final env = DotEnv()..load();
-    final mongoUrl = env["MONGO_URL"];
-    if(mongoUrl == null){
-      throw Exception('MONGO_URL not found');
+    final mongoUrl = env['MONGO_URL'];
+    if (mongoUrl == null) {
+      throw Exception("MONGO_URL not found");
     }
     db = await Db.create(mongoUrl);
     await db.open();
     users = db.collection('users');
     password = db.collection('password');
+    categories = db.collection('categories');
+    products = db.collection('products');
     print("Mongo Db Connected");
   }
 }

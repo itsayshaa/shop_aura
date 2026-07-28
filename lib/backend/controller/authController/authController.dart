@@ -75,7 +75,6 @@ Future<Response> loginUser(Request request) async {
       );
     }
     print("checked password..");
-    // Find user
     final user = await MongoService.users.findOne(
       where.eq("email", email),
     );
@@ -93,10 +92,8 @@ Future<Response> loginUser(Request request) async {
       );
     }
 print("user founded");
-    // Hash entered password
     final hashedPassword = hashPassword(password);
 
-    // Check password
     if (user["password"] != hashedPassword) {
       return Response(
         401,
@@ -110,7 +107,6 @@ print("user founded");
       );
     }
 
-    // Generate JWT
     final token = Jwtservice.generateToken(
       userId: user["_id"].toString(),
       email: user["email"],
