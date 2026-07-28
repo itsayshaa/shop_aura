@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dotenv/dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/client/screens/auth/login/login.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
@@ -34,14 +33,14 @@ Future<String> _sendResetLink({
   required String email,
 }) async {
   try {
-    String url = Apiconfig.baseUrl;
+    String baseUrl = Apiconfig.baseUrl;
 
-    if (url == null || url.isEmpty) {
+    if (baseUrl.isEmpty) {
       throw Exception('API URL is not configured');
     }
 
     final response = await http.post(
-      Uri.parse('$url/forgotpassword'),
+      Uri.parse('$baseUrl/auth/forgotpassword'),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -133,7 +132,6 @@ Future<void> _handleSendOtp() async {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Back to Home
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -161,7 +159,6 @@ Future<void> _handleSendOtp() async {
 
                     const SizedBox(height: 38),
 
-                    // Title
                     const Center(
                       child: Text(
                         'Forgot Password?',
@@ -177,7 +174,6 @@ Future<void> _handleSendOtp() async {
 
                     const SizedBox(height: 14),
 
-                    // Description
                     const Center(
                       child: Text(
                         'Enter your registered email address below, and we will send you a secure link to reset your account password.',
@@ -192,7 +188,6 @@ Future<void> _handleSendOtp() async {
 
                     const SizedBox(height: 28),
 
-                    // Error Message
                     if (_errorMessage != null)
                       Container(
                         width: double.infinity,
@@ -216,7 +211,6 @@ Future<void> _handleSendOtp() async {
                         ),
                       ),
 
-                    // Email Label
                     const Text(
                       'Email Address',
                       style: TextStyle(
@@ -228,7 +222,6 @@ Future<void> _handleSendOtp() async {
 
                     const SizedBox(height: 9),
 
-                    // Email Field
                     AuthTextField(
                       hint: "Enter Your Email Address",
                       controller: _emailController,
@@ -252,7 +245,6 @@ Future<void> _handleSendOtp() async {
 
                     const SizedBox(height: 22),
 
-                    // Send Reset Link Button
                     SizedBox(
                       width: double.infinity,
                       height: 56,
@@ -264,7 +256,6 @@ Future<void> _handleSendOtp() async {
                     ),
                     const SizedBox(height: 25),
 
-                    // Bottom Login Text
                     Center(
                       child: RichText(
                         text: TextSpan(

@@ -27,7 +27,6 @@ class _HomeHeaderState extends State<HomeHeader> {
       child: Row(
         children: [
 
-          // Logo
           const Expanded(
             child: Text(
               "ShopAura",
@@ -39,7 +38,6 @@ class _HomeHeaderState extends State<HomeHeader> {
             ),
           ),
 
-          // Cart
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -108,7 +106,6 @@ class _HomeHeaderState extends State<HomeHeader> {
 
           const SizedBox(width: 10),
 
-          // Profile
           Container(
             height: 46,
             width: 46,

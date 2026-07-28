@@ -43,7 +43,6 @@ class _ProductCardState extends State<ProductCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// IMAGE
             Expanded(
               flex: 6,
               child: Stack(
@@ -133,7 +132,6 @@ class _ProductCardState extends State<ProductCard> {
               ),
             ),
 
-            /// DETAILS
             Expanded(
               flex: 5,
               child: Padding(

@@ -26,12 +26,10 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  int _currentStep = 0; // 0: Summary, 1: Address, 2: Payment
+  int _currentStep = 0; 
 
-  // ---- Delivery Options ----
   int _deliveryOptionIndex = 0;
 
-  // ---- Address Form ----
   final _addressFormKey = GlobalKey<FormState>();
   final _addressNameCtrl = TextEditingController();
   final _addressPhoneCtrl = TextEditingController();
@@ -40,29 +38,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final _addressZipCtrl = TextEditingController();
   final _addressStateCtrl = TextEditingController();
 
-  // ---- Payment Method ----
   PaymentMethod _selectedMethod = PaymentMethod.card;
 
-  // ---- Card details ----
   final _cardFormKey = GlobalKey<FormState>();
   final _cardNumberCtrl = TextEditingController();
   final _cardNameCtrl = TextEditingController();
   final _cardExpiryCtrl = TextEditingController();
   final _cardCvvCtrl = TextEditingController();
 
-  // ---- UPI ----
   final _upiCtrl = TextEditingController();
 
-  // ---- Promo & Wallet ----
   final _promoCtrl = TextEditingController();
   bool _promoApplied = false;
   bool _useWallet = false;
   final double _walletBalance = 250.0;
 
-  // ---- Terms ----
   bool _acceptedTerms = false;
 
-  // ---- Placing Order ----
   bool _isPlacingOrder = false;
 
   static const double _deliveryFeeStandard = 0;
@@ -139,32 +131,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (!mounted) return;
 
       final double totalPaid = _finalTotal;
-
-      // Construct and add the order
-      final itemsToOrder = List<CartItem>.from(CartService.instance.items);
-      final newOrder = OrderModel(
-        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
-        items: itemsToOrder,
-        totalAmount: totalPaid,
-        date: DateTime.now(),
-        status: "Processing",
-        name: _addressNameCtrl.text.isNotEmpty ? _addressNameCtrl.text : "Customer",
-        phone: _addressPhoneCtrl.text.isNotEmpty ? _addressPhoneCtrl.text : "N/A",
-        address: "${_addressStreetCtrl.text}, ${_addressCityCtrl.text}, ${_addressStateCtrl.text} ${_addressZipCtrl.text}",
-        paymentMethod: _selectedMethod.name,
-      );
-
-      await OrderService.instance.addOrder(newOrder);
-
-      // Clear cart on successful order
       CartService.instance.clearCart();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SuccessScreen(order: newOrder),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (_) => SuccessScreen(order:o ),
+      //   ),
+      // );
     } catch (e) {
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -226,7 +200,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
       body: Column(
         children: [
-          // Step progress indicator
           _buildStepperHeader(),
           Expanded(
             child: SingleChildScrollView(

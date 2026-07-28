@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shop_aura/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
-  // final env = DotEnv()..load();
   bool _isLoggedIn = false;
   String? _userName;
   String? _userEmail;
@@ -18,7 +18,7 @@ class Authservice extends ChangeNotifier {
   Future<bool> login({required String email, required String password})async{
     try{
       final response = await http.post(
-        Uri.parse("$baseurl/login"),
+        Uri.parse("$baseurl/auth/login"),
         headers: {"Content-Type":"application/json"},
         body: jsonEncode({
           "email":email,
@@ -31,14 +31,17 @@ class Authservice extends ChangeNotifier {
         final userName = body["user"]["name"];
         final userEmail = body["user"]["email"];
         final userPhone = body["user"]["phone"];
-        
+
+        final createdAt = body["user"]["createdAt"];
+        DateTime date = DateTime.parse(createdAt);
+        final joinedAt = DateFormat('MMMM d, yyyy').format(date);
         final prefs = await SharedPreferences.getInstance();
 
         await prefs.setString("jwt_token", token);
         await prefs.setString("user_name", userName);
         await prefs.setString("user_email", userEmail);
         await prefs.setString("user_phone", userPhone);
-
+        await prefs.setString("createdAt", joinedAt);
 
         _isLoggedIn = true;
         _userName = body["name"];
@@ -75,7 +78,7 @@ static Future<String?> getToken()async{
     required String password
   })async{
     final response = await http.post(
-      Uri.parse("$baseurl/register"),
+      Uri.parse("$baseurl/auth/register"),
       headers: {"Content-Type":"application/json"},
       body: jsonEncode({
         "name":name,

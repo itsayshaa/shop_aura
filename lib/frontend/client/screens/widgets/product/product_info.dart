@@ -27,7 +27,6 @@ class ProductInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// Product Name
           Text(
             productName,
             style: const TextStyle(
@@ -40,7 +39,6 @@ class ProductInfo extends StatelessWidget {
 
           const SizedBox(height: 12),
 
-          /// Rating
           Row(
             children: [
               const Icon(
@@ -71,7 +69,6 @@ class ProductInfo extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          /// Brand
           Row(
             children: [
               const Text(
@@ -85,8 +82,6 @@ class ProductInfo extends StatelessWidget {
           ),
 
           const SizedBox(height: 8),
-
-          /// Category
           Row(
             children: [
               const Text(
@@ -101,7 +96,6 @@ class ProductInfo extends StatelessWidget {
 
           const SizedBox(height: 15),
 
-          /// Stock
           Row(
             children: [
               Icon(

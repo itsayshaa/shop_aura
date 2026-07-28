@@ -17,7 +17,6 @@ class ProductImageGallery extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        /// Main Image
         Container(
           margin: const EdgeInsets.all(20),
           height: 320,
@@ -42,7 +41,6 @@ class ProductImageGallery extends StatelessWidget {
           ),
         ),
 
-        /// Thumbnails
         SizedBox(
           height: 90,
           child: ListView.separated(

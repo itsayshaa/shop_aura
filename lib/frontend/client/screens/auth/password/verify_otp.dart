@@ -4,7 +4,6 @@ import 'package:shop_aura/frontend/client/screens/widgets/auth/button.dart';
 import 'new_password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:dotenv/dotenv.dart';
 import 'package:shop_aura/main.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
@@ -65,12 +64,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     required String email,
     required String otp
   })async{
-    final url = Apiconfig.baseUrl;
-    if(url == null || url.isEmpty){
+    final baseUrl = Apiconfig.baseUrl;
+    if(baseUrl.isEmpty){
       throw Exception("Api url is missing");
     }
     final response = await http.post(
-      Uri.parse("$url/verify-otp"),
+      Uri.parse("$baseUrl/auth/verify-otp"),
       body: jsonEncode({
         "email":email,
         "otp":otp
@@ -332,7 +331,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                 borderRadius: BorderRadius.circular(10),
 
                                 borderSide: const BorderSide(
-                                  color: Color(0xFF292929),
+                                  color: AppColors.accent,
 
                                   width: 1.5,
                                 ),

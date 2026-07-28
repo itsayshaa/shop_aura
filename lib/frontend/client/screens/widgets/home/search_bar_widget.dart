@@ -141,7 +141,6 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
           IconButton(
             onPressed: () {
-              // Voice Search (Coming Soon)
             },
             icon: const Icon(
               Icons.mic_none_rounded,

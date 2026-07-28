@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/auth/button.dart';
 import 'package:http/http.dart' as http;
-import 'package:dotenv/dotenv.dart';
 import 'dart:convert';
 
 import 'package:shop_aura/main.dart';
@@ -49,12 +48,12 @@ class _ResetPasswordScreenState
   });
 
   try{
-    final url = Apiconfig.baseUrl;
-    if(url == null || url.isEmpty){
+    final baseUrl = Apiconfig.baseUrl;
+    if(baseUrl.isEmpty){
       throw Exception("API url is missing");
     }
     final response = await http.post(
-      Uri.parse("$url/changepassword"),
+      Uri.parse("$baseUrl/auth/changepassword"),
       headers: {"Content-Type":"application/json"},
       body: jsonEncode({
       "email": widget.email,
@@ -155,7 +154,6 @@ class _ResetPasswordScreenState
 
                   children: [
 
-                    // Back Button
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -193,7 +191,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 38),
 
-                    // Title
                     const Center(
                       child: Text(
                         'Reset Password',
@@ -214,7 +211,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 14),
 
-                    // Description
                     const Center(
                       child: Text(
                         'Create a new password for your account. Make sure your password is strong and secure.',
@@ -233,7 +229,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 28),
 
-                    // Error Message
                     if (_errorMessage != null)
                       Container(
                         width:
@@ -291,7 +286,6 @@ class _ResetPasswordScreenState
                         ),
                       ),
 
-                    // New Password Label
                     const Text(
                       'New Password',
 
@@ -306,7 +300,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 9),
 
-                    // New Password Field
                     TextFormField(
                       controller:
                           _newPasswordController,
@@ -393,7 +386,7 @@ class _ResetPasswordScreenState
                           borderSide:
                               const BorderSide(
                             color:
-                                Color(0xFF292929),
+                                AppColors.accent,
                             width: 1.5,
                           ),
                         ),
@@ -402,7 +395,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 20),
 
-                    // Confirm Password Label
                     const Text(
                       'Confirm Password',
 
@@ -417,7 +409,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 9),
 
-                    // Confirm Password Field
                     TextFormField(
                       controller:
                           _confirmPasswordController,
@@ -506,7 +497,7 @@ class _ResetPasswordScreenState
                           borderSide:
                               const BorderSide(
                             color:
-                                Color(0xFF292929),
+                                AppColors.accent,
                             width: 1.5,
                           ),
                         ),
@@ -515,7 +506,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 28),
 
-                    // Reset Password Button
                     SizedBox(
                       width:
                           double.infinity,
@@ -539,7 +529,6 @@ class _ResetPasswordScreenState
 
                     const SizedBox(height: 25),
 
-                    // Security Text
                     const Center(
                       child: Text(
                         'Your password will be securely updated.',

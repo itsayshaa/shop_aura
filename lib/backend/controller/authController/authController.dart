@@ -5,6 +5,8 @@ import 'package:shop_aura/backend/database/mongo_service.dart';
 import 'package:crypto/crypto.dart';
 import 'package:shop_aura/backend/models/client/userModel.dart';
 import 'package:shop_aura/backend/services/jwtService.dart';
+
+
  String hashPassword(String password){
   return sha256.
   convert(utf8.encode(password)).toString();
@@ -36,6 +38,7 @@ Future<Response> registerUser(Request request)async{
     profileImage: "",
     isBlocked: false,
     isVerified: false,
+    createdAt: DateTime.now().toUtc().toIso8601String()
   );
   await MongoService.users.insertOne(
     user.toJson()
@@ -72,7 +75,6 @@ Future<Response> loginUser(Request request) async {
       );
     }
     print("checked password..");
-    // Find user
     final user = await MongoService.users.findOne(
       where.eq("email", email),
     );
@@ -90,10 +92,8 @@ Future<Response> loginUser(Request request) async {
       );
     }
 print("user founded");
-    // Hash entered password
     final hashedPassword = hashPassword(password);
 
-    // Check password
     if (user["password"] != hashedPassword) {
       return Response(
         401,
@@ -107,7 +107,6 @@ print("user founded");
       );
     }
 
-    // Generate JWT
     final token = Jwtservice.generateToken(
       userId: user["_id"].toString(),
       email: user["email"],
@@ -122,10 +121,9 @@ print("user founded");
         "name": user["name"],
         "email": user["email"],
         "phone": user["phone"],
+        "createdAt":user["createdAt"]
       },
     };
-    print("print response");
-    print(jsonEncode(res));
 
     return Response.ok(
       jsonEncode(res),
