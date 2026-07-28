@@ -19,7 +19,6 @@ class _LoginPage extends State<LoginPage>{
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
    bool _isLoading = false;
-  // Map<String,dynamic>? Pagedata;
 Future<void> _handleLogin() async {
   if (!_formKey.currentState!.validate()) return;
 
@@ -36,13 +35,14 @@ Future<void> _handleLogin() async {
     if (!mounted) return;
 
     if (success) {
+      if(!context.mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => const HomeScreen(),
         ),
         (route) => false,
       );
-    }
+    } 
   } catch (e) {
     if (!mounted) return;
 
@@ -137,7 +137,6 @@ Future<void> _handleLogin() async {
                           isPassword: true,
                           validator: (v){
                             if(v == null || v.isEmpty) return "password is required";
-                            if(v.length < 8) return "Minimum 8 character";
                             return null;
                           },
                         ),
@@ -149,7 +148,6 @@ Future<void> _handleLogin() async {
                           GestureDetector(
                             onTap: ()=> setState(() => _rememberMe = !_rememberMe),
                             child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Checkbox(
                                   value: _rememberMe,

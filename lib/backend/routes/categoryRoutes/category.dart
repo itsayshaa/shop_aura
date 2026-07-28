@@ -9,16 +9,11 @@ class CategoryRoutes {
   Router get router {
     final router = Router();
 
-    // GET
     router.get('/', getCategories);
 
-    // GET FEATURED
     router.get('/featured', getFeaturedCategories);
 
-    // POST
     router.post('/add', addCategory);
-
-    // 404
     router.get('/<ignored|.*>', (Request request) async {
       return Response(
         404,

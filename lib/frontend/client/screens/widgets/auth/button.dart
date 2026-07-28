@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../theme/app_colors.dart';
 
-/// A full-width gradient CTA button with a built-in loading state.
 class GradientButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -15,7 +14,7 @@ class GradientButton extends StatelessWidget {
     required this.onPressed,
     this.isLoading = false,
     this.height = 56,
-    this.gradient = AppColors.loginGradient,
+    this.gradient = AppColors.accentGradient,
   });
 
   @override

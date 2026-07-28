@@ -51,4 +51,12 @@ Future<Response> addCategory(Request request) async {
       "Content-Type": "application/json",
     },
   );
+
+}
+Future<Response> getCategory(Request request)async{
+  final category = await MongoService.categories.find().toList();
+  return Response.ok(
+    jsonEncode(category),
+    headers: {"Content-Type":"application/json"}
+  );
 }

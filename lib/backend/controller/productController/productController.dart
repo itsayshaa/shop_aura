@@ -6,36 +6,20 @@ import 'package:shelf_router/shelf_router.dart';
 
 import '../../database/mongo_service.dart';
 
-/// ===============================
-/// GET ALL PRODUCTS
-/// ===============================
-
 Future<Response> getProducts(Request request) async {
   try {
     final products = await MongoService.products.find().toList();
-
     return Response.ok(
       jsonEncode(products),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     );
   } catch (e) {
     return Response.internalServerError(
-      body: jsonEncode({
-        "success": false,
-        "message": e.toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: jsonEncode({"success": false, "message": e.toString()}),
+      headers: {"Content-Type": "application/json"},
     );
   }
 }
-
-/// ===============================
-/// GET PRODUCT BY ID
-/// ===============================
 
 Future<Response> getProduct(Request request) async {
   try {
@@ -48,9 +32,7 @@ Future<Response> getProduct(Request request) async {
           "success": false,
           "message": "Product id is required",
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json"},
       );
     }
 
@@ -61,38 +43,22 @@ Future<Response> getProduct(Request request) async {
     if (product == null) {
       return Response(
         404,
-        body: jsonEncode({
-          "success": false,
-          "message": "Product not found",
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        body: jsonEncode({"success": false, "message": "Product not found"}),
+        headers: {"Content-Type": "application/json"},
       );
     }
 
     return Response.ok(
       jsonEncode(product),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     );
   } catch (e) {
     return Response.internalServerError(
-      body: jsonEncode({
-        "success": false,
-        "message": e.toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: jsonEncode({"success": false, "message": e.toString()}),
+      headers: {"Content-Type": "application/json"},
     );
   }
 }
-
-/// ===============================
-/// GET PRODUCTS BY CATEGORY
-/// ===============================
 
 Future<Response> getProductsByCategory(Request request) async {
   try {
@@ -105,43 +71,25 @@ Future<Response> getProductsByCategory(Request request) async {
           "success": false,
           "message": "Category id is required",
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json"},
       );
     }
 
     final products = await MongoService.products
-        .find(
-          where.eq(
-            "categoryId",
-            ObjectId.fromHexString(categoryId),
-          ),
-        )
+        .find(where.eq("categoryId", ObjectId.fromHexString(categoryId)))
         .toList();
 
     return Response.ok(
       jsonEncode(products),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     );
   } catch (e) {
     return Response.internalServerError(
-      body: jsonEncode({
-        "success": false,
-        "message": e.toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: jsonEncode({"success": false, "message": e.toString()}),
+      headers: {"Content-Type": "application/json"},
     );
   }
 }
-
-/// ===============================
-/// ADD PRODUCT
-/// ===============================
 
 Future<Response> addProduct(Request request) async {
   try {
@@ -166,23 +114,13 @@ Future<Response> addProduct(Request request) async {
     });
 
     return Response.ok(
-      jsonEncode({
-        "success": true,
-        "message": "Product added successfully",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      jsonEncode({"success": true, "message": "Product added successfully"}),
+      headers: {"Content-Type": "application/json"},
     );
   } catch (e) {
     return Response.internalServerError(
-      body: jsonEncode({
-        "success": false,
-        "message": e.toString(),
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: jsonEncode({"success": false, "message": e.toString()}),
+      headers: {"Content-Type": "application/json"},
     );
   }
 }

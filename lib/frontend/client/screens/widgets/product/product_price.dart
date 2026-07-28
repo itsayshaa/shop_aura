@@ -21,7 +21,6 @@ class ProductPrice extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
 
-          /// Current Price
           Text(
             "₹${price.toStringAsFixed(0)}",
             style: const TextStyle(
@@ -33,7 +32,6 @@ class ProductPrice extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          /// Old Price
           Text(
             "₹${oldPrice.toStringAsFixed(0)}",
             style: const TextStyle(
@@ -45,7 +43,6 @@ class ProductPrice extends StatelessWidget {
 
           const Spacer(),
 
-          /// Discount Badge
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 12,

@@ -2,7 +2,15 @@ import 'dart:convert';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shop_aura/backend/database/mongo_service.dart';
+import 'package:crypto/crypto.dart';
+import 'package:shop_aura/backend/models/client/userModel.dart';
+import 'package:shop_aura/backend/services/jwtService.dart';
 
+
+ String hashPassword(String password){
+  return sha256.
+  convert(utf8.encode(password)).toString();
+}
 Future<Response> registerUser(Request request)async{
   final body = await request.readAsString();
   final data = jsonDecode(body);
@@ -20,57 +28,122 @@ Future<Response> registerUser(Request request)async{
       headers: {"Content-Type":"application/json"}
     );
   }
-  await MongoService.users.insertOne({
-    "name":data["name"],
-    "email":data["email"],
-    "phone":data["phone"],
-    "password":data["password"]
-  });
+  final user = UserModel(
+    name: data["name"],
+    email: data["email"],
+    phone: data["phone"],
+    password: hashPassword(data["password"]),
+    address: [],
+    wishList: [],
+    profileImage: "",
+    isBlocked: false,
+    isVerified: false,
+    createdAt: DateTime.now().toUtc().toIso8601String()
+  );
+  await MongoService.users.insertOne(
+    user.toJson()
+  );
   return Response.ok(
     jsonEncode({
-      "success":false,
+      "success":true,
       "message":"Register Success"
     }),
     headers: {"Content-Type":"application/json"}
   );
 }
 
-Future<Response> loginUser(Request request)async{
-  final body = await request.readAsString();
-  final data = jsonDecode(body);
+Future<Response> loginUser(Request request) async {
+  try {
+    print("called login");
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
 
-  final user = await MongoService.users.findOne(
-    where.eq("email",data["email"])
-);
-  if(user == null){
-    return Response(
-      400,
+    final email = data["email"]?.toString().trim();
+    final password = data["password"]?.toString();
+
+    if (email == null || email.isEmpty ||
+        password == null || password.isEmpty) {
+      return Response(
+        400,
+        body: jsonEncode({
+          "success": false,
+          "message": "Email and password are required",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+    }
+    print("checked password..");
+    final user = await MongoService.users.findOne(
+      where.eq("email", email),
+    );
+
+    if (user == null) {
+      return Response(
+        401,
+        body: jsonEncode({
+          "success": false,
+          "message": "Invalid email or password",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+    }
+print("user founded");
+    final hashedPassword = hashPassword(password);
+
+    if (user["password"] != hashedPassword) {
+      return Response(
+        401,
+        body: jsonEncode({
+          "success": false,
+          "message": "Invalid email or password",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+    }
+
+    final token = Jwtservice.generateToken(
+      userId: user["_id"].toString(),
+      email: user["email"],
+    );
+    print("jwt created");
+    final res = {
+      "success": true,
+      "message": "Login success",
+      "token": token,
+      "user": {
+        "id": user["_id"].toString(),
+        "name": user["name"],
+        "email": user["email"],
+        "phone": user["phone"],
+        "createdAt":user["createdAt"]
+      },
+    };
+
+    return Response.ok(
+      jsonEncode(res),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+  } catch (e) {
+    print("Login error: $e");
+
+    return Response.internalServerError(
       body: jsonEncode({
-        "success":false,
-        "message":"Please Register First"
+        "success": false,
+        "message": "Something went wrong",
       }),
       headers: {
-        "Content-Type":"application/json"
-      }
+        "Content-Type": "application/json",
+      },
     );
   }
-  if(user["password"] != data["password"]){
-    return Response(
-      401,
-      body: jsonEncode({
-        "success":false,
-        "message":"Password Not match"
-      }),
-      headers: {"Content-Type":"application/json"}
-    );
-  }
-return Response.ok(
-  jsonEncode({
-    "success":true,
-    "message":"login success"
-  }),
-  headers: {"Content-Type":"application/json"}
-);
 }
 
 Future<Response> getUser(Request request)async{

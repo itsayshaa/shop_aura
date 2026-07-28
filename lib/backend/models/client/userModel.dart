@@ -7,9 +7,9 @@ class UserModel{
   String phone;
   List<String> wishList;
   String profileImage;
+  String createdAt;
   bool isVerified;
-  bool isBocked;
-  String role;
+  bool isBlocked;
 
   UserModel({
     this.id,
@@ -21,8 +21,8 @@ class UserModel{
     required this.wishList,
     required this.profileImage,
     required this.isVerified,
-    required this.isBocked,
-    required this.role,
+    required this.isBlocked,
+    required this.createdAt,
   });
 
   Map<String,dynamic> toJson(){
@@ -35,8 +35,9 @@ class UserModel{
       "wishList":wishList,
       "profile_image":profileImage,
       "isVerified":isVerified,
-      "isBlocked":isBocked,
-      "role":"user"
+      "isBlocked":isBlocked,
+      "createdAt":createdAt
+
     };
   }
 

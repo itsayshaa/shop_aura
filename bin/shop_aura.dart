@@ -11,11 +11,8 @@ Future<void> main()async{
   await MongoService.connect();
   final router = Router();
   router.mount('/auth/', AuthRoutes().router.call);
-
-router.mount('/category/', CategoryRoutes().router.call);
-
-router.mount('/product/', ProductRoutes().router.call);
-  // router.mount('/', LoginPage())
+  router.mount('/category/',CategoryRoutes().router.call);
+  router.mount('/product/',ProductRoutes().router.call);
   final handler = Pipeline()
     .addMiddleware(logRequests())
     .addMiddleware(corsHeader())

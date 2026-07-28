@@ -1,12 +1,9 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../database/mongo_service.dart';
-import '../models/client/productModel.dart';
+import './../models/client/productModel.dart';
 
 class ProductServices {
-  // =========================
-  // Get All Products
-  // =========================
 
   static Future<List<ProductModel>> getProducts() async {
     final data = await MongoService.products.find().toList();
@@ -16,26 +13,16 @@ class ProductServices {
         .toList();
   }
 
-  // =========================
-  // Get Products By Category
-  // =========================
+
 
   static Future<List<ProductModel>> getProductsByCategory(
       ObjectId categoryId) async {
-    final data = await MongoService.products
-        .find(
-          where.eq("categoryId", categoryId),
-        )
-        .toList();
-
     return data
         .map((e) => ProductModel.fromJson(e))
         .toList();
   }
 
-  // =========================
-  // Get Product By ID
-  // =========================
+
 
   static Future<ProductModel?> getProductById(
       ObjectId id) async {
@@ -47,10 +34,6 @@ class ProductServices {
 
     return ProductModel.fromJson(data);
   }
-
-  // =========================
-  // Search Products
-  // =========================
 
   static Future<List<ProductModel>> searchProducts(
       String keyword) async {
@@ -66,9 +49,6 @@ class ProductServices {
     }).toList();
   }
 
-  // =========================
-  // Add Product
-  // =========================
 
   static Future<void> addProduct(
       ProductModel product) async {
@@ -77,9 +57,6 @@ class ProductServices {
     );
   }
 
-  // =========================
-  // Update Product
-  // =========================
 
   static Future<void> updateProduct(
       ProductModel product) async {
@@ -89,9 +66,6 @@ class ProductServices {
     );
   }
 
-  // =========================
-  // Delete Product
-  // =========================
 
   static Future<void> deleteProduct(
       ObjectId id) async {

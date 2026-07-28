@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
-  // final env = DotEnv()..load();
   bool _isLoggedIn = false;
   String? _userName;
   String? _userEmail;

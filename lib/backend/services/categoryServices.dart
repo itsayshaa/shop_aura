@@ -4,9 +4,8 @@ import '../database/mongo_service.dart';
 import '../models/client/categoryModel.dart';
 
 class CategoryServices {
-  // =========================
-  // Get All Categories
-  // =========================
+
+
 
   static Future<List<CategoryModel>> getCategories() async {
     final data = await MongoService.categories.find().toList();
@@ -16,9 +15,6 @@ class CategoryServices {
         .toList();
   }
 
-  // =========================
-  // Get Featured Categories
-  // =========================
 
   static Future<List<CategoryModel>> getFeaturedCategories() async {
     final data = await MongoService.categories
@@ -32,9 +28,6 @@ class CategoryServices {
         .toList();
   }
 
-  // =========================
-  // Search Categories
-  // =========================
 
   static Future<List<CategoryModel>> searchCategory(
       String keyword) async {
@@ -47,9 +40,6 @@ class CategoryServices {
     }).toList();
   }
 
-  // =========================
-  // Add Category
-  // =========================
 
   static Future<void> addCategory(
       CategoryModel category) async {
@@ -58,9 +48,6 @@ class CategoryServices {
     );
   }
 
-  // =========================
-  // Update Category
-  // =========================
 
   static Future<void> updateCategory(
       CategoryModel category) async {
@@ -70,9 +57,6 @@ class CategoryServices {
     );
   }
 
-  // =========================
-  // Delete Category
-  // =========================
 
   static Future<void> deleteCategory(
       ObjectId id) async {
