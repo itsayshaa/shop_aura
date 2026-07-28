@@ -14,11 +14,11 @@ class Authservice extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
   String? get userName => _userName;
   String? get userEmail => _userEmail;
-  String baseUrl = Apiconfig.baseUrl;
+  String? get baseurl => Apiconfig.baseUrl;
   Future<bool> login({required String email, required String password})async{
     try{
       final response = await http.post(
-        Uri.parse("$baseUrl/login"),
+        Uri.parse("$baseurl/login"),
         headers: {"Content-Type":"application/json"},
         body: jsonEncode({
           "email":email,
@@ -75,7 +75,7 @@ static Future<String?> getToken()async{
     required String password
   })async{
     final response = await http.post(
-      Uri.parse("$baseUrl/register"),
+      Uri.parse("$baseurl/register"),
       headers: {"Content-Type":"application/json"},
       body: jsonEncode({
         "name":name,

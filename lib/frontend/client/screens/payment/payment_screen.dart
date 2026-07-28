@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/frontend/services/order_service.dart';
+import 'package:shop_aura/frontend/models/cart_item_model.dart';
 
 import 'package:shop_aura/frontend/client/screens/payment/payment_types.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/order_summary_section.dart';
@@ -134,19 +137,32 @@ class _PaymentScreenState extends State<PaymentScreen> {
       await Future.delayed(const Duration(seconds: 2));
 
       if (!mounted) return;
-      
+
       final double totalPaid = _finalTotal;
-      
+
+      // Construct and add the order
+      final itemsToOrder = List<CartItem>.from(CartService.instance.items);
+      final newOrder = OrderModel(
+        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
+        items: itemsToOrder,
+        totalAmount: totalPaid,
+        date: DateTime.now(),
+        status: "Processing",
+        name: _addressNameCtrl.text.isNotEmpty ? _addressNameCtrl.text : "Customer",
+        phone: _addressPhoneCtrl.text.isNotEmpty ? _addressPhoneCtrl.text : "N/A",
+        address: "${_addressStreetCtrl.text}, ${_addressCityCtrl.text}, ${_addressStateCtrl.text} ${_addressZipCtrl.text}",
+        paymentMethod: _selectedMethod.name,
+      );
+
+      await OrderService.instance.addOrder(newOrder);
+
       // Clear cart on successful order
       CartService.instance.clearCart();
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => SuccessScreen(
-            total: totalPaid,
-            onDone: () => Navigator.popUntil(context, (r) => r.isFirst),
-          ),
+          builder: (_) => SuccessScreen(order: newOrder),
         ),
       );
     } catch (e) {

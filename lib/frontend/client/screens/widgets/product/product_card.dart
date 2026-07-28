@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../../../models/product_model.dart';
 import '../../../../theme/app_colors.dart';
+import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 class ProductCard extends StatefulWidget {
   final ProductModel product;
@@ -89,20 +90,43 @@ class _ProductCardState extends State<ProductCard> {
                   Positioned(
                     top: 8,
                     right: 8,
-                    child: InkWell(
-                      onTap: widget.onFavourite,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_border,
-                          size: 20,
-                          color: Colors.red,
-                        ),
-                      ),
+                    child: ListenableBuilder(
+                      listenable: WishlistService.instance,
+                      builder: (context, _) {
+                        final isWishlisted = WishlistService.instance.isWishlisted(product.name);
+                        return InkWell(
+                          onTap: () {
+                            WishlistService.instance.toggle(
+                              image: product.image,
+                              category: product.category,
+                              name: product.name,
+                              rating: product.rating,
+                              reviews: product.reviews,
+                              price: product.price.toInt(),
+                              oldPrice: product.oldPrice.toInt(),
+                              discount: product.discount,
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const WishlistScreen(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isWishlisted ? Icons.favorite : Icons.favorite_border,
+                              size: 20,
+                              color: Colors.red,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

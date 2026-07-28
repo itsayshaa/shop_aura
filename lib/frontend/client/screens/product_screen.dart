@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/product/review_card.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
+import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
+import 'package:shop_aura/frontend/client/screens/payment/payment_screen.dart';
 
 class ProductScreen extends StatefulWidget {
   final String productName;
@@ -62,6 +66,7 @@ class _ProductScreenState
   @override
   void initState() {
     super.initState();
+    favourite = WishlistService.instance.isWishlisted(widget.productName);
 
     images.addAll([
       widget.image,
@@ -96,8 +101,21 @@ class _ProductScreenState
 
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
-
+                  onPressed: () {
+                    CartService.instance.addToCart(
+                      image: widget.image,
+                      category: widget.category,
+                      name: widget.productName,
+                      price: widget.price.toInt(),
+                      oldPrice: widget.oldPrice.toInt(),
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PaymentScreen(),
+                      ),
+                    );
+                  },
                   child: const Text(
                     "Buy Now",
                   ),
@@ -114,7 +132,21 @@ class _ProductScreenState
                         AppColors.primary,
                   ),
 
-                  onPressed: () {},
+                  onPressed: () {
+                    CartService.instance.addToCart(
+                      image: widget.image,
+                      category: widget.category,
+                      name: widget.productName,
+                      price: widget.price.toInt(),
+                      oldPrice: widget.oldPrice.toInt(),
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CartScreen(),
+                      ),
+                    );
+                  },
 
                   child: const Text(
                     "Add to Cart",
@@ -160,9 +192,26 @@ class _ProductScreenState
                   backgroundColor: Colors.white,
                   child: IconButton(
                     onPressed: () {
+                      final discount = (((widget.oldPrice - widget.price) / widget.oldPrice) * 100).round();
+                      WishlistService.instance.toggle(
+                        image: widget.image,
+                        category: widget.category,
+                        name: widget.productName,
+                        rating: widget.rating,
+                        reviews: widget.reviews,
+                        price: widget.price.toInt(),
+                        oldPrice: widget.oldPrice.toInt(),
+                        discount: discount,
+                      );
                       setState(() {
-                        favourite = !favourite;
+                        favourite = WishlistService.instance.isWishlisted(widget.productName);
                       });
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const WishlistScreen(),
+                        ),
+                      );
                     },
                     icon: Icon(
                       favourite

@@ -5,6 +5,7 @@ import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:shop_aura/backend/services/authServices.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/profile/edit_details.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -105,7 +106,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 35),
                         OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const OrdersScreen(),
+                              ),
+                            );
+                          },
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size(double.infinity, 60),
                             shape: RoundedRectangleBorder(
