@@ -111,7 +111,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 35),
                         OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            
+                          },
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size(double.infinity, 60),
                             shape: RoundedRectangleBorder(

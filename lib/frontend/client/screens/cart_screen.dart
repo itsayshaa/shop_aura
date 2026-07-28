@@ -248,7 +248,7 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         child: const Text(
-                          "Checkout",
+                          "BUY NOW",
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),

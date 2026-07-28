@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -174,6 +175,12 @@ class WishlistScreen extends StatelessWidget {
                                 content: Text("${item.name} added to cart"),
                                 duration: const Duration(seconds: 1),
                                 behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CartScreen(),
                               ),
                             );
                           },
