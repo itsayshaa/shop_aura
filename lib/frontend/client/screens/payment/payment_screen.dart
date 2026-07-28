@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/frontend/services/order_service.dart';
+import 'package:shop_aura/frontend/models/cart_item_model.dart';
 
 import 'package:shop_aura/frontend/client/screens/payment/payment_types.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/order_summary_section.dart';
@@ -126,19 +129,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
       await Future.delayed(const Duration(seconds: 2));
 
       if (!mounted) return;
-      
+
       final double totalPaid = _finalTotal;
       CartService.instance.clearCart();
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SuccessScreen(
-            total: totalPaid,
-            onDone: () => Navigator.popUntil(context, (r) => r.isFirst),
-          ),
-        ),
-      );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (_) => SuccessScreen(order:o ),
+      //   ),
+      // );
     } catch (e) {
       if (!mounted) return;
       Navigator.pushReplacement(

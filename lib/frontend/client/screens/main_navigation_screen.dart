@@ -4,12 +4,14 @@ import 'home_screen.dart';
 import 'category_screen.dart';
 import 'wishlist_screen.dart';
 import 'cart_screen.dart';
+import 'orders_screen.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/bottom_nav_bar.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class MainNavigationScreen extends StatefulWidget {
-  const MainNavigationScreen({super.key});
+  final int initialIndex;
+  const MainNavigationScreen({super.key, this.initialIndex = 0});
 
   @override
   State<MainNavigationScreen> createState() =>
@@ -18,19 +20,21 @@ class MainNavigationScreen extends StatefulWidget {
 
 class _MainNavigationScreenState
     extends State<MainNavigationScreen> {
-  int currentIndex = 0;
+  late int currentIndex;
 
   late final List<Widget> pages;
 
   @override
   void initState() {
     super.initState();
+    currentIndex = widget.initialIndex;
 
     pages = const [
       HomeScreen(),
       CategoryScreen(),
       WishlistScreen(),
       CartScreen(),
+      OrdersScreen(),
     ];
   }
 
