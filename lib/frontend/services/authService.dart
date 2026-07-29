@@ -31,18 +31,19 @@ class Authservice extends ChangeNotifier {
         final userName = body["user"]["name"];
         final userEmail = body["user"]["email"];
         final userPhone = body["user"]["phone"];
+        final role = body["user"]["role"];
+
 
         final createdAt = body["user"]["createdAt"];
         DateTime date = DateTime.parse(createdAt);
         final joinedAt = DateFormat('MMMM d, yyyy').format(date);
         final prefs = await SharedPreferences.getInstance();
-
         await prefs.setString("jwt_token", token);
         await prefs.setString("user_name", userName);
         await prefs.setString("user_email", userEmail);
         await prefs.setString("user_phone", userPhone);
         await prefs.setString("createdAt", joinedAt);
-
+        await prefs.setString("user_role", role);
         _isLoggedIn = true;
         _userName = body["name"];
         _userEmail = body["email"];
@@ -102,4 +103,39 @@ static Future<String?> getToken()async{
     await prefs.remove("user_email");
     await prefs.remove("user_phone");
   }
+
+
+  static Future<bool> updateProfile({
+  required String name,
+  required String phone,
+}) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+
+    final token = prefs.getString("jwt_token");
+
+    final response = await http.put(
+      Uri.parse("${Apiconfig.baseUrl}/auth/profile"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+      body: jsonEncode({
+        "name": name,
+        "phone": phone,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      await prefs.setString("user_name", name);
+      await prefs.setString("user_phone", phone);
+      return true;
+    }
+
+    return false;
+  } catch (e) {
+    print(e);
+    return false;
+  }
+}
 }

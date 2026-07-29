@@ -36,6 +36,11 @@ class AppColors {
   static const Color text = Color(0xFF1F2937);
   static const Color textSoft = Color(0xFF6B7280);
 
+  static const green = Color(0xFF1E8E5A);
+  static const greenBg = Color(0xFFE6F6EE);
+  static const textDark = Color(0xFF1F1D2B);
+  static const textGrey = Color(0xFF8A8A9A);
+  static const cardBorder = Color(0xFFEDEDF2);
 
   static const Color white = Colors.white;
   static const Color black = Colors.black;
