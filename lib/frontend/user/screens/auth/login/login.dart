@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:shop_aura/frontend/user/screens/home_screen.dart';
+=======
+import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shop_aura/frontend/user/screens/home_screen.dart';
+>>>>>>> 663ab323a58f47080480419bbaa0fb2e3ce523c3
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/user/screens/widgets/auth/auth_text_field.dart';
 import 'package:shop_aura/frontend/user/screens/widgets/auth/button.dart';
@@ -7,8 +12,13 @@ import 'package:shop_aura/frontend/user/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:shop_aura/frontend/user/screens/auth/password/forgot_password.dart';
+<<<<<<< HEAD
 
 
+=======
+import 'package:shop_aura/main.dart';
+import 'package:shop_aura/frontend/client/dashboard.dart';
+>>>>>>> 663ab323a58f47080480419bbaa0fb2e3ce523c3
 class LoginPage extends StatefulWidget{
 @override
 State<LoginPage> createState() => _LoginPage();
@@ -35,14 +45,22 @@ Future<void> _handleLogin() async {
     if (!mounted) return;
 
     if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString("user_role");
+
+      if(role == "admin"){
+        if(!mounted) return;
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> AdminApp()));
+        return;
+      }
       if(!context.mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const ShopAuraApp(),
         ),
         (route) => false,
       );
-    } 
+    }
   } catch (e) {
     if (!mounted) return;
 

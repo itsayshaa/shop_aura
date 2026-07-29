@@ -4,13 +4,12 @@ import 'package:shelf_router/shelf_router.dart';
 import 'package:shop_aura/backend/controller/authController/authController.dart';
 import 'package:shop_aura/backend/controller/authController/emailController.dart';
 import 'package:shop_aura/backend/controller/authController/passwordController.dart';
-
 class AuthRoutes{
   Router get router{
     final router = Router();
     router.post('/register',registerUser);
     router.post('/login',loginUser);
-
+    router.put('/profile', updateProfile);
     
     router.post('/forgotpassword',sendOtp);
     router.post('/verify-otp',verifyOtp);
