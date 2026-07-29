@@ -10,6 +10,7 @@ class UserModel{
   String createdAt;
   bool isVerified;
   bool isBlocked;
+  String role;
 
   UserModel({
     this.id,
@@ -23,6 +24,7 @@ class UserModel{
     required this.isVerified,
     required this.isBlocked,
     required this.createdAt,
+    required this.role
   });
 
   Map<String,dynamic> toJson(){
@@ -36,8 +38,8 @@ class UserModel{
       "profile_image":profileImage,
       "isVerified":isVerified,
       "isBlocked":isBlocked,
-      "createdAt":createdAt
-
+      "createdAt":createdAt,
+      "role":role
     };
   }
 
