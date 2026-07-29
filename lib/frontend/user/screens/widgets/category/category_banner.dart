@@ -48,7 +48,7 @@ class _CategoryBannerState extends State<CategoryBanner>
     return ScaleTransition(
       scale: _scaleAnimation,
       child: Container(
-        height: 230,
+        height: 290,
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
