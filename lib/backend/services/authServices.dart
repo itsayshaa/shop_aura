@@ -71,7 +71,4 @@ class Authservices {
     await prefs.remove("user_phone");
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ShopAuraApp()));
   }
-
-
-
 }
