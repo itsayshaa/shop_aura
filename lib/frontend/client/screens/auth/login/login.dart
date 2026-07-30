@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
@@ -7,6 +8,11 @@ import 'package:shop_aura/frontend/client/screens/auth/register/register.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:shop_aura/frontend/client/screens/auth/password/forgot_password.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/services/order_service.dart';
+import 'package:shop_aura/frontend/client/screens/main_navigation_screen.dart';
+import 'package:shop_aura/main.dart';
 
 
 class LoginPage extends StatefulWidget{
@@ -35,14 +41,22 @@ Future<void> _handleLogin() async {
     if (!mounted) return;
 
     if (success) {
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString("user_role");
+
+      if(role == "admin"){
+        if(!mounted) return;
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> ShopAuraApp()));
+        return;
+      }
       if(!context.mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) =>  ShopAuraApp(),
         ),
         (route) => false,
       );
-    } 
+    }
   } catch (e) {
     if (!mounted) return;
 

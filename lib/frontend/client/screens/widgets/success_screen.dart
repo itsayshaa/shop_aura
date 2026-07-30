@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shop_aura/frontend/models/order_model.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/category_screen.dart';
+import 'package:shop_aura/frontend/client/screens/main_navigation_screen.dart';
 import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
 
 class SuccessScreen extends StatelessWidget {
@@ -16,7 +16,7 @@ class SuccessScreen extends StatelessWidget {
   void _handleContinueShopping(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const CategoryScreen()),
+      MaterialPageRoute(builder: (_) => const MainNavigationScreen(initialIndex: 1)),
       (route) => false,
     );
   }
@@ -93,7 +93,6 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // Order Summary Details Card
                     Card(
                       elevation: 0,
                       color: Colors.white,
@@ -153,7 +152,6 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Items Card
                     Card(
                       elevation: 0,
                       color: Colors.white,
@@ -242,7 +240,6 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Delivery Address Card
                     Card(
                       elevation: 0,
                       color: Colors.white,
@@ -285,7 +282,6 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Total Paid Card
                     Card(
                       elevation: 0,
                       color: Colors.white,
@@ -319,7 +315,6 @@ class SuccessScreen extends StatelessWidget {
               ),
             ),
 
-            // Action Buttons
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(

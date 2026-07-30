@@ -5,6 +5,8 @@ import 'package:shop_aura/frontend/models/order_model.dart';
 import 'package:shop_aura/frontend/services/order_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
+import 'package:shop_aura/frontend/client/screens/main_navigation_screen.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/bottom_nav_bar.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -24,6 +26,16 @@ class _OrdersScreenState extends State<OrdersScreen> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
+    );
+  }
+
+  void _handleNavTap(BuildContext context, int index) {
+    if (index == 3) return; // already on Orders
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => MainNavigationScreen(initialIndex: index)),
       (route) => false,
     );
   }
@@ -98,6 +110,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
             },
           );
         },
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 3,
+        onTap: (index) => _handleNavTap(context, index),
       ),
     );
   }
