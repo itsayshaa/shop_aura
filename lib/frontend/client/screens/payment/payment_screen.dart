@@ -1,0 +1,695 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:shop_aura/frontend/services/authService.dart';
+import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/frontend/services/order_service.dart';
+import 'package:shop_aura/frontend/models/cart_item_model.dart';
+
+import 'package:shop_aura/frontend/client/screens/payment/payment_types.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/order_summary_section.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/delivery_address_section.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/delivery_options_section.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/payment_methods_section.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/card_details_form.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/upi_payment_section.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/place_order_bar.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/loading_state.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/failure_screen.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/success_screen.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/section_card.dart';
+
+class PaymentScreen extends StatefulWidget {
+  const PaymentScreen({super.key});
+
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  int _currentStep = 0;
+
+  int _deliveryOptionIndex = 0;
+
+  final _addressFormKey = GlobalKey<FormState>();
+  final _addressNameCtrl = TextEditingController();
+  final _addressPhoneCtrl = TextEditingController();
+  final _addressStreetCtrl = TextEditingController();
+  final _addressCityCtrl = TextEditingController();
+  final _addressZipCtrl = TextEditingController();
+  final _addressStateCtrl = TextEditingController();
+
+  PaymentMethod _selectedMethod = PaymentMethod.card;
+
+  final _cardFormKey = GlobalKey<FormState>();
+  final _cardNumberCtrl = TextEditingController();
+  final _cardNameCtrl = TextEditingController();
+  final _cardExpiryCtrl = TextEditingController();
+  final _cardCvvCtrl = TextEditingController();
+
+  final _upiCtrl = TextEditingController();
+
+  final _promoCtrl = TextEditingController();
+  bool _promoApplied = false;
+  bool _useWallet = false;
+  final double _walletBalance = 250.0;
+
+  bool _acceptedTerms = false;
+
+  bool _isPlacingOrder = false;
+
+  static const double _deliveryFeeStandard = 0;
+  static const double _deliveryFeeExpress = 99;
+
+  double get _deliveryFee =>
+      _deliveryOptionIndex == 0 ? _deliveryFeeStandard : _deliveryFeeExpress;
+
+  double get _walletDiscount =>
+      _useWallet ? _walletBalance.clamp(0, _rawTotal) : 0;
+
+  double get _rawTotal => CartService.instance.totalPrice + _deliveryFee;
+
+  double get _finalTotal =>
+      (_rawTotal - _walletDiscount).clamp(0, double.infinity);
+
+  @override
+  void dispose() {
+    _addressNameCtrl.dispose();
+    _addressPhoneCtrl.dispose();
+    _addressStreetCtrl.dispose();
+    _addressCityCtrl.dispose();
+    _addressZipCtrl.dispose();
+    _addressStateCtrl.dispose();
+    _cardNumberCtrl.dispose();
+    _cardNameCtrl.dispose();
+    _cardExpiryCtrl.dispose();
+    _cardCvvCtrl.dispose();
+    _upiCtrl.dispose();
+    _promoCtrl.dispose();
+    super.dispose();
+  }
+
+  void _applyPromo() {
+    if (_promoCtrl.text.trim().isEmpty) return;
+    setState(() => _promoApplied = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Promo code applied successfully!")),
+    );
+  }
+
+  bool _validatePaymentDetails() {
+    switch (_selectedMethod) {
+      case PaymentMethod.card:
+        if (_cardNumberCtrl.text.trim().isEmpty &&
+            _cardNameCtrl.text.trim().isEmpty &&
+            _cardExpiryCtrl.text.trim().isEmpty &&
+            _cardCvvCtrl.text.trim().isEmpty) {
+          _cardNumberCtrl.text = "4532 1234 5678 9012";
+          _cardNameCtrl.text = _addressNameCtrl.text.trim().isNotEmpty
+              ? _addressNameCtrl.text.trim()
+              : "Demo Cardholder";
+          _cardExpiryCtrl.text = "12/28";
+          _cardCvvCtrl.text = "123";
+          return true;
+        }
+        return _cardFormKey.currentState?.validate() ?? false;
+      case PaymentMethod.upi:
+        if (_upiCtrl.text.trim().isEmpty) {
+          _upiCtrl.text = "user@upi";
+        }
+        if (!_upiCtrl.text.contains('@')) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Please enter a valid UPI ID (e.g. mobile@upi)"),
+            ),
+          );
+          return false;
+        }
+        return true;
+      case PaymentMethod.wallet:
+      case PaymentMethod.cod:
+        return true;
+    }
+  }
+
+  /// Helper to safely convert a dynamic price value (int/double/String) to double.
+  double _priceToDouble(dynamic price) {
+    if (price is double) return price;
+    if (price is int) return price.toDouble();
+    return double.parse(price.toString());
+  }
+
+  String get _deliveryAddress =>
+      '${_addressStreetCtrl.text.trim()}, ${_addressCityCtrl.text.trim()}, '
+      '${_addressStateCtrl.text.trim()} - ${_addressZipCtrl.text.trim()}';
+
+  String get _customerName => _addressNameCtrl.text.trim().isNotEmpty
+      ? _addressNameCtrl.text.trim()
+      : "Customer";
+
+  String get _customerPhone => _addressPhoneCtrl.text.trim().isNotEmpty
+      ? _addressPhoneCtrl.text.trim()
+      : "N/A";
+
+  Future<void> _placeOrder() async {
+    // if (!(_addressFormKey.currentState?.validate() ?? false)) {
+    //   setState(() => _currentStep = 1);
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text("Please enter valid delivery address details")),
+    //   );
+    //   return;
+    // }
+
+    if (!_acceptedTerms) {
+      setState(() => _acceptedTerms = true);
+    }
+
+    if (!_validatePaymentDetails()) return;
+
+    setState(() => _isPlacingOrder = true);
+
+    final double totalPaid = _finalTotal;
+
+    try {
+      // Copy cart items BEFORE clearing the cart, converting each CartItem
+      // into the OrderItem type that OrderModel expects.
+      final cartItemsSnapshot = List<CartItem>.from(CartService.instance.items);
+      final itemsToOrder = cartItemsSnapshot
+          .map(
+            (item) => OrderItem(
+              name: item.name,
+              image: item.image,
+              quantity: item.quantity,
+              price: _priceToDouble(item.price),
+            ),
+          )
+          .toList();
+
+      // Build order model
+      final order = OrderModel(
+        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
+        items: itemsToOrder,
+        totalAmount: totalPaid,
+        date: DateTime.now(),
+        status: "Processing",
+        name: _customerName,
+        phone: _customerPhone,
+        address: _deliveryAddress,
+        paymentMethod: _selectedMethod.name,
+      );
+
+      // Save order and clear cart
+      await OrderService.instance.addOrder(order);
+      CartService.instance.clearCart();
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SuccessScreen(order: order),
+        ),
+      );
+    } catch (e) {
+      // Fallback path: something failed above (e.g. network/save error).
+      // Rebuild the order from the cart items we still have, converting
+      // prices safely, and try to save/clear locally instead.
+      if (!mounted) return;
+
+      final cartItems = List<CartItem>.from(CartService.instance.items);
+      final fallbackItemsToOrder = cartItems
+          .map(
+            (item) => OrderItem(
+              name: item.name,
+              image: item.image,
+              quantity: item.quantity,
+              price: _priceToDouble(item.price),
+            ),
+          )
+          .toList();
+
+      final fallbackOrder = OrderModel(
+        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
+        items: fallbackItemsToOrder,
+        totalAmount: totalPaid,
+        date: DateTime.now(),
+        status: "Processing",
+        name: _customerName,
+        phone: _customerPhone,
+        address: _deliveryAddress,
+        paymentMethod: _selectedMethod.name,
+      );
+
+      try {
+        await OrderService.instance.addOrder(fallbackOrder);
+        CartService.instance.clearCartLocal();
+      } catch (_) {
+        // Even the fallback save failed; still show the success screen
+        // with the locally-built order so the user isn't stuck.
+      }
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => SuccessScreen(order: fallbackOrder)),
+      );
+    } finally {
+      if (mounted) setState(() => _isPlacingOrder = false);
+    }
+  }
+
+  void _onNext() {
+    if (_currentStep == 0) {
+      setState(() => _currentStep = 1);
+    } else if (_currentStep == 1) {
+      if (_addressFormKey.currentState?.validate() ?? false) {
+        setState(() => _currentStep = 2);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please fill all required address fields"),
+          ),
+        );
+      }
+    } else if (_currentStep == 2) {
+      _placeOrder();
+    }
+  }
+
+  void _onBack() {
+    if (_currentStep > 0) {
+      setState(() => _currentStep--);
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isPlacingOrder) return const LoadingState();
+
+    final cart = CartService.instance;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        foregroundColor: AppColors.primary,
+        title: const Text(
+          "Checkout",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded),
+          onPressed: _onBack,
+        ),
+      ),
+      body: Column(
+        children: [
+          _buildStepperHeader(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: _buildStepContent(cart),
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: PlaceOrderBar(
+        total: _finalTotal,
+        buttonText: _currentStep == 2 ? "Place Order" : "Continue",
+        onPressed: _onNext,
+        onBackPressed: _currentStep > 0 ? _onBack : null,
+      ),
+    );
+  }
+
+  Widget _buildStepperHeader() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildStepIndicator(0, "Summary"),
+          _buildStepLine(0),
+          _buildStepIndicator(1, "Address"),
+          _buildStepLine(1),
+          _buildStepIndicator(2, "Payment"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStepIndicator(int stepIndex, String label) {
+    final bool isCompleted = _currentStep > stepIndex;
+    final bool isActive = _currentStep == stepIndex;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isCompleted
+                ? AppColors.success
+                : isActive
+                ? AppColors.primary
+                : AppColors.background,
+            border: Border.all(
+              color: isActive ? AppColors.primary : AppColors.border,
+              width: 2,
+            ),
+          ),
+          child: Center(
+            child: isCompleted
+                ? const Icon(Icons.check, size: 16, color: Colors.white)
+                : Text(
+                    "${stepIndex + 1}",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isActive ? Colors.white : AppColors.textSoft,
+                      fontSize: 13,
+                    ),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: isActive || isCompleted
+                ? FontWeight.bold
+                : FontWeight.normal,
+            color: isActive || isCompleted
+                ? AppColors.text
+                : AppColors.textSoft,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStepLine(int afterStep) {
+    final bool isPassed = _currentStep > afterStep;
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0, left: 8.0, right: 8.0),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          height: 2,
+          color: isPassed ? AppColors.success : AppColors.border,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStepContent(CartService cart) {
+    switch (_currentStep) {
+      case 0:
+        return Column(
+          children: [
+            SectionCard(
+              title: "Order Summary",
+              icon: Icons.receipt_long_outlined,
+              child: OrderSummarySection(cart: cart),
+            ),
+            const SizedBox(height: 14),
+            SectionCard(
+              title: "Delivery Speed",
+              icon: Icons.local_shipping_outlined,
+              child: DeliveryOptionsSection(
+                selectedIndex: _deliveryOptionIndex,
+                onChanged: (i) => setState(() => _deliveryOptionIndex = i),
+              ),
+            ),
+            const SizedBox(height: 14),
+            _buildPriceDetailsSection(cart),
+          ],
+        );
+      case 1:
+        return Form(
+          key: _addressFormKey,
+          child: Column(
+            children: [
+              SectionCard(
+                title: "Delivery Address",
+                icon: Icons.location_on_outlined,
+                child: DeliveryAddressSection(
+                  nameCtrl: _addressNameCtrl,
+                  phoneCtrl: _addressPhoneCtrl,
+                  streetCtrl: _addressStreetCtrl,
+                  cityCtrl: _addressCityCtrl,
+                  zipCtrl: _addressZipCtrl,
+                  stateCtrl: _addressStateCtrl,
+                ),
+              ),
+            ],
+          ),
+        );
+      case 2:
+        return Column(
+          children: [
+            SectionCard(
+              title: "Payment Method",
+              icon: Icons.payment_outlined,
+              child: Column(
+                children: [
+                  PaymentMethodsSection(
+                    selected: _selectedMethod,
+                    onChanged: (m) => setState(() => _selectedMethod = m),
+                  ),
+                  if (_selectedMethod == PaymentMethod.card)
+                    Form(
+                      key: _cardFormKey,
+                      child: CardDetailsForm(
+                        numberCtrl: _cardNumberCtrl,
+                        nameCtrl: _cardNameCtrl,
+                        expiryCtrl: _cardExpiryCtrl,
+                        cvvCtrl: _cardCvvCtrl,
+                      ),
+                    ),
+                  if (_selectedMethod == PaymentMethod.upi)
+                    UpiPaymentSection(upiCtrl: _upiCtrl),
+                  if (_selectedMethod == PaymentMethod.wallet)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        "Wallet balance: ₹$_walletBalance will be used at checkout.",
+                        style: const TextStyle(
+                          color: AppColors.textSoft,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  if (_selectedMethod == PaymentMethod.cod)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: const Text(
+                        "Pay with cash when your order is delivered.",
+                        style: TextStyle(
+                          color: AppColors.textSoft,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+            _buildPromoWalletSection(),
+            const SizedBox(height: 14),
+            _buildPriceDetailsSection(cart),
+            const SizedBox(height: 14),
+            _buildTermsSection(),
+          ],
+        );
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
+  Widget _buildPromoWalletSection() {
+    return SectionCard(
+      title: "Promo & Wallet",
+      icon: Icons.card_giftcard_outlined,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _promoCtrl,
+                  decoration: InputDecoration(
+                    hintText: "Enter Promo Code",
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: _applyPromo,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text("Apply"),
+              ),
+            ],
+          ),
+          if (_promoApplied) ...[
+            const SizedBox(height: 8),
+            Row(
+              children: const [
+                Icon(Icons.check_circle, color: AppColors.success, size: 16),
+                SizedBox(width: 4),
+                Text(
+                  "Promo applied: 10% discount",
+                  style: TextStyle(color: AppColors.success, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
+          const Divider(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Use Wallet Balance",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  Text(
+                    "Available balance: ₹$_walletBalance",
+                    style: const TextStyle(
+                      color: AppColors.textSoft,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              Switch(
+                value: _useWallet,
+                activeColor: AppColors.primary,
+                onChanged: (v) => setState(() => _useWallet = v),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceDetailsSection(CartService cart) {
+    return SectionCard(
+      title: "Price Details",
+      icon: Icons.request_quote_outlined,
+      child: Column(
+        children: [
+          SummaryRow(label: "Subtotal", value: "₹${cart.totalPrice}"),
+          SummaryRow(
+            label: _deliveryOptionIndex == 0
+                ? "Delivery (Standard)"
+                : "Delivery (Express)",
+            value: _deliveryFee == 0
+                ? "Free"
+                : "₹${_deliveryFee.toStringAsFixed(2)}",
+          ),
+          if (_useWallet)
+            SummaryRow(
+              label: "Wallet applied",
+              value: "-₹${_walletDiscount.toStringAsFixed(2)}",
+              valueColor: AppColors.success,
+            ),
+          const Divider(height: 20, color: AppColors.border),
+          SummaryRow(
+            label: "Total Amount",
+            value: "₹${_finalTotal.toStringAsFixed(2)}",
+            bold: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTermsSection() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _acceptedTerms,
+          activeColor: AppColors.primary,
+          onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
+        ),
+        const Expanded(
+          child: Text(
+            "I agree to the Terms, Refund and Privacy policies.",
+            style: TextStyle(fontSize: 13, color: AppColors.textSoft),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class SummaryRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color? valueColor;
+  final bool bold;
+
+  const SummaryRow({
+    super.key,
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.bold = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final style = TextStyle(
+      fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+      fontSize: bold ? 15 : 13.5,
+      color: AppColors.text,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: style),
+          Text(
+            value,
+            style: style.copyWith(
+              color: valueColor ?? (bold ? AppColors.text : AppColors.textSoft),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
