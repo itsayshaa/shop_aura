@@ -151,14 +151,14 @@ void initState() {
 
                   CategoryBanner(onShopNow: () {}),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   const SectionTitle(
                     title: "Featured Collections",
                     subtitle: "Best shopping collections for you",
                   ),
 
                   SizedBox(
-                    height: 240,
+                    height: 280,
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -4,7 +4,6 @@ import '../database/mongo_service.dart';
 import './../models/client/productModel.dart';
 
 class ProductServices {
-
   static Future<List<ProductModel>> getProducts() async {
     final data = await MongoService.products.find().toList();
 
@@ -14,18 +13,16 @@ class ProductServices {
   }
 
 
-  static Future<List<ProductModel>> getProductsByCategory(
-      ObjectId categoryId) async {
-    final data = await MongoService.products
-        .find(
-          where.eq("categoryId", categoryId),
-        )
-        .toList();
 
+  static Future<List<ProductModel>> getProductsByCategory(
+    
+      ObjectId categoryId) async {
+    final data = await MongoService.products.find().toList();
     return data
         .map((e) => ProductModel.fromJson(e))
         .toList();
   }
+
 
 
   static Future<ProductModel?> getProductById(
@@ -60,6 +57,7 @@ class ProductServices {
       product.toJson(),
     );
   }
+
 
   static Future<void> updateProduct(
       ProductModel product) async {
