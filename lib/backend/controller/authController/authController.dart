@@ -38,7 +38,8 @@ Future<Response> registerUser(Request request)async{
     profileImage: "",
     isBlocked: false,
     isVerified: false,
-    createdAt: DateTime.now().toUtc().toIso8601String()
+    createdAt: DateTime.now().toUtc().toIso8601String(),
+    role: "user"
   );
   await MongoService.users.insertOne(
     user.toJson()
@@ -121,7 +122,8 @@ print("user founded");
         "name": user["name"],
         "email": user["email"],
         "phone": user["phone"],
-        "createdAt":user["createdAt"]
+        "createdAt":user["createdAt"],
+        "role":user["role"]
       },
     };
 
@@ -129,6 +131,7 @@ print("user founded");
       jsonEncode(res),
       headers: {
         "Content-Type": "application/json",
+        
       },
     );
   } catch (e) {
@@ -145,7 +148,54 @@ print("user founded");
     );
   }
 }
+Future<Response> updateProfile(Request request) async {
+    try {
+      final body = jsonDecode(await request.readAsString());
 
+      final token =
+          request.headers["authorization"]?.replaceFirst("Bearer ", "");
+
+      if (token == null) {
+        return Response.forbidden(
+          jsonEncode({
+            "success": false,
+            "message": "Token missing",
+          }),
+        );
+      }
+
+      final payload = Jwtservice.verifyToken(token);
+
+      final email = payload?["email"];
+
+      final name = body["name"];
+      final phone = body["phone"];
+
+      await MongoService.users.updateOne(
+        where.eq("email", email),
+        modify
+          ..set("name", name)
+          ..set("phone", phone),
+      );
+
+      return Response.ok(
+        jsonEncode({
+          "success": true,
+          "message": "Profile updated",
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+    } catch (e) {
+      return Response.internalServerError(
+        body: jsonEncode({
+          "success": false,
+          "message": e.toString(),
+        }),
+      );
+    }
+  }
 Future<Response> getUser(Request request)async{
   final users = await MongoService.users.find().toList();
   return Response.ok(

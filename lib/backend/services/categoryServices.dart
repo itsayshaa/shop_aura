@@ -5,6 +5,8 @@ import '../models/client/categoryModel.dart';
 
 class CategoryServices {
 
+
+
   static Future<List<CategoryModel>> getCategories() async {
     final data = await MongoService.categories.find().toList();
 
@@ -12,6 +14,7 @@ class CategoryServices {
         .map((e) => CategoryModel.fromJson(e))
         .toList();
   }
+
 
   static Future<List<CategoryModel>> getFeaturedCategories() async {
     final data = await MongoService.categories
@@ -24,6 +27,7 @@ class CategoryServices {
         .map((e) => CategoryModel.fromJson(e))
         .toList();
   }
+
 
   static Future<List<CategoryModel>> searchCategory(
       String keyword) async {
@@ -44,6 +48,7 @@ class CategoryServices {
     );
   }
 
+
   static Future<void> updateCategory(
       CategoryModel category) async {
     await MongoService.categories.replaceOne(
@@ -51,6 +56,7 @@ class CategoryServices {
       category.toJson(),
     );
   }
+
 
   static Future<void> deleteCategory(
       ObjectId id) async {

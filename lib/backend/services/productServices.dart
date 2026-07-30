@@ -14,18 +14,14 @@ class ProductServices {
   }
 
 
+
   static Future<List<ProductModel>> getProductsByCategory(
       ObjectId categoryId) async {
-    final data = await MongoService.products
-        .find(
-          where.eq("categoryId", categoryId),
-        )
-        .toList();
-
     return data
         .map((e) => ProductModel.fromJson(e))
         .toList();
   }
+
 
 
   static Future<ProductModel?> getProductById(
@@ -60,6 +56,7 @@ class ProductServices {
       product.toJson(),
     );
   }
+
 
   static Future<void> updateProduct(
       ProductModel product) async {
