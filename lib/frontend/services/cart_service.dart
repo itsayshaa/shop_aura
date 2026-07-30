@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:shop_aura/frontend/models/cart_item_model.dart';
+import 'package:shop_aura/frontend/services/authService.dart';
 
 class CartService extends ChangeNotifier {
   CartService._internal();
@@ -17,13 +20,39 @@ class CartService extends ChangeNotifier {
 
   bool isInCart(String name) => _items.any((item) => item.name == name);
 
-  void addToCart({
+  Future<void> fetchCartFromServer() async {
+    try {
+      final token = await Authservice.getToken();
+      if (token == null) {
+        _items.clear();
+        notifyListeners();
+        return;
+      }
+      final response = await http.get(
+        Uri.parse("${Authservice.instance.baseurl}/cart/"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
+      );
+      if (response.statusCode == 200) {
+        final List decoded = jsonDecode(response.body);
+        _items.clear();
+        _items.addAll(decoded.map((item) => CartItem.fromJson(item)).toList());
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error fetching cart: $e");
+    }
+  }
+
+  Future<void> addToCart({
     required String image,
     required String category,
     required String name,
     required int price,
     required int oldPrice,
-  }) {
+  }) async {
     final existingIndex = _items.indexWhere((item) => item.name == name);
 
     if (existingIndex != -1) {
@@ -36,32 +65,141 @@ class CartService extends ChangeNotifier {
           name: name,
           price: price,
           oldPrice: oldPrice,
+          quantity: 1,
         ),
       );
     }
     notifyListeners();
+
+    try {
+      final token = await Authservice.getToken();
+      if (token != null) {
+        await http.post(
+          Uri.parse("${Authservice.instance.baseurl}/cart/add"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode({
+            "image": image,
+            "category": category,
+            "name": name,
+            "price": price,
+            "oldPrice": oldPrice,
+            "quantity": 1
+          }),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error adding item to cart: $e");
+    }
   }
 
-  void increaseQuantity(int index) {
-    _items[index].quantity += 1;
+  Future<void> increaseQuantity(int index) async {
+    if (index < 0 || index >= _items.length) return;
+    final item = _items[index];
+    item.quantity += 1;
     notifyListeners();
+
+    try {
+      final token = await Authservice.getToken();
+      if (token != null) {
+        await http.post(
+          Uri.parse("${Authservice.instance.baseurl}/cart/update"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode({
+            "name": item.name,
+            "quantity": item.quantity,
+          }),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error increasing quantity on server: $e");
+    }
   }
 
-  void decreaseQuantity(int index) {
-    if (_items[index].quantity > 1) {
-      _items[index].quantity -= 1;
+  Future<void> decreaseQuantity(int index) async {
+    if (index < 0 || index >= _items.length) return;
+    final item = _items[index];
+    final String name = item.name;
+    final int newQty = item.quantity - 1;
+
+    if (item.quantity > 1) {
+      item.quantity -= 1;
     } else {
       _items.removeAt(index);
     }
     notifyListeners();
+
+    try {
+      final token = await Authservice.getToken();
+      if (token != null) {
+        await http.post(
+          Uri.parse("${Authservice.instance.baseurl}/cart/update"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode({
+            "name": name,
+            "quantity": newQty,
+          }),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error decreasing quantity on server: $e");
+    }
   }
 
-  void removeItem(int index) {
+  Future<void> removeItem(int index) async {
+    if (index < 0 || index >= _items.length) return;
+    final item = _items[index];
     _items.removeAt(index);
     notifyListeners();
+
+    try {
+      final token = await Authservice.getToken();
+      if (token != null) {
+        await http.post(
+          Uri.parse("${Authservice.instance.baseurl}/cart/remove"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode({
+            "name": item.name,
+          }),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error removing item on server: $e");
+    }
   }
 
-  void clearCart() {
+  Future<void> clearCart() async {
+    _items.clear();
+    notifyListeners();
+
+    try {
+      final token = await Authservice.getToken();
+      if (token != null) {
+        await http.post(
+          Uri.parse("${Authservice.instance.baseurl}/cart/clear"),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+        );
+      }
+    } catch (e) {
+      debugPrint("Error clearing cart on server: $e");
+    }
+  }
+
+  void clearCartLocal() {
     _items.clear();
     notifyListeners();
   }

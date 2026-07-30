@@ -1,29 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/models/order_model.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/main_navigation_screen.dart';
-import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
+
 
 class SuccessScreen extends StatelessWidget {
   final OrderModel order;
 
   const SuccessScreen({super.key, required this.order});
-
-  void _handleContinueShopping(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainNavigationScreen(initialIndex: 1)),
-      (route) => false,
-    );
-  }
-
-  void _handleViewOrders(BuildContext context) {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const OrdersScreen()),
-      (route) => false,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,21 +64,8 @@ class SuccessScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () => _handleContinueShopping(context),
+              onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
               child: const Text('Back to Home'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary, width: 1.5),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () => _handleViewOrders(context),
-              child: const Text('View My Orders'),
             ),
           ],
         ),

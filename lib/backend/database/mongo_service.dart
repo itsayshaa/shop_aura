@@ -1,5 +1,3 @@
-
-
 import 'package:dotenv/dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -10,6 +8,9 @@ class MongoService {
   static late DbCollection password;
   static late DbCollection categories;
   static late DbCollection products;
+  static late DbCollection carts;
+  static late DbCollection wishlists;
+  static late DbCollection orders;
   static Future<void> connect() async {
     final env = DotEnv()..load();
     final mongoUrl = env['MONGO_URL'];
@@ -22,6 +23,9 @@ class MongoService {
     password = db.collection('password');
     categories = db.collection('categories');
     products = db.collection('products');
+    carts = db.collection('carts');
+    wishlists = db.collection('wishlists');
+    orders = db.collection('orders');
     print("Mongo Db Connected");
   }
 }
