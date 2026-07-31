@@ -308,14 +308,88 @@ class _OrderCardState extends State<_OrderCard> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    order.paymentMethod.toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: AppColors.text,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        order.paymentMethod.toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: AppColors.text,
+                        ),
+                      ),
+                      if (order.paymentStatus != null)
+                        Text(
+                          "Status: ${order.paymentStatus}",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: order.paymentStatus?.toLowerCase() == 'refunded'
+                                ? Colors.purple
+                                : order.paymentStatus?.toLowerCase() == 'paid'
+                                    ? AppColors.success
+                                    : Colors.orange,
+                          ),
+                        ),
+                    ],
                   ),
+                  const SizedBox(height: 16),
+                  const Divider(height: 1, color: AppColors.border),
+                  const SizedBox(height: 12),
+                  if (order.refundStatus != null) ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.amber.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.info_outline, size: 16, color: Colors.amber),
+                              const SizedBox(width: 6),
+                              Text(
+                                "Refund Status: ${order.refundStatus}",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: Colors.amber,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (order.refundReason != null && order.refundReason!.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              "Reason: ${order.refundReason}",
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSoft),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.replay_rounded, size: 16),
+                        label: const Text("Request Refund"),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => _showRefundDialog(context, order),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -358,6 +432,97 @@ class _OrderCardState extends State<_OrderCard> {
       ),
     );
   }
+
+  void _showRefundDialog(BuildContext context, OrderModel order) {
+    String selectedReason = "Defective / Damaged Item";
+    final notesController = TextEditingController();
+    final reasons = [
+      "Defective / Damaged Item",
+      "Received Wrong Product",
+      "Item Quality Not as Expected",
+      "Delayed Delivery",
+      "Other"
+    ];
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text("Request Refund", style: TextStyle(fontWeight: FontWeight.bold)),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Order #${order.id.substring(0, 8).toUpperCase()}",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textSoft),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text("Select Reason for Refund:"),
+                    const SizedBox(height: 6),
+                    ...reasons.map((r) => RadioListTile<String>(
+                          title: Text(r, style: const TextStyle(fontSize: 13)),
+                          value: r,
+                          groupValue: selectedReason,
+                          dense: true,
+                          contentPadding: EdgeInsets.zero,
+                          onChanged: (val) {
+                            if (val != null) {
+                              setDialogState(() => selectedReason = val);
+                            }
+                          },
+                        )),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: notesController,
+                      decoration: const InputDecoration(
+                        labelText: "Additional details (optional)",
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text("Cancel"),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                  ),
+                  onPressed: () async {
+                    final reasonStr = selectedReason +
+                        (notesController.text.trim().isNotEmpty
+                            ? " - ${notesController.text.trim()}"
+                            : "");
+                    await OrderService.instance.requestRefund(order.id, reasonStr);
+                    if (context.mounted) {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Refund request submitted successfully!"),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text("Submit Request"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
 
 class _StatusChip extends StatelessWidget {
@@ -381,6 +546,10 @@ class _StatusChip extends StatelessWidget {
       case 'delivered':
         bg = AppColors.successBackground;
         fg = AppColors.success;
+        break;
+      case 'cancelled':
+        bg = Colors.red.shade50;
+        fg = Colors.red.shade700;
         break;
       default:
         bg = Colors.grey.shade100;

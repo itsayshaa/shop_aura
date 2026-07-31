@@ -10,6 +10,10 @@ class OrderRoutes {
     router.get('/', getOrders);
     router.post('/create', createOrder);
     router.post('/payment/process', processPayment);
+    router.post('/refund/request', requestRefund);
+    router.get('/admin/all', getAdminOrders);
+    router.post('/admin/update-status', updateOrderStatus);
+    router.post('/admin/refund/process', processAdminRefund);
 
     router.get('/<ignored|.*>', (Request request) async {
       return Response(

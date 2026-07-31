@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../../models/product_model.dart';
 import '../../../../theme/app_colors.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
 import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 class ProductCard extends StatefulWidget {
@@ -44,7 +46,7 @@ class _ProductCardState extends State<ProductCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 6,
+              flex: 5,
               child: Stack(
                 children: [
                   ClipRRect(
@@ -72,8 +74,7 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           "-${product.discount}%",
@@ -133,47 +134,47 @@ class _ProductCardState extends State<ProductCard> {
             ),
 
             Expanded(
-              flex: 5,
+              flex: 6,
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       product.brand,
                       style: TextStyle(
                         color: Colors.grey.shade600,
-                        fontSize: 12,
+                        fontSize: 11,
+                      ),
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    Text(
+                      product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                       ),
                     ),
 
                     const SizedBox(height: 4),
-
-                    Text(
-                      product.name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-
-                    const Spacer(),
 
                     Row(
                       children: [
                         const Icon(
                           Icons.star,
                           color: Colors.orange,
-                          size: 16,
+                          size: 14,
                         ),
                         const SizedBox(width: 3),
                         Text(
                           product.rating.toString(),
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
+                            fontSize: 12,
                           ),
                         ),
                         const Spacer(),
@@ -181,13 +182,13 @@ class _ProductCardState extends State<ProductCard> {
                           "(${product.reviews})",
                           style: TextStyle(
                             color: Colors.grey.shade600,
-                            fontSize: 12,
+                            fontSize: 11,
                           ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
 
                     Row(
                       children: [
@@ -196,22 +197,59 @@ class _ProductCardState extends State<ProductCard> {
                           style: const TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 16,
                           ),
                         ),
 
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
 
                         Text(
                           "₹${product.oldPrice.toStringAsFixed(0)}",
                           style: const TextStyle(
-                            decoration:
-                                TextDecoration.lineThrough,
+                            decoration: TextDecoration.lineThrough,
                             color: Colors.grey,
-                            fontSize: 13,
+                            fontSize: 12,
                           ),
                         ),
                       ],
+                    ),
+
+                    const Spacer(),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 32,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.shopping_cart_outlined, size: 14),
+                        label: const Text(
+                          "Add to Cart",
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          CartService.instance.addToCart(
+                            image: product.image,
+                            category: product.category,
+                            name: product.name,
+                            price: product.price.toInt(),
+                            oldPrice: product.oldPrice.toInt(),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CartScreen(),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
