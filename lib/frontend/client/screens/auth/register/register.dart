@@ -58,7 +58,7 @@ class _RegisterPage extends State<RegisterPage> {
       setState(() {
         _isLoading = true;
       });
-      final message = await Authservice.instance.register(
+      await Authservice.instance.register(
         name: _nameController.text.trim(),
         email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),

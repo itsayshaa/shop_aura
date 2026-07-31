@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shop_aura/frontend/admin/dashboard.dart';
 
 import 'frontend/theme/app_theme.dart';
-import 'frontend/client/screens/main_navigation_screen.dart';
+import 'frontend/client/screens/main_navigation_screen.dart'; 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'frontend/providers/category_provider.dart';
 import 'frontend/providers/product_provider.dart';
@@ -43,7 +43,7 @@ class ShopAuraApp extends StatelessWidget {
         title: "Shop Aura",
         theme: AppTheme.lightTheme,
         // home: const MainNavigationScreen(),
-          home: const AdminApp(),
+        home: const AdminApp(),
       ),
     );
   }

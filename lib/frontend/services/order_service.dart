@@ -71,6 +71,58 @@ class OrderService extends ChangeNotifier {
     }
   }
 
+  /// Request a refund for a given order
+  Future<void> requestRefund(String orderId, String reason) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      _orders[index] = _orders[index].copyWith(
+        refundStatus: 'Requested',
+        refundReason: reason,
+        refundRequestedAt: DateTime.now(),
+      );
+      notifyListeners();
+      await _persist();
+    }
+  }
+
+  /// Update order delivery status (Admin action)
+  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      _orders[index] = _orders[index].copyWith(status: newStatus);
+      notifyListeners();
+      await _persist();
+    }
+  }
+
+  /// Process refund action: 'approve', 'reject', or 'refund' (Admin action)
+  Future<void> processRefund(String orderId, String action) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      String refundStatus;
+      String paymentStatus;
+
+      if (action.toLowerCase() == 'approve') {
+        refundStatus = 'Approved';
+        paymentStatus = 'Refund Pending';
+      } else if (action.toLowerCase() == 'reject') {
+        refundStatus = 'Rejected';
+        paymentStatus = 'Paid';
+      } else {
+        refundStatus = 'Refunded';
+        paymentStatus = 'Refunded';
+      }
+
+      _orders[index] = _orders[index].copyWith(
+        refundStatus: refundStatus,
+        paymentStatus: paymentStatus,
+        transactionId: _orders[index].transactionId ?? 'TXN_${DateTime.now().millisecondsSinceEpoch}',
+      );
+      notifyListeners();
+      await _persist();
+    }
+  }
+
   /// Optional: clear all orders (e.g. on logout)
   Future<void> clearOrders() async {
     _orders.clear();

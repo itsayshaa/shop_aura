@@ -29,7 +29,7 @@ Future<void> main()async{
     InternetAddress.anyIPv4,
     5000
   );
-  print("Server running on http://localhost:5000");
+  print("Server running on http://${server.address.host}:${server.port}");
 }
 
 Middleware corsHeader(){

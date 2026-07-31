@@ -9,10 +9,12 @@ import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:shop_aura/frontend/client/screens/auth/password/forgot_password.dart';
 import 'package:shop_aura/main.dart';
 import 'package:shop_aura/frontend/admin/dashboard.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-class LoginPage extends StatefulWidget{
-@override
-State<LoginPage> createState() => _LoginPage();
+
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPage();
 }
 class _LoginPage extends State<LoginPage>{
   final _formKey = GlobalKey<FormState>();

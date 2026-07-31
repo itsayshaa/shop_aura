@@ -6,6 +6,8 @@ import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/admin/screens/products/products_screen.dart';
 import 'package:shop_aura/frontend/admin/screens/categories/category_screen.dart';
 import 'package:shop_aura/frontend/admin/screens/brands/brands_screen.dart';
+import 'package:shop_aura/frontend/admin/screens/admin_orders_screen.dart';
+
 
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
