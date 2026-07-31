@@ -12,55 +12,24 @@ class CartItem {
     required this.name,
     required this.price,
     required this.oldPrice,
-    this.quantity = 1,
+    required this.quantity,
   });
 
-  
-  int get totalPrice => price * quantity;
+  Map<String, dynamic> toJson() => {
+        'image': image,
+        'category': category,
+        'name': name,
+        'price': price,
+        'oldPrice': oldPrice,
+        'quantity': quantity,
+      };
 
-  void increaseQuantity() {
-    quantity++;
-  }
-  void decreaseQuantity() {
-    if (quantity > 1) {
-      quantity--;
-    }
-  }
-  Map<String, dynamic> toJson() {
-    return {
-      'image': image,
-      'category': category,
-      'name': name,
-      'price': price,
-      'oldPrice': oldPrice,
-      'quantity': quantity,
-    };
-  }
-  factory CartItem.fromJson(Map<String, dynamic> json) {
-    return CartItem(
-      image: json['image'],
-      category: json['category'],
-      name: json['name'],
-      price: json['price'],
-      oldPrice: json['oldPrice'],
-      quantity: json['quantity'] ?? 1,
-    );
-  }
-  CartItem copyWith({
-    String? image,
-    String? category,
-    String? name,
-    int? price,
-    int? oldPrice,
-    int? quantity,
-  }) {
-    return CartItem(
-      image: image ?? this.image,
-      category: category ?? this.category,
-      name: name ?? this.name,
-      price: price ?? this.price,
-      oldPrice: oldPrice ?? this.oldPrice,
-      quantity: quantity ?? this.quantity,
-    );
-  }
+  factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
+        image: json['image'] as String,
+        category: json['category'] as String,
+        name: json['name'] as String,
+        price: json['price'] as int,
+        oldPrice: json['oldPrice'] as int,
+        quantity: json['quantity'] as int,
+      );
 }

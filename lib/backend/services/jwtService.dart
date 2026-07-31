@@ -28,4 +28,19 @@ class Jwtservice {
       return null;
     }
   }
+
+  static String? getUserIdFromRequest(dynamic request) {
+    try {
+      final authHeader = request.headers['Authorization'] ?? request.headers['authorization'];
+      if (authHeader == null) return null;
+      String token = authHeader;
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.substring(7);
+      }
+      final payload = verifyToken(token);
+      return payload?['userId']?.toString();
+    } catch (e) {
+      return null;
+    }
+  }
 }
