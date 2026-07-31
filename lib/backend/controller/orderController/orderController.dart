@@ -38,6 +38,8 @@ Future<Response> createOrder(Request request) async {
     final String phone = data["phone"] ?? "";
     final String address = data["address"] ?? "";
     final String paymentMethod = data["paymentMethod"] ?? "";
+    final String paymentStatus = data["paymentStatus"] ?? (paymentMethod.toLowerCase() == "cod" ? "Pending" : "Paid");
+    final String transactionId = data["transactionId"] ?? "TXN_${DateTime.now().millisecondsSinceEpoch}";
 
     final newOrder = {
       "id": orderId,
@@ -49,7 +51,12 @@ Future<Response> createOrder(Request request) async {
       "name": name,
       "phone": phone,
       "address": address,
-      "paymentMethod": paymentMethod
+      "paymentMethod": paymentMethod,
+      "paymentStatus": paymentStatus,
+      "transactionId": transactionId,
+      "refundStatus": null,
+      "refundReason": null,
+      "refundRequestedAt": null,
     };
 
     // Insert order in database
@@ -86,18 +93,145 @@ Future<Response> processPayment(Request request) async {
     final String paymentMethod = data["paymentMethod"] ?? "card";
     final double amount = (data["amount"] ?? 0.0).toDouble();
 
-    // Perform validation or dummy checks
     if (amount <= 0) {
       return Response(400, body: jsonEncode({"success": false, "message": "Invalid transaction amount"}), headers: {"Content-Type": "application/json"});
     }
 
-    final String transactionId = "TXN_${DateTime.now().millisecondsSinceEpoch}_${userId.substring(userId.length - 4)}";
+    final String transactionId = "TXN_${DateTime.now().millisecondsSinceEpoch}_${userId.length >= 4 ? userId.substring(userId.length - 4) : 'USER'}";
 
     return Response.ok(
       jsonEncode({
         "success": true,
         "message": "Payment of ₹${amount.toStringAsFixed(2)} processed successfully via ${paymentMethod.toUpperCase()}.",
         "transactionId": transactionId,
+        "paymentStatus": paymentMethod.toLowerCase() == 'cod' ? 'Pending' : 'Paid',
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+  } catch (e) {
+    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
+  }
+}
+
+Future<Response> requestRefund(Request request) async {
+  try {
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
+
+    final String orderId = data["orderId"] ?? "";
+    final String reason = data["reason"] ?? "Customer request";
+
+    if (orderId.isEmpty) {
+      return Response(400, body: jsonEncode({"success": false, "message": "Missing orderId"}), headers: {"Content-Type": "application/json"});
+    }
+
+    final updateResult = await MongoService.orders.updateOne(
+      where.eq("id", orderId),
+      modify
+          .set("refundStatus", "Requested")
+          .set("refundReason", reason)
+          .set("refundRequestedAt", DateTime.now().toUtc().toIso8601String()),
+    );
+
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Refund requested successfully",
+        "orderId": orderId,
+        "refundStatus": "Requested",
+        "reason": reason,
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+  } catch (e) {
+    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
+  }
+}
+
+Future<Response> getAdminOrders(Request request) async {
+  try {
+    final orders = await MongoService.orders.find(where.sortBy("date", descending: true)).toList();
+    return Response.ok(jsonEncode(orders), headers: {"Content-Type": "application/json"});
+  } catch (e) {
+    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
+  }
+}
+
+Future<Response> updateOrderStatus(Request request) async {
+  try {
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
+
+    final String orderId = data["orderId"] ?? "";
+    final String newStatus = data["status"] ?? "Processing";
+
+    if (orderId.isEmpty) {
+      return Response(400, body: jsonEncode({"success": false, "message": "Missing orderId"}), headers: {"Content-Type": "application/json"});
+    }
+
+    await MongoService.orders.updateOne(
+      where.eq("id", orderId),
+      modify.set("status", newStatus),
+    );
+
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Order status updated to $newStatus",
+        "orderId": orderId,
+        "status": newStatus,
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+  } catch (e) {
+    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
+  }
+}
+
+Future<Response> processAdminRefund(Request request) async {
+  try {
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
+
+    final String orderId = data["orderId"] ?? "";
+    final String action = data["action"] ?? "approve"; // approve, reject, refund
+
+    if (orderId.isEmpty) {
+      return Response(400, body: jsonEncode({"success": false, "message": "Missing orderId"}), headers: {"Content-Type": "application/json"});
+    }
+
+    String refundStatus;
+    String paymentStatus;
+
+    if (action.toLowerCase() == "approve") {
+      refundStatus = "Approved";
+      paymentStatus = "Refund Pending";
+    } else if (action.toLowerCase() == "reject") {
+      refundStatus = "Rejected";
+      paymentStatus = "Paid";
+    } else {
+      refundStatus = "Refunded";
+      paymentStatus = "Refunded";
+    }
+
+    final refundTxnId = "RFND_${DateTime.now().millisecondsSinceEpoch}";
+
+    await MongoService.orders.updateOne(
+      where.eq("id", orderId),
+      modify
+          .set("refundStatus", refundStatus)
+          .set("paymentStatus", paymentStatus)
+          .set("refundTransactionId", refundTxnId),
+    );
+
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Refund action '$action' processed successfully",
+        "orderId": orderId,
+        "refundStatus": refundStatus,
+        "paymentStatus": paymentStatus,
+        "refundTransactionId": refundTxnId,
       }),
       headers: {"Content-Type": "application/json"},
     );

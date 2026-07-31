@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
+import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 class ProductCard extends StatelessWidget {
   final String image;
@@ -111,30 +113,21 @@ class ProductCard extends StatelessWidget {
                               ),
                               color: Colors.red,
                               onPressed: () {
-                                final nowWishlisted = WishlistService.instance
-                                    .toggle(
-                                      image: image,
-                                      category: category,
-                                      name: name,
-                                      rating: rating,
-                                      reviews: reviews,
-                                      price: price,
-                                      oldPrice: oldPrice,
-                                      discount: discount,
-                                    );
+                                WishlistService.instance.toggle(
+                                  image: image,
+                                  category: category,
+                                  name: name,
+                                  rating: rating,
+                                  reviews: reviews,
+                                  price: price,
+                                  oldPrice: oldPrice,
+                                  discount: discount,
+                                );
 
-                                ScaffoldMessenger.of(
+                                Navigator.push(
                                   context,
-                                ).hideCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      nowWishlisted
-                                          ? "$name added to wishlist"
-                                          : "$name removed from wishlist",
-                                    ),
-                                    duration: const Duration(seconds: 1),
-                                    behavior: SnackBarBehavior.floating,
+                                  MaterialPageRoute(
+                                    builder: (_) => const WishlistScreen(),
                                   ),
                                 );
                               },
@@ -245,12 +238,10 @@ class ProductCard extends StatelessWidget {
                             oldPrice: oldPrice,
                           );
 
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("$name added to cart"),
-                              duration: const Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CartScreen(),
                             ),
                           );
                         },

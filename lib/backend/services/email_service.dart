@@ -100,8 +100,7 @@ if(user.isEmpty || password.isEmpty){
       ''';
 
     try {
-      final sendReport = await send(message, smtpServer);
-
+      await send(message, smtpServer);
       print("OTP Email send successfully to $email");
     } on MailerException catch (e) {
       print('Failed to send email: $e');
