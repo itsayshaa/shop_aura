@@ -22,6 +22,7 @@ class ProductModel {
   bool isFeatured;
   bool isBestSeller;
   bool isFlashSale;
+  bool isActive;
 
   ProductModel({
     this.id,
@@ -39,6 +40,7 @@ class ProductModel {
     this.isFeatured = false,
     this.isBestSeller = false,
     this.isFlashSale = false,
+    this.isActive = true,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -58,6 +60,7 @@ class ProductModel {
       isFeatured: json["isFeatured"] ?? false,
       isBestSeller: json["isBestSeller"] ?? false,
       isFlashSale: json["isFlashSale"] ?? false,
+      isActive: json["isActive"] ?? true,
     );
   }
 
@@ -78,6 +81,7 @@ class ProductModel {
       "isFeatured": isFeatured,
       "isBestSeller": isBestSeller,
       "isFlashSale": isFlashSale,
+      "isActive": isActive,
     };
   }
 }

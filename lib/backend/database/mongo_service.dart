@@ -8,6 +8,7 @@ class MongoService {
   static late DbCollection password;
   static late DbCollection categories;
   static late DbCollection products;
+  static late DbCollection brands;
   static late DbCollection carts;
   static late DbCollection wishlists;
   static late DbCollection orders;
@@ -23,6 +24,7 @@ class MongoService {
     password = db.collection('password');
     categories = db.collection('categories');
     products = db.collection('products');
+    brands = db.collection('brands');
     carts = db.collection('carts');
     wishlists = db.collection('wishlists');
     orders = db.collection('orders');
