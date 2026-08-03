@@ -8,6 +8,7 @@ class MongoService {
   static late DbCollection password;
   static late DbCollection categories;
   static late DbCollection products;
+  static late DbCollection brands;
   static late DbCollection cart;
   static late DbCollection wishlists;
   static late DbCollection orders;
@@ -34,5 +35,4 @@ class MongoService {
 
     print("MongoDB Atlas Connected via MongoDBService");
   }
-
 }

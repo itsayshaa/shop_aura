@@ -17,27 +17,19 @@ class AddBrandScreen extends StatefulWidget {
   });
 
   @override
-  State<AddBrandScreen> createState() =>
-      _AddBrandScreenState();
+  State<AddBrandScreen> createState() => _AddBrandScreenState();
 }
 
-class _AddBrandScreenState
-    extends State<AddBrandScreen> {
+class _AddBrandScreenState extends State<AddBrandScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late final TextEditingController
-      _nameController;
-
-  late final TextEditingController
-      _slugController;
-
-  late final TextEditingController
-      _descriptionController;
+  late final TextEditingController _nameController;
+  late final TextEditingController _slugController;
+  late final TextEditingController _descriptionController;
 
   bool _isActive = true;
 
-  bool get _isEditing =>
-      widget.brand != null;
+  bool get _isEditing => widget.brand != null;
 
   @override
   void initState() {
@@ -45,23 +37,19 @@ class _AddBrandScreenState
 
     final brand = widget.brand;
 
-    _nameController =
-        TextEditingController(
+    _nameController = TextEditingController(
       text: brand?.name ?? '',
     );
 
-    _slugController =
-        TextEditingController(
+    _slugController = TextEditingController(
       text: brand?.slug ?? '',
     );
 
-    _descriptionController =
-        TextEditingController(
+    _descriptionController = TextEditingController(
       text: brand?.description ?? '',
     );
 
-    _isActive =
-        brand?.isActive ?? true;
+    _isActive = brand?.isActive ?? true;
   }
 
   @override
@@ -73,9 +61,7 @@ class _AddBrandScreenState
     super.dispose();
   }
 
-  void _generateSlug(
-    String value,
-  ) {
+  void _generateSlug(String value) {
     final slug = value
         .toLowerCase()
         .trim()
@@ -88,32 +74,27 @@ class _AddBrandScreenState
           '',
         );
 
-    _slugController.value =
-        TextEditingValue(
+    _slugController.value = TextEditingValue(
       text: slug,
-      selection:
-          TextSelection.collapsed(
+      selection: TextSelection.collapsed(
         offset: slug.length,
       ),
     );
   }
 
   void _saveBrand() {
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           _isEditing
               ? 'Brand updated successfully'
               : 'Brand saved successfully',
         ),
-        backgroundColor:
-            AppColors.primary,
+        backgroundColor: AppColors.primary,
       ),
     );
 
@@ -125,155 +106,137 @@ class _AddBrandScreenState
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding:
-            const EdgeInsets.all(24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              TextButton.icon(
-                onPressed: _cancel,
-                icon: const Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: 16,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F7F9),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextButton.icon(
+                  onPressed: _cancel,
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    size: 16,
+                  ),
+                  label: const Text(
+                    'Back',
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textGrey,
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-                label: const Text(
-                  'Back',
+
+                const SizedBox(
+                  height: 14,
                 ),
-                style:
-                    TextButton.styleFrom(
-                  foregroundColor:
-                      AppColors.textGrey,
-                  padding:
-                      EdgeInsets.zero,
+
+                Text(
+                  _isEditing
+                      ? 'Edit Brand'
+                      : 'Add Brand',
+                  style: const TextStyle(
+                    fontSize: 34,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
                 ),
-              ),
 
-              const SizedBox(
-                height: 14,
-              ),
-
-              Text(
-                _isEditing
-                    ? 'Edit Brand'
-                    : 'Add Brand',
-                style:
-                    const TextStyle(
-                  fontSize: 34,
-                  fontWeight:
-                      FontWeight.w700,
-                  color:
-                      AppColors.textDark,
+                const SizedBox(
+                  height: 6,
                 ),
-              ),
 
-              const SizedBox(
-                height: 6,
-              ),
-
-              Text(
-                _isEditing
-                    ? 'Update your product brand'
-                    : 'Create a new product brand',
-                style:
-                    const TextStyle(
-                  fontSize: 16,
-                  color:
-                      AppColors.textGrey,
+                Text(
+                  _isEditing
+                      ? 'Update your product brand'
+                      : 'Create a new product brand',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textGrey,
+                  ),
                 ),
-              ),
 
-              const SizedBox(
-                height: 24,
-              ),
+                const SizedBox(
+                  height: 24,
+                ),
 
-              LayoutBuilder(
-                builder: (
-                  context,
-                  constraints,
-                ) {
-                  final isMobile =
-                      constraints
-                              .maxWidth <
-                          850;
+                LayoutBuilder(
+                  builder: (
+                    context,
+                    constraints,
+                  ) {
+                    final isMobile =
+                        constraints.maxWidth < 850;
 
-                  if (isMobile) {
-                    return Column(
+                    if (isMobile) {
+                      return Column(
+                        children: [
+                          _buildBrandDetails(),
+
+                          const SizedBox(
+                            height: 18,
+                          ),
+
+                          _buildSideSection(),
+
+                          const SizedBox(
+                            height: 18,
+                          ),
+
+                          _buildActions(),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
                       children: [
-                        _buildBrandDetails(),
-
-                        const SizedBox(
-                          height: 18,
+                        Expanded(
+                          flex: 3,
+                          child: _buildBrandDetails(),
                         ),
 
-                        _buildSideSection(),
-
                         const SizedBox(
-                          height: 18,
+                          width: 24,
                         ),
 
-                        _buildActions(),
+                        Expanded(
+                          flex: 2,
+                          child: _buildSideSection(),
+                        ),
                       ],
                     );
-                  }
+                  },
+                ),
 
-                  return Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child:
-                            _buildBrandDetails(),
-                      ),
+                const SizedBox(
+                  height: 18,
+                ),
 
-                      const SizedBox(
-                        width: 24,
-                      ),
+                LayoutBuilder(
+                  builder: (
+                    context,
+                    constraints,
+                  ) {
+                    if (constraints.maxWidth < 850) {
+                      return const SizedBox();
+                    }
 
-                      Expanded(
-                        flex: 2,
-                        child:
-                            _buildSideSection(),
-                      ),
-                    ],
-                  );
-                },
-              ),
-
-              const SizedBox(
-                height: 18,
-              ),
-
-              LayoutBuilder(
-                builder: (
-                  context,
-                  constraints,
-                ) {
-                  if (constraints
-                          .maxWidth <
-                      850) {
-                    return const SizedBox();
-                  }
-
-                  return Align(
-                    alignment:
-                        Alignment
-                            .centerRight,
-                    child:
-                        _buildActions(),
-                  );
-                },
-              ),
-            ],
+                    return Align(
+                      alignment:
+                          Alignment.centerRight,
+                      child: _buildActions(),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -289,19 +252,12 @@ class _AddBrandScreenState
         children: [
           BrandTextField(
             label: 'Brand Name *',
-            hintText:
-                'Enter brand name',
-            controller:
-                _nameController,
-            onChanged:
-                _generateSlug,
-            validator: (
-              value,
-            ) {
+            hintText: 'Enter brand name',
+            controller: _nameController,
+            onChanged: _generateSlug,
+            validator: (value) {
               if (value == null ||
-                  value
-                      .trim()
-                      .isEmpty) {
+                  value.trim().isEmpty) {
                 return 'Please enter the brand name';
               }
 
@@ -315,17 +271,11 @@ class _AddBrandScreenState
 
           BrandTextField(
             label: 'Slug',
-            hintText:
-                'brand-slug',
-            controller:
-                _slugController,
-            validator: (
-              value,
-            ) {
+            hintText: 'brand-slug',
+            controller: _slugController,
+            validator: (value) {
               if (value == null ||
-                  value
-                      .trim()
-                      .isEmpty) {
+                  value.trim().isEmpty) {
                 return 'Please enter the slug';
               }
 
@@ -339,10 +289,8 @@ class _AddBrandScreenState
 
           BrandTextField(
             label: 'Description',
-            hintText:
-                'Brand description...',
-            controller:
-                _descriptionController,
+            hintText: 'Brand description...',
+            controller: _descriptionController,
             maxLines: 6,
           ),
         ],
@@ -355,8 +303,7 @@ class _AddBrandScreenState
       children: [
         BrandImagePicker(
           title: 'Brand Logo',
-          imagePath:
-              widget.brand?.logoPath,
+          imagePath: widget.brand?.logoPath,
         ),
 
         const SizedBox(
@@ -365,9 +312,7 @@ class _AddBrandScreenState
 
         BrandStatusSwitch(
           isActive: _isActive,
-          onChanged: (
-            value,
-          ) {
+          onChanged: (value) {
             setState(() {
               _isActive = value;
             });
