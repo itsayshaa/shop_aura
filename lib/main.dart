@@ -9,6 +9,7 @@ import 'frontend/providers/category_provider.dart';
 import 'frontend/providers/product_provider.dart';
 import 'frontend/providers/search_provider.dart';
 
+
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -42,8 +43,8 @@ class ShopAuraApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: "Shop Aura",
         theme: AppTheme.lightTheme,
-        // home: const MainNavigationScreen(),
-        home: const AdminApp(),
+        home: const MainNavigationScreen(),
+        // home: const AdminApp(),
       ),
     );
   }

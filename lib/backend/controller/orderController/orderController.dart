@@ -13,8 +13,15 @@ Future<Response> getOrders(Request request) async {
 
     // Find all orders for this user
     final orders = await MongoService.orders.find(where.eq("userId", userId).sortBy("date", descending: true)).toList();
+    final cleanOrders = orders.map((o) {
+      final map = Map<String, dynamic>.from(o);
+      if (map['_id'] != null) {
+        map['_id'] = map['_id'].toString();
+      }
+      return map;
+    }).toList();
 
-    return Response.ok(jsonEncode(orders), headers: {"Content-Type": "application/json"});
+    return Response.ok(jsonEncode(cleanOrders), headers: {"Content-Type": "application/json"});
   } catch (e) {
     return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
   }
@@ -61,6 +68,9 @@ Future<Response> createOrder(Request request) async {
 
     // Insert order in database
     await MongoService.orders.insertOne(newOrder);
+    if (newOrder['_id'] != null) {
+      newOrder['_id'] = newOrder['_id'].toString();
+    }
 
     // Clear the cart for this user in the database
     await MongoService.carts.updateOne(
@@ -151,7 +161,14 @@ Future<Response> requestRefund(Request request) async {
 Future<Response> getAdminOrders(Request request) async {
   try {
     final orders = await MongoService.orders.find(where.sortBy("date", descending: true)).toList();
-    return Response.ok(jsonEncode(orders), headers: {"Content-Type": "application/json"});
+    final cleanOrders = orders.map((o) {
+      final map = Map<String, dynamic>.from(o);
+      if (map['_id'] != null) {
+        map['_id'] = map['_id'].toString();
+      }
+      return map;
+    }).toList();
+    return Response.ok(jsonEncode(cleanOrders), headers: {"Content-Type": "application/json"});
   } catch (e) {
     return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
   }
