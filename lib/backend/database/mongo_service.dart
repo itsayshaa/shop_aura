@@ -1,20 +1,38 @@
 import 'package:dotenv/dotenv.dart';
 import 'package:mongo_dart/mongo_dart.dart';
-import 'mongodb_service.dart';
 
 class MongoService {
-  static Db get db => MongoDBService.db;
+  static late Db db;
 
-  static DbCollection get users => MongoDBService.users;
-  static DbCollection get password => MongoDBService.password;
-  static DbCollection get categories => MongoDBService.categories;
-  static DbCollection get products => MongoDBService.products;
-  static DbCollection get carts => MongoDBService.carts;
-  static DbCollection get wishlists => MongoDBService.wishlists;
-  static DbCollection get orders => MongoDBService.orders;
-  
+  static late DbCollection users;
+  static late DbCollection password;
+  static late DbCollection categories;
+  static late DbCollection products;
+  static late DbCollection cart;
+  static late DbCollection wishlists;
+  static late DbCollection orders;
+  static late DbCollection refunds;
 
   static Future<void> connect() async {
-    await MongoDBService.connect();
+    final env = DotEnv()..load();
+    final mongoUrl = env['MONGO_URL'];
+    if (mongoUrl == null || mongoUrl.isEmpty) {
+      throw Exception("MONGO_URL not found in environment variables");
+    }
+
+    db = await Db.create(mongoUrl);
+    await db.open();
+
+    users = db.collection('users');
+    password = db.collection('password');
+    categories = db.collection('categories');
+    products = db.collection('products');
+    cart = db.collection('cart');
+    wishlists = db.collection('wishlists');
+    orders = db.collection('orders');
+    refunds = db.collection('refunds');
+
+    print("MongoDB Atlas Connected via MongoDBService");
   }
+
 }
