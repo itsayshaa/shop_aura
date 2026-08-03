@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:shop_aura/backend/database/mongodb_service.dart';
 import 'package:shop_aura/backend/routes/authRoutes/auth.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
@@ -10,9 +9,9 @@ import 'package:shop_aura/backend/routes/cartRoutes/cart.dart';
 import 'package:shop_aura/backend/routes/wishlistRoutes/wishlist.dart';
 import 'package:shop_aura/backend/routes/order_routes.dart';
 import 'package:shop_aura/backend/routes/refund_routes.dart';
-
+import 'package:shop_aura/backend/database/mongo_service.dart';
 Future<void> main() async {
-  await MongoDBService.connect();
+  await MongoService.connect();
   final router = Router();
   router.mount('/auth/', AuthRoutes().router.call);
   router.mount('/category/', CategoryRoutes().router.call);

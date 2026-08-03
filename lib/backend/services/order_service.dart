@@ -1,19 +1,19 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import '../database/mongodb_service.dart';
+import '../database/mongo_service.dart';
 
 class BackendOrderService {
   static Future<List<Map<String, dynamic>>> fetchUserOrders(String userId) async {
-    final orders = await MongoDBService.orders
+    final orders = await MongoService.orders
         .find(where.eq("userId", userId).sortBy("date", descending: true))
         .toList();
-    return MongoDBService.cleanDocs(orders);
+    return orders;
   }
 
   static Future<List<Map<String, dynamic>>> fetchAllOrdersAdmin() async {
-    final orders = await MongoDBService.orders
+    final orders = await MongoService.orders
         .find(where.sortBy("date", descending: true))
         .toList();
-    return MongoDBService.cleanDocs(orders);
+    return orders;
   }
 
   static Future<Map<String, dynamic>> createOrder({
@@ -49,19 +49,19 @@ class BackendOrderService {
       "refundRequestedAt": null,
     };
 
-    await MongoDBService.orders.insertOne(newOrder);
+    await MongoService.orders.insertOne(newOrder);
 
     // Clear cart for user
-    await MongoDBService.carts.updateOne(
+    await MongoService.cart.updateOne(
       where.eq("userId", userId),
       modify.set("items", []),
     );
 
-    return MongoDBService.cleanDoc(newOrder);
+    return newOrder;
   }
 
   static Future<bool> updateOrderStatus(String orderId, String newStatus) async {
-    final result = await MongoDBService.orders.updateOne(
+    final result = await MongoService.orders.updateOne(
       where.eq("id", orderId),
       modify.set("status", newStatus),
     );

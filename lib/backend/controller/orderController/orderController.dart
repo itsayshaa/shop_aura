@@ -73,7 +73,7 @@ Future<Response> createOrder(Request request) async {
     }
 
     // Clear the cart for this user in the database
-    await MongoService.carts.updateOne(
+    await MongoService.cart.updateOne(
       where.eq("userId", userId),
       modify.set("items", []),
     );

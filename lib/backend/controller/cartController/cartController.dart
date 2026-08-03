@@ -11,7 +11,7 @@ Future<Response> getCart(Request request) async {
       return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
     }
 
-    final cart = await MongoService.carts.findOne(where.eq("userId", userId));
+    final cart = await MongoService.cart.findOne(where.eq("userId", userId));
     final items = cart != null ? cart["items"] ?? [] : [];
 
     return Response.ok(jsonEncode(items), headers: {"Content-Type": "application/json"});
@@ -41,7 +41,7 @@ Future<Response> addToCart(Request request) async {
       return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
     }
 
-    var cart = await MongoService.carts.findOne(where.eq("userId", userId));
+    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
 
     if (cart == null) {
       // Create new cart
@@ -58,7 +58,7 @@ Future<Response> addToCart(Request request) async {
           }
         ]
       };
-      await MongoService.carts.insertOne(newCart);
+      await MongoService.cart.insertOne(newCart);
     } else {
       List items = List.from(cart["items"] ?? []);
       final existingIndex = items.indexWhere((item) => item["name"] == name);
@@ -76,7 +76,7 @@ Future<Response> addToCart(Request request) async {
         });
       }
 
-      await MongoService.carts.updateOne(
+      await MongoService.cart.updateOne(
         where.eq("userId", userId),
         modify.set("items", items),
       );
@@ -105,7 +105,7 @@ Future<Response> updateQuantity(Request request) async {
       return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
     }
 
-    var cart = await MongoService.carts.findOne(where.eq("userId", userId));
+    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
     if (cart == null) {
       return Response(404, body: jsonEncode({"success": false, "message": "Cart not found"}), headers: {"Content-Type": "application/json"});
     }
@@ -120,7 +120,7 @@ Future<Response> updateQuantity(Request request) async {
         items[index]["quantity"] = quantity;
       }
 
-      await MongoService.carts.updateOne(
+      await MongoService.cart.updateOne(
         where.eq("userId", userId),
         modify.set("items", items),
       );
@@ -148,7 +148,7 @@ Future<Response> removeFromCart(Request request) async {
       return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
     }
 
-    var cart = await MongoService.carts.findOne(where.eq("userId", userId));
+    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
     if (cart == null) {
       return Response(404, body: jsonEncode({"success": false, "message": "Cart not found"}), headers: {"Content-Type": "application/json"});
     }
@@ -156,7 +156,7 @@ Future<Response> removeFromCart(Request request) async {
     List items = List.from(cart["items"] ?? []);
     items.removeWhere((item) => item["name"] == name);
 
-    await MongoService.carts.updateOne(
+    await MongoService.cart.updateOne(
       where.eq("userId", userId),
       modify.set("items", items),
     );
@@ -174,7 +174,7 @@ Future<Response> clearCart(Request request) async {
       return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
     }
 
-    await MongoService.carts.updateOne(
+    await MongoService.cart.updateOne(
       where.eq("userId", userId),
       modify.set("items", []),
     );

@@ -79,7 +79,7 @@ Future<Response> loginUser(Request request) async {
     final user = await MongoService.users.findOne(
       where.eq("email", email),
     );
-
+    print("user fetched");
     if (user == null) {
       return Response(
         401,
