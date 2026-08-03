@@ -1,17 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/product/review_card.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
-import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
 import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
-import 'package:shop_aura/frontend/client/screens/payment/payment_screen.dart';
+import 'package:shop_aura/main.dart';
+import 'package:http/http.dart' as http;
+
+
+
 
 class ProductScreen extends StatefulWidget {
   final String productName;
   final String category;
   final String image;
-
+  final String productId;
   final double price;
   final double oldPrice;
   final double rating;
@@ -21,6 +27,7 @@ class ProductScreen extends StatefulWidget {
   const ProductScreen({
     super.key,
     required this.productName,
+    required this.productId,
     required this.category,
     required this.image,
     required this.price,
@@ -33,7 +40,21 @@ class ProductScreen extends StatefulWidget {
   State<ProductScreen> createState() =>
       _ProductScreenState();
 }
+String? get baseUrl => Apiconfig.baseUrl;
+Future<void> getProduct()async{
+  try{
+    final response = await http.get(
+      Uri.parse("$baseUrl/product/"),
+      headers:{"Content-Type":"application/json"}
+    );
 
+    if(response.statusCode == 200){
+      final data = jsonDecode(response.body);
+    }
+  }catch(e){
+    print(e);
+  }
+}
 class _ProductScreenState
     extends State<ProductScreen> {
 
@@ -63,6 +84,24 @@ class _ProductScreenState
     "XL",
   ];
 
+
+String userId = "";
+
+
+Future<void> getUserId()async{
+  final prefs = await SharedPreferences.getInstance();
+  final userid = prefs.getString("userId") ?? "";
+  // if(userid.isEmpty){
+  //  if(!mounted) return;
+  //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
+  //  return;
+  // }
+
+  setState(() {
+    userId = userid;
+  });
+  print(userid);
+}
   @override
   void initState() {
     super.initState();
@@ -74,16 +113,12 @@ class _ProductScreenState
       widget.image,
       widget.image,
     ]);
+    getUserId();
+    getProduct();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    final discount =
-        (((widget.oldPrice - widget.price) /
-                    widget.oldPrice) *
-                100)
-            .round();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -99,28 +134,28 @@ class _ProductScreenState
           child: Row(
             children: [
 
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () {
-                    CartService.instance.addToCart(
-                      image: widget.image,
-                      category: widget.category,
-                      name: widget.productName,
-                      price: widget.price.toInt(),
-                      oldPrice: widget.oldPrice.toInt(),
-                    );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const PaymentScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Buy Now",
-                  ),
-                ),
-              ),
+              // Expanded(
+              //   child: OutlinedButton(
+              //     onPressed: () {
+              //       CartService.instance.addToCart(
+              //         image: widget.image,
+              //         category: widget.category,
+              //         name: widget.productName,
+              //         price: widget.price.toInt(),
+              //         oldPrice: widget.oldPrice.toInt(),
+              //       );
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (_) => const PaymentScreen(),
+              //         ),
+              //       );
+              //     },
+              //     child: const Text(
+              //       "Buy Now",
+              //     ),
+              //   ),
+              // ),
 
               const SizedBox(width: 12),
 
@@ -132,22 +167,9 @@ class _ProductScreenState
                         AppColors.primary,
                   ),
 
-                  onPressed: () {
-                    CartService.instance.addToCart(
-                      image: widget.image,
-                      category: widget.category,
-                      name: widget.productName,
-                      price: widget.price.toInt(),
-                      oldPrice: widget.oldPrice.toInt(),
-                    );
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CartScreen(),
-                      ),
-                    );
+                  onPressed: ()async{
+                    await CartService().addToCart(userId: userId,productId: widget.productId,quantity: quantity);
                   },
-
                   child: const Text(
                     "Add to Cart",
                     style: TextStyle(
@@ -200,8 +222,7 @@ class _ProductScreenState
                         rating: widget.rating,
                         reviews: widget.reviews,
                         price: widget.price.toInt(),
-                        oldPrice: widget.oldPrice.toInt(),
-                        discount: discount,
+                        discount: discount.toDouble(),
                       );
                       setState(() {
                         favourite = WishlistService.instance.isWishlisted(widget.productName);
@@ -252,7 +273,7 @@ class _ProductScreenState
                     ),
                   ),
 
-                  if (discount > 0)
+                  if (30 > 0)
                     Positioned(
                       top: 90,
                       left: 20,
@@ -267,7 +288,7 @@ class _ProductScreenState
                               BorderRadius.circular(20),
                         ),
                         child: Text(
-                          "$discount% OFF",
+                          "30% OFF",
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -424,7 +445,7 @@ class _ProductScreenState
                       const SizedBox(width: 10),
 
                       Text(
-                        "$discount% OFF",
+                        "40% OFF",
                         style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,

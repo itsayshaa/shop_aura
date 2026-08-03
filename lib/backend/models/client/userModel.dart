@@ -1,5 +1,4 @@
 class UserModel{
-  String? id;
   String name;
   String email;
   String password;
@@ -8,12 +7,12 @@ class UserModel{
   List<String> wishList;
   String profileImage;
   String createdAt;
+  String isActive;
   bool isVerified;
   bool isBlocked;
   String role;
 
   UserModel({
-    this.id,
     required this.name,
     required this.email,
     required this.password,
@@ -21,10 +20,11 @@ class UserModel{
     required this.phone,
     required this.wishList,
     required this.profileImage,
+    required this.isActive,
     required this.isVerified,
     required this.isBlocked,
     required this.createdAt,
-    required this.role
+    required this.role,
   });
 
   Map<String,dynamic> toJson(){
@@ -36,6 +36,7 @@ class UserModel{
       "phone":phone,
       "wishList":wishList,
       "profile_image":profileImage,
+      "isActive":isActive,
       "isVerified":isVerified,
       "isBlocked":isBlocked,
       "createdAt":createdAt,

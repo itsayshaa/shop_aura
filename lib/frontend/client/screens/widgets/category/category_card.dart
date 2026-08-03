@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../../../../models/category_model.dart';
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 
 class CategoryCard extends StatefulWidget {
   final CategoryModel category;
@@ -99,21 +98,20 @@ class _CategoryCardState extends State<CategoryCard>
                     top: Radius.circular(22),
                   ),
                   child: Hero(
-                    tag: category.id,
+                    tag: category.id ?? category.categoriesName,
                     child: Image.network(
-                      category.image,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) {
-                        return Container(
-                          color: Colors.grey.shade200,
-                          child: const Icon(
-                            Icons.image,
-                            size: 40,
-                          ),
-                        );
-                      },
-                    ),
+  category.categoriesImage.isNotEmpty
+      ? category.categoriesImage.first
+      : "",
+  width: double.infinity,
+  fit: BoxFit.cover,
+  errorBuilder: (_, __, ___) {
+    return Container(
+      color: Colors.grey.shade200,
+      child: const Icon(Icons.image, size: 40),
+    );
+  },
+),
                   ),
                 ),
               ),
@@ -127,7 +125,7 @@ class _CategoryCardState extends State<CategoryCard>
                         MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        category.name,
+                        category.categoriesName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
@@ -138,33 +136,36 @@ class _CategoryCardState extends State<CategoryCard>
                       ),
 
                       Text(
-                        "${category.productCount} Products",
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
-                      ),
+  category.description,
+  maxLines: 2,
+  overflow: TextOverflow.ellipsis,
+  textAlign: TextAlign.center,
+  style: TextStyle(
+    color: Colors.grey.shade600,
+    fontSize: 12,
+  ),
+),
 
-                      if (category.isFeatured)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade100,
-                            borderRadius:
-                                BorderRadius.circular(30),
-                          ),
-                          child: const Text(
-                            "Featured",
-                            style: TextStyle(
-                              color: Colors.deepOrange,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ),
+                      // if (category.isFeatured)
+                      //   Container(
+                      //     padding: const EdgeInsets.symmetric(
+                      //       horizontal: 10,
+                      //       vertical: 4,
+                      //     ),
+                      //     decoration: BoxDecoration(
+                      //       color: Colors.orange.shade100,
+                      //       borderRadius:
+                      //           BorderRadius.circular(30),
+                      //     ),
+                      //     child: const Text(
+                      //       "Featured",
+                      //       style: TextStyle(
+                      //         color: Colors.deepOrange,
+                      //         fontWeight: FontWeight.w600,
+                      //         fontSize: 11,
+                      //       ),
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ),

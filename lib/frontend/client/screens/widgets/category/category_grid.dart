@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../models/category_model.dart';
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import 'category_card.dart';
 
 class CategoryGrid extends StatefulWidget {

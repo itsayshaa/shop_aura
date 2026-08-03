@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 
 class OrderService extends ChangeNotifier {
   OrderService._internal();

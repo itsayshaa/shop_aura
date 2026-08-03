@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/category_screen.dart';
 import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
@@ -8,15 +8,12 @@ import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
 class SuccessScreen extends StatelessWidget {
   final OrderModel order;
 
-  const SuccessScreen({
-    super.key,
-    required this.order,
-  });
+  const SuccessScreen({super.key, required this.order});
 
   void _handleContinueShopping(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const CategoryScreen()),
+      MaterialPageRoute(builder: (_) => CategoryScreen()),
       (route) => false,
     );
   }
@@ -31,7 +28,7 @@ class SuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.date);
+    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -77,13 +74,16 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade50,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        order.status,
+                        order.orderStatus,
                         style: TextStyle(
                           color: Colors.blue.shade700,
                           fontSize: 12,
@@ -111,11 +111,17 @@ class SuccessScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   "Order ID",
-                                  style: TextStyle(color: AppColors.textSoft, fontSize: 13),
+                                  style: TextStyle(
+                                    color: AppColors.textSoft,
+                                    fontSize: 13,
+                                  ),
                                 ),
                                 Text(
-                                  "#${order.id.substring(4).toUpperCase()}",
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                                  "#${order.id}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13.5,
+                                  ),
                                 ),
                               ],
                             ),
@@ -125,11 +131,17 @@ class SuccessScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   "Placed On",
-                                  style: TextStyle(color: AppColors.textSoft, fontSize: 13),
+                                  style: TextStyle(
+                                    color: AppColors.textSoft,
+                                    fontSize: 13,
+                                  ),
                                 ),
                                 Text(
                                   dateStr,
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -139,11 +151,17 @@ class SuccessScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   "Payment Method",
-                                  style: TextStyle(color: AppColors.textSoft, fontSize: 13),
+                                  style: TextStyle(
+                                    color: AppColors.textSoft,
+                                    fontSize: 13,
+                                  ),
                                 ),
                                 Text(
                                   order.paymentMethod.toUpperCase(),
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -179,10 +197,13 @@ class SuccessScreen extends StatelessWidget {
                             ListView.separated(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemCount: order.items.length,
-                              separatorBuilder: (_, __) => const Divider(height: 16, color: AppColors.border),
+                              itemCount: order.products.length,
+                              separatorBuilder: (_, __) => const Divider(
+                                height: 16,
+                                color: AppColors.border,
+                              ),
                               itemBuilder: (context, index) {
-                                final item = order.items[index];
+                                final item = order.products[index];
                                 return Row(
                                   children: [
                                     ClipRRect(
@@ -196,14 +217,18 @@ class SuccessScreen extends StatelessWidget {
                                           width: 50,
                                           height: 50,
                                           color: AppColors.secondarySoft,
-                                          child: const Icon(Icons.image_not_supported, size: 20),
+                                          child: const Icon(
+                                            Icons.image_not_supported,
+                                            size: 20,
+                                          ),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             item.name,
@@ -264,20 +289,45 @@ class SuccessScreen extends StatelessWidget {
                                 letterSpacing: 1.1,
                               ),
                             ),
-                            const SizedBox(height: 8),
                             Text(
-                              order.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                              order.shippingAddress.fullName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                              ),
                             ),
+
                             const SizedBox(height: 4),
+
                             Text(
-                              "Phone: ${order.phone}",
-                              style: const TextStyle(color: AppColors.textSoft, fontSize: 12.5),
+                              "Phone: ${order.shippingAddress.phone}",
+                              style: const TextStyle(
+                                color: AppColors.textSoft,
+                                fontSize: 12.5,
+                              ),
                             ),
+
                             const SizedBox(height: 2),
+
                             Text(
-                              order.address,
-                              style: const TextStyle(color: AppColors.textSoft, fontSize: 12.5),
+                              "${order.shippingAddress.address}, "
+                              "${order.shippingAddress.city}, "
+                              "${order.shippingAddress.state} - "
+                              "${order.shippingAddress.pincode}",
+                              style: const TextStyle(
+                                color: AppColors.textSoft,
+                                fontSize: 12.5,
+                              ),
+                            ),
+
+                            const SizedBox(height: 2),
+
+                            Text(
+                              order.shippingAddress.country,
+                              style: const TextStyle(
+                                color: AppColors.textSoft,
+                                fontSize: 12.5,
+                              ),
                             ),
                           ],
                         ),
@@ -300,7 +350,10 @@ class SuccessScreen extends StatelessWidget {
                           children: [
                             const Text(
                               "Total Paid Amount",
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
                             ),
                             Text(
                               "₹${order.totalAmount.toStringAsFixed(2)}",
@@ -347,7 +400,10 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       "Continue Shopping",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -355,7 +411,10 @@ class SuccessScreen extends StatelessWidget {
                     onPressed: () => _handleViewOrders(context),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary, width: 1.5),
+                      side: const BorderSide(
+                        color: AppColors.primary,
+                        width: 1.5,
+                      ),
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -363,7 +422,10 @@ class SuccessScreen extends StatelessWidget {
                     ),
                     child: const Text(
                       "View My Orders",
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ],

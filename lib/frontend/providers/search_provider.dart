@@ -1,21 +1,16 @@
 import 'package:flutter/foundation.dart';
-
-import 'package:shop_aura/frontend/models/product_model.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 import 'package:shop_aura/frontend/services/product_service.dart';
 
 class SearchProvider extends ChangeNotifier {
-  final ProductService _service = ProductService.instance;
+  final ProductService _service = ProductService();
 
-  List<ProductModel> _results = [];
-
+  List<ProductsModel> _results = [];
   bool _isSearching = false;
-
   String _query = "";
 
-  List<ProductModel> get results => _results;
-
+  List<ProductsModel> get results => _results;
   bool get isSearching => _isSearching;
-
   String get query => _query;
 
   Future<void> search(String value) async {
@@ -31,7 +26,13 @@ class SearchProvider extends ChangeNotifier {
     _isSearching = true;
     notifyListeners();
 
-    _results = await _service.searchProducts(value);
+    final allProducts = await _service.getProducts();
+
+    _results = allProducts.where((product) {
+      return product.productName
+          .toLowerCase()
+          .contains(value.toLowerCase());
+    }).toList();
 
     _isSearching = false;
     notifyListeners();

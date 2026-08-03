@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../models/product_model.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 import '../services/product_service.dart';
 
 class ProductProvider extends ChangeNotifier {
-  final ProductService _service = ProductService.instance;
+  final ProductService _service = ProductService();
 
-  List<ProductModel> _products = [];
-  List<ProductModel> _searchResults = [];
+  List<ProductsModel> _products = [];
+  List<ProductsModel> _searchResults = [];
 
   bool _isLoading = false;
   String _error = '';
 
-  List<ProductModel> get products =>
+  List<ProductsModel> get products =>
       _searchResults.isEmpty ? _products : _searchResults;
 
   bool get isLoading => _isLoading;
@@ -52,14 +52,13 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<ProductModel>> getProductsByCategory(
-      String category) async {
-    return await _service.getProductsByCategory(category);
-  }
+Future<List<ProductsModel>> getProductsByCategory(String category) async {
+  return await _service.getProductsByCategory(category);
+}
 
-  Future<ProductModel?> getProductById(String id) async {
-    return await _service.getProduct(id);
-  }
+Future<ProductsModel?> getProductById(String id) async {
+  return await _service.getProduct(id);
+}
 
   void clear() {
     _products.clear();

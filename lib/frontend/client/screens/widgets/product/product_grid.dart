@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'product_card.dart';
-import '../../../../models/product_model.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 
 class ProductGrid extends StatefulWidget {
-  final List<ProductModel> products;
-  final Function(ProductModel)? onProductTap;
-  final Function(ProductModel)? onFavourite;
+  final List<ProductsModel> products;
+  final Function(ProductsModel)? onProductTap;
+  final Function(ProductsModel)? onFavourite;
 
   const ProductGrid({
     super.key,

@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'frontend/providers/category_provider.dart';
 import 'frontend/providers/product_provider.dart';
 import 'frontend/providers/search_provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -26,18 +26,20 @@ class Authservice extends ChangeNotifier {
         })
       );
       final body = jsonDecode(response.body);
+      print(body);
       if(response.statusCode == 200 || body["success"] == true){
         final token = body["token"];
         final userName = body["user"]["name"];
         final userEmail = body["user"]["email"];
         final userPhone = body["user"]["phone"];
         final role = body["user"]["role"];
-
+        final userId = body["user"]["id"].toString();
 
         final createdAt = body["user"]["createdAt"];
         DateTime date = DateTime.parse(createdAt);
         final joinedAt = DateFormat('MMMM d, yyyy').format(date);
         final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("userId", userId);
         await prefs.setString("jwt_token", token);
         await prefs.setString("user_name", userName);
         await prefs.setString("user_email", userEmail);

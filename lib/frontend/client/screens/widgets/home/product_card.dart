@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductCard extends StatelessWidget {
   final String image;
@@ -10,8 +11,8 @@ class ProductCard extends StatelessWidget {
   final int reviews;
   final int price;
   final int oldPrice;
-  final int discount;
-
+  final double discount;
+  final String productId;
   const ProductCard({
     super.key,
     required this.image,
@@ -22,6 +23,7 @@ class ProductCard extends StatelessWidget {
     required this.price,
     required this.oldPrice,
     required this.discount,
+    required this.productId,
   });
 
   @override
@@ -68,8 +70,8 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      left: 0* scale,
-                      top: 0* scale,
+                      left: 0 * scale,
+                      top: 0 * scale,
                       child: Container(
                         padding: EdgeInsets.symmetric(
                           horizontal: 10 * scale,
@@ -90,8 +92,8 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      right: 0* scale,
-                      top: 0* scale,
+                      right: 0 * scale,
+                      top: 0 * scale,
                       child: ListenableBuilder(
                         listenable: WishlistService.instance,
                         builder: (context, _) {
@@ -119,7 +121,6 @@ class ProductCard extends StatelessWidget {
                                       rating: rating,
                                       reviews: reviews,
                                       price: price,
-                                      oldPrice: oldPrice,
                                       discount: discount,
                                     );
 
@@ -236,23 +237,32 @@ class ProductCard extends StatelessWidget {
                       width: double.infinity,
                       height: 30 * scale,
                       child: ElevatedButton(
-                        onPressed: () {
-                          CartService.instance.addToCart(
-                            image: image,
-                            category: category,
-                            name: name,
-                            price: price,
-                            oldPrice: oldPrice,
-                          );
+                        onPressed: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getString("userId");
 
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("$name added to cart"),
-                              duration: const Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          if (userId == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Please login")),
+                            );
+                            return;
+                          }
+
+                          try {
+                            await CartService().addToCart(
+                              userId: userId,
+                              productId: productId,
+                              quantity: 1,
+                            );
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("$name added to cart")),
+                            );
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(e.toString())),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xff2E2926),

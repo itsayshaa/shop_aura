@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/home/home_header.dart';
@@ -8,10 +8,12 @@ import 'package:shop_aura/frontend/client/screens/widgets/home/category_section.
 import 'package:shop_aura/frontend/client/screens/widgets/home/banner_slider.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/home/shop_category.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/product/product_card.dart';
-import 'package:shop_aura/frontend/models/product_model.dart';
 import 'package:shop_aura/frontend/client/screens/product_screen.dart';
 import 'package:shop_aura/frontend/utils/app_data.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 
+import 'package:shop_aura/frontend/services/product_service.dart';
+import 'package:shop_aura/frontend/services/category_service.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,91 +22,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final TextEditingController searchController =
-      TextEditingController();
+  final TextEditingController searchController = TextEditingController();
 
   int selectedCategory = 0;
+  List<ProductsModel> products = [];
 
-  final List<Map<String, dynamic>> products = [
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3eSGmhJubfc-dwgA7h0_E3CkzrDgrb47x0-LNHVfkkQ&s=10",
-      "category": "Football",
-      "name": "Lionel Messi",
-      "rating": 4.9,
-      "reviews": 1000,
-      "price": 899990,
-      "oldPrice": 950000,
-      "discount": 11,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR4mfqqLzhMIYYm7z6BhDh_XUoWpweK21fVYkK4V9iaISzWYKbj0lPJNdW5&s=10",
-      "category": "Football",
-      "name": "Enzo Fernandez",
-      "rating": 4.8,
-      "reviews": 999,
-      "price": 799990,
-      "oldPrice": 850000,
-      "discount": 12,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSbkEHxqrYqL_GoAe5OaddaqKhoj6GmWI9ZLAruaJwFqZcxQWX5ZW-thPys&s=10",
-      "category": "Football",
-      "name": "Rodrigo De Paul",
-      "rating": 4.7,
-      "reviews": 998,
-      "price": 699990,
-      "oldPrice": 775000,
-      "discount": 15,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJc4Ms3E6LWmYQ-r3uki1A8yO8qR3I-bul3180JRJOaKeZ38rhOr9NlrY&s=10",
-      "category": "Football",
-      "name": "Leandro Paredes",
-      "rating": 4.6,
-      "reviews": 997,
-      "price": 599990,
-      "oldPrice": 650000,
-      "discount": 14,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSGy4ZDWnsFKlM7HwdOji9ZOOONixFsvidXlFGunNlCeMhVOpqkGQQMho&s=10",
-      "category": "Football",
-      "name": "Lisandro Martinez",
-      "rating": 4.5,
-      "reviews": 995,
-      "price": 499990,
-      "oldPrice": 515000,
-      "discount": 11,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4J8QZY7g4x7pPStH_NNk5HC4au6ajp_dUcdyVqdwZ4PbTLt7tnBo630I&s=10",
-      "category": "Football",
-      "name": "Julian Alvarez",
-      "rating": 4.8,
-      "reviews": 998,
-      "price": 235000,
-      "oldPrice": 244900,
-      "discount": 10,
-    },
-    {
-      "networkImage":
-          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTShBWL-C1QiPc_akwFXmrRaXvIWFMyXeksOCQiocLsIYx1Fz7BZXirKhE&s=10",
-      "category": "Football",
-      "name": "Emiliano Martinez",
-      "rating": 4.7,
-      "reviews": 1001,
-      "price": 275000,
-      "oldPrice": 295000,
-      "discount": 8,
-    },
-  ];
+  final ProductService service = ProductService();
 
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+List<CategoryModel> categories = [];
+Future<void> loadData() async {
+  try{
+  final response =await CategoryService().getCategories();
+  print("Load Data: $response");
+  setState(() {
+    categories = response;
+    loading = false;
+  });
+}catch(e){
+  print("category error: $e");
+}
+}
+
+  bool loading = true;
   @override
   void dispose() {
     searchController.dispose();
@@ -117,9 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+@override
+Widget build(BuildContext context) {
+
+List<ProductsModel> filteredProducts = products;
+
+
+
+  return Scaffold(
       backgroundColor: AppColors.background,
 
       body: SafeArea(
@@ -133,105 +83,81 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 12),
 
-              SearchBarWidget(
-                controller: searchController,
-              ),
+              SearchBarWidget(controller: searchController),
 
               const SizedBox(height: 18),
 
               CategorySection(
-                categories: AppData.homeCategories,
+                categories: categories,
                 selectedIndex: selectedCategory,
                 onCategoryTap: selectCategory,
               ),
 
               const SizedBox(height: 18),
 
-              BannerSlider(
-                banners: AppData.banners,
-              ),
+              BannerSlider(banners: AppData.banners),
 
               const SizedBox(height: 20),
 
-              ShopCategory(
-                categories: AppData.shopCategories,
-              ),
+              ShopCategory(categories: categories),
 
               const SizedBox(height: 20),
-                            GridView.builder(
+              GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
-                itemCount: products.length,
-                gridDelegate:
-                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: filteredProducts.length,
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 220,
                   childAspectRatio: .56,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
                 ),
                 itemBuilder: (context, index) {
-                  final product = products[index];
+                  final product = filteredProducts[index];
 
-                  return GestureDetector(
+                  return ProductCard(
+                    product: ProductsModel(
+                      categoryName: product.categoryName,
+                      id: product.id,
+                      categoryId: product.categoryId,
+                      productName: product.productName,
+                      brand: product.brand,
+                      description: product.description,
+                      productImage: product.productImage,
+                      weight: product.weight,
+                      size: product.size,
+                      color: product.color,
+                      status: product.status,
+                      price: product.price,
+                      rating: product.rating,
+                      reviews: product.reviews,
+                      stock: product.stock,
+                      discountPrice: product.discountPrice,
+                      createdAt: product.createdAt,
+                      updatedAt: product.updatedAt,
+                      isTrending: product.isTrending,
+                      isDeleted: product.isDeleted,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (_) => ProductScreen(
-                            productName: product["name"],
-                            category: product["category"],
-                            image: product["networkImage"],
-                            price: (product["price"] as int)
-                                .toDouble(),
-                            oldPrice:
-                                (product["oldPrice"] as int)
-                                    .toDouble(),
-                            rating:
-                                (product["rating"] as num)
-                                    .toDouble(),
-                            reviews: product["reviews"],
+                            productId: product.id?.toHexString() ?? "",
+                            productName: product.productName,
+                            category: product.categoryName,
+                            image: product.productImage.isNotEmpty
+                                ? product.productImage.first
+                                : "",
+                            price: product.price,
+                            oldPrice: product.discountPrice,
+                            rating: product.rating,
+                            reviews: product.reviews,
                           ),
                         ),
                       );
                     },
-                    child: ProductCard(
-  product: ProductModel(
-    id: index.toString(),
-    name: product["name"],
-    brand: "Shop Aura",
-    category: product["category"],
-    image: product["networkImage"],
-    price: (product["price"] as num).toDouble(),
-    oldPrice: (product["oldPrice"] as num).toDouble(),
-    rating: (product["rating"] as num).toDouble(),
-    reviews: product["reviews"],
-    stock: 20,
-    discount: product["discount"],
-    isFavorite: false,
-    isFeatured: true,
-    isBestSeller: false,
-    isFlashSale: false,
-  ),
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ProductScreen(
-          productName: product["name"],
-          category: product["category"],
-          image: product["networkImage"],
-          price: (product["price"] as num).toDouble(),
-          oldPrice: (product["oldPrice"] as num).toDouble(),
-          rating: (product["rating"] as num).toDouble(),
-          reviews: product["reviews"],
-        ),
-      ),
-    );
-  },
-),
                   );
                 },
               ),

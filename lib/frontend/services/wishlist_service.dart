@@ -21,8 +21,7 @@ class WishlistService extends ChangeNotifier {
     required double rating,
     required int reviews,
     required int price,
-    required int oldPrice,
-    required int discount,
+    required double discount,
   }) {
     final existingIndex = _items.indexWhere((item) => item.name == name);
 
@@ -40,8 +39,8 @@ class WishlistService extends ChangeNotifier {
         rating: rating,
         reviews: reviews,
         price: price,
-        oldPrice: oldPrice,
         discount: discount,
+        
       ),
     );
     notifyListeners();

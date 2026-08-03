@@ -1,38 +1,61 @@
-import 'package:mongo_dart/mongo_dart.dart';
-
 class CategoryModel {
-  ObjectId? id;
+  String? id;
 
-  String name;
-  String image;
-  int productCount;
-  bool isFeatured;
+  String categoriesName;
+  List<String> categoriesImage;
+  String description;
+  String? parentCategories;
+  String status;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   CategoryModel({
     this.id,
-    required this.name,
-    required this.image,
-    required this.productCount,
-    this.isFeatured = false,
+    required this.categoriesName,
+    required this.categoriesImage,
+    required this.description,
+    this.parentCategories,
+    required this.status,
+    this.createdAt,
+    this.updatedAt,
   });
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
-      id: json["_id"] as ObjectId?,
-      name: json["name"] ?? "",
-      image: json["image"] ?? "",
-      productCount: json["productCount"] ?? 0,
-      isFeatured: json["isFeatured"] ?? false,
+      id: json["_id"]?.toString(),
+
+      categoriesName: json["categoryName"] ?? "",
+
+      categoriesImage: json["categoryImage"] != null
+          ? List<String>.from(json["categoryImage"])
+          : [],
+
+      description: json["description"] ?? "",
+
+      parentCategories: json["parentCategories"]?.toString(),
+
+      status: json["status"] ?? "",
+
+      createdAt: json["createdAt"] != null
+          ? DateTime.parse(json["createdAt"])
+          : null,
+
+      updatedAt: json["updatedAt"] != null
+          ? DateTime.parse(json["updatedAt"])
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       "_id": id,
-      "name": name,
-      "image": image,
-      "productCount": productCount,
-      "isFeatured": isFeatured,
+      "categoryName": categoriesName,
+      "categoryImage": categoriesImage,
+      "description": description,
+      "parentCategories": parentCategories,
+      "status": status,
+      "createdAt": createdAt?.toIso8601String(),
+      "updatedAt": updatedAt?.toIso8601String(),
     };
   }
 }

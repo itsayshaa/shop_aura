@@ -5,27 +5,33 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/category.dart';
+import 'package:shop_aura/backend/routes/ordersRoutes/ordersRoute.dart';
 import 'package:shop_aura/backend/routes/productRoutes/product.dart';
-
-Future<void> main()async{
+import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
+Future<void> main() async {
   await MongoService.connect();
+
   final router = Router();
+
   router.mount('/auth/', AuthRoutes().router.call);
-  router.mount('/category/',CategoryRoutes().router.call);
-  router.mount('/product/',ProductRoutes().router.call);
+  router.mount('/category/', CategoryRoutes().router.call);
+  router.mount('/product', ProductRoutes().router.call);
+  router.mount('/orders/', Ordersroute().router.call);
+  router.mount('/cart/', Cartroutes().router.call);
+
   final handler = Pipeline()
-    .addMiddleware(logRequests())
-    .addMiddleware(corsHeader())
-    .addHandler(router.call);
-  
+      .addMiddleware(logRequests())
+      .addMiddleware(corsHeader())
+      .addHandler(router.call);
+
   final server = await shelf_io.serve(
     handler,
     InternetAddress.anyIPv4,
-    5000
+    5000,
   );
-  print("Server running on http://localhost:5000");
-}
 
+  print("Server running on http://${server.address.host}:${server.port}");
+}
 Middleware corsHeader(){
   return createMiddleware(
     requestHandler: (Request request){

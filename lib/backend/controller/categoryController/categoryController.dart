@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
-
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import '../../database/mongo_service.dart';
 
 Future<Response> getCategories(Request request) async {
@@ -34,13 +34,16 @@ Future<Response> getFeaturedCategories(Request request) async {
 Future<Response> addCategory(Request request) async {
   final body = await request.readAsString();
   final data = jsonDecode(body);
-
-  await MongoService.categories.insertOne({
-    "name": data["name"],
-    "image": data["image"],
-    "productCount": data["productCount"],
-    "isFeatured": data["isFeatured"] ?? false,
-  });
+  final category = CategoryModel(
+     categoriesName: data["categoriesName"],
+   categoriesImage : data["categoriesImage"],
+  description: data["description"],
+   parentCategories : data["parentCategories"],
+   status: data["status"],
+   createdAt: data["createdAt"],
+   updatedAt: data["updatedAt"],
+  );
+  await MongoService.categories.insertOne(category.toJson());
 
   return Response.ok(
     jsonEncode({

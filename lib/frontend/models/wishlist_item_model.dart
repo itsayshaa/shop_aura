@@ -5,8 +5,7 @@ class WishlistItem {
   final double rating;
   final int reviews;
   final int price;
-  final int oldPrice;
-  final int discount;
+  final double discount;
 
   WishlistItem({
     required this.image,
@@ -15,7 +14,6 @@ class WishlistItem {
     required this.rating,
     required this.reviews,
     required this.price,
-    required this.oldPrice,
     required this.discount,
   });
 }

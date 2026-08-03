@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shop_aura/frontend/admin/widgets/bottombar.dart';
 import 'package:shop_aura/frontend/admin/widgets/drawer.dart';
 import 'package:shop_aura/frontend/admin/widgets/income.dart';
+import 'package:shop_aura/frontend/admin/widgets/low_stock.dart';
+import 'package:shop_aura/frontend/admin/widgets/recent_orders.dart';
+import 'package:shop_aura/frontend/admin/widgets/sales_chat.dart';
+import 'package:shop_aura/frontend/admin/widgets/top_products.dart';
+import 'package:shop_aura/frontend/client/screens/widgets/section_card.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
@@ -78,7 +83,19 @@ bottomNavigationBar: AdminBottomNav(
                   ),
                 ),
                 SizedBox(height: 30,),
-                DashboardPage()
+                DashboardPage(),
+                SizedBox(height: 10,),
+                SectionCard(
+                  title: "Sales Overview",
+                  child: SalesChart(),
+                  icon: Icons.grain_sharp
+                ),
+                SizedBox(height: 10,),
+                LowStockWidget(),
+                SizedBox(height: 10,),
+                RecentOrdersWidget(),
+                SizedBox(height: 10,),
+                TopProductsWidget()
             ],
           ),
           )
