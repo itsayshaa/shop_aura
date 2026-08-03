@@ -21,7 +21,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     if (widget.initialRefundsFilter) {
       _selectedFilter = 'Refund Requests';
     }
-    OrderService.instance.loadOrders();
+    OrderService.instance.loadAdminOrders();
   }
 
   @override
