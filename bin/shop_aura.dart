@@ -1,8 +1,5 @@
 import 'dart:io';
-<<<<<<< HEAD
 import 'package:shop_aura/backend/database/mongo_service.dart';
-=======
->>>>>>> a5459af627811accf46c00d2cc3baf8d8ce5ad08
 import 'package:shop_aura/backend/routes/authRoutes/auth.dart';
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
@@ -14,14 +11,13 @@ import 'package:shop_aura/backend/routes/categoryRoutes/admin_category.dart';
 import 'package:shop_aura/backend/routes/brandRoutes/admin_brand.dart';
 import 'package:shop_aura/backend/routes/cartRoutes/cart.dart';
 import 'package:shop_aura/backend/routes/wishlistRoutes/wishlist.dart';
-<<<<<<< HEAD
+
 import 'package:shop_aura/backend/routes/orderRoutes/order.dart';
 
-=======
 import 'package:shop_aura/backend/routes/order_routes.dart';
 import 'package:shop_aura/backend/routes/refund_routes.dart';
 import 'package:shop_aura/backend/database/mongo_service.dart';
->>>>>>> a5459af627811accf46c00d2cc3baf8d8ce5ad08
+
 Future<void> main() async {
   await MongoService.connect();
   final router = Router();
