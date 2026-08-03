@@ -1,5 +1,5 @@
 import 'package:mongo_dart/mongo_dart.dart';
-import '../database/mongodb_service.dart';
+import '../database/mongo_service.dart';
 import 'notification_service.dart';
 
 class BackendRefundService {
@@ -8,7 +8,7 @@ class BackendRefundService {
     required String reason,
   }) async {
     final nowIso = DateTime.now().toUtc().toIso8601String();
-    await MongoDBService.orders.updateOne(
+    await MongoService.orders.updateOne(
       where.eq("id", orderId),
       modify
           .set("refundStatus", "Requested")
@@ -23,9 +23,9 @@ class BackendRefundService {
       "refundRequestedAt": nowIso,
     };
 
-    await MongoDBService.refunds.insertOne(Map<String, dynamic>.from(refundRecord));
+    await MongoService.refunds.insertOne(Map<String, dynamic>.from(refundRecord));
 
-    return MongoDBService.cleanDoc(refundRecord);
+    return refundRecord;
   }
 
   static Future<Map<String, dynamic>> processAdminRefund({
@@ -48,7 +48,7 @@ class BackendRefundService {
 
     final refundTxnId = "RFND_${DateTime.now().millisecondsSinceEpoch}";
 
-    await MongoDBService.orders.updateOne(
+    await MongoService.orders.updateOne(
       where.eq("id", orderId),
       modify
           .set("refundStatus", refundStatus)
@@ -71,9 +71,9 @@ class BackendRefundService {
   }
 
   static Future<List<Map<String, dynamic>>> fetchAllRefunds() async {
-    final ordersWithRefunds = await MongoDBService.orders
+    final ordersWithRefunds = await MongoService.orders
         .find(where.ne("refundStatus", null).sortBy("date", descending: true))
         .toList();
-    return MongoDBService.cleanDocs(ordersWithRefunds);
+    return ordersWithRefunds;
   }
 }
