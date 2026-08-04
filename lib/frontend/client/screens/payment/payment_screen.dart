@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shop_aura/frontend/services/authService.dart';
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/backend/models/client/cartModel/cartItem.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
 import 'package:shop_aura/frontend/services/order_service.dart';
-import 'package:shop_aura/frontend/models/cart_item_model.dart';
-
+import 'package:shop_aura/frontend/client/screens/widgets/success_screen.dart';
 import 'package:shop_aura/frontend/client/screens/payment/payment_types.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/order_summary_section.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/delivery_address_section.dart';
@@ -18,11 +17,19 @@ import 'package:shop_aura/frontend/client/screens/widgets/upi_payment_section.da
 import 'package:shop_aura/frontend/client/screens/widgets/place_order_bar.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/loading_state.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/failure_screen.dart';
-import 'package:shop_aura/frontend/client/screens/widgets/success_screen.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/section_card.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mongo_dart/mongo_dart.dart' show ObjectId;
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final List<CartItemModel> items;
+  final double total;
+
+  const PaymentScreen({
+    super.key,
+    required this.items,
+    required this.total,
+  });
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
@@ -53,6 +60,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   final _promoCtrl = TextEditingController();
   bool _promoApplied = false;
+  
   bool _useWallet = false;
   final double _walletBalance = 250.0;
 
@@ -69,7 +77,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
   double get _walletDiscount =>
       _useWallet ? _walletBalance.clamp(0, _rawTotal) : 0;
 
-  double get _rawTotal => CartService.instance.totalPrice + _deliveryFee;
+double get _subTotal {
+  return widget.items.fold(
+    0.0,
+    (sum, item) => sum + item.subtotal,
+  );
+}
+
+double get _rawTotal => _subTotal + _deliveryFee;
 
   double get _finalTotal =>
       (_rawTotal - _walletDiscount).clamp(0, double.infinity);
@@ -171,38 +186,69 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => _isPlacingOrder = true);
 
     final double totalPaid = _finalTotal;
+final prefs = await SharedPreferences.getInstance();
+final userId = prefs.getString("userId")!;
 
     try {
-      // Copy cart items BEFORE clearing the cart, converting each CartItem
-      // into the OrderItem type that OrderModel expects.
-      final cartItemsSnapshot = List<CartItem>.from(CartService.instance.items);
-      final itemsToOrder = cartItemsSnapshot
-          .map(
-            (item) => OrderItem(
-              name: item.name,
-              image: item.image,
-              quantity: item.quantity,
-              price: _priceToDouble(item.price),
-            ),
-          )
-          .toList();
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (!mounted) return;
+
+      final double totalPaid = _finalTotal;
+
+      // Copy cart items BEFORE clearing the cart, so the order keeps its own list
+      final itemsToOrder = widget.items;
 
       // Build order model
-      final order = OrderModel(
-        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
-        items: itemsToOrder,
-        totalAmount: totalPaid,
-        date: DateTime.now(),
-        status: "Processing",
-        name: _customerName,
-        phone: _customerPhone,
-        address: _deliveryAddress,
-        paymentMethod: _selectedMethod.name,
-      );
+
+
+final orderItems = widget.items.map((item) {
+  return OrderItemModel(
+    productId: item.productId,
+    name: item.name,
+    image: item.image,
+    color: item.color,
+    size: item.size,
+    price: item.price,
+    quantity: item.quantity,
+    subtotal: item.subtotal,
+  );
+}).toList();
+
+final shippingAddress = ShippingAddressModel(
+  fullName: _addressNameCtrl.text.trim(),
+  phone: _addressPhoneCtrl.text.trim(),
+  address: _addressStreetCtrl.text.trim(),
+  city: _addressCityCtrl.text.trim(),
+  state: _addressStateCtrl.text.trim(),
+  pincode: _addressZipCtrl.text.trim(),
+);
+
+final order = OrderModel(
+  userId: ObjectId.fromHexString(userId),
+  orderNumber: DateTime.now().millisecondsSinceEpoch,
+
+  products: orderItems,
+
+  paymentMethod: _selectedMethod.name,
+
+  paymentStatus: "Pending",
+  orderStatus: "Processing",
+
+  subTotal: _subTotal,
+  discount: _walletDiscount,
+  tax: 0,
+  shipping: _deliveryFee,
+  totalAmount: _finalTotal,
+
+  shippingAddress: shippingAddress,
+
+  createdAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
 
       // Save order and clear cart
       await OrderService.instance.addOrder(order);
-      CartService.instance.clearCart();
 
       if (!mounted) return;
 
@@ -218,37 +264,50 @@ class _PaymentScreenState extends State<PaymentScreen> {
       // prices safely, and try to save/clear locally instead.
       if (!mounted) return;
 
-      final cartItems = List<CartItem>.from(CartService.instance.items);
-      final fallbackItemsToOrder = cartItems
-          .map(
-            (item) => OrderItem(
-              name: item.name,
-              image: item.image,
-              quantity: item.quantity,
-              price: _priceToDouble(item.price),
-            ),
-          )
-          .toList();
+final cartItems = widget.items;
 
-      final fallbackOrder = OrderModel(
-        id: "ORD_${DateTime.now().millisecondsSinceEpoch}",
-        items: fallbackItemsToOrder,
-        totalAmount: totalPaid,
-        date: DateTime.now(),
-        status: "Processing",
-        name: _customerName,
-        phone: _customerPhone,
-        address: _deliveryAddress,
-        paymentMethod: _selectedMethod.name,
-      );
+final fallbackItemsToOrder = cartItems.map(
+  (item) => OrderItemModel(
+    productId: item.productId,
+    name: item.name,
+    image: item.image,
+    color: item.color,
+    size: item.size,
+    price: item.price,
+    quantity: item.quantity,
+    subtotal: item.subtotal,
+  ),
+).toList();
 
-      try {
-        await OrderService.instance.addOrder(fallbackOrder);
-        CartService.instance.clearCartLocal();
-      } catch (_) {
-        // Even the fallback save failed; still show the success screen
-        // with the locally-built order so the user isn't stuck.
-      }
+ final fallbackOrder = OrderModel(
+  
+  userId: ObjectId.fromHexString(userId),
+  orderNumber: DateTime.now().millisecondsSinceEpoch,
+
+  products: fallbackItemsToOrder,
+
+  paymentMethod: _selectedMethod.name,
+  paymentStatus: "Pending",
+  orderStatus: "Processing",
+
+  subTotal: _subTotal,
+  discount: _walletDiscount,
+  tax: 0,
+  shipping: _deliveryFee,
+  totalAmount: totalPaid,
+
+  shippingAddress: ShippingAddressModel(
+    fullName: _customerName,
+    phone: _customerPhone,
+    address: _addressStreetCtrl.text.trim(),
+    city: _addressCityCtrl.text.trim(),
+    state: _addressStateCtrl.text.trim(),
+    pincode: _addressZipCtrl.text.trim(),
+  ),
+
+  createdAt: DateTime.now(),
+  updatedAt: DateTime.now(),
+);
 
       if (!mounted) return;
 
@@ -286,12 +345,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       Navigator.pop(context);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     if (_isPlacingOrder) return const LoadingState();
 
-    final cart = CartService.instance;
+  final items = widget.items;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -314,7 +372,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: _buildStepContent(cart),
+              child: _buildStepContent(),
             ),
           ),
         ],
@@ -415,7 +473,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Widget _buildStepContent(CartService cart) {
+  Widget _buildStepContent() {
     switch (_currentStep) {
       case 0:
         return Column(
@@ -423,7 +481,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             SectionCard(
               title: "Order Summary",
               icon: Icons.receipt_long_outlined,
-              child: OrderSummarySection(cart: cart),
+              child: OrderSummarySection(item: widget.items),
             ),
             const SizedBox(height: 14),
             SectionCard(
@@ -435,7 +493,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
             const SizedBox(height: 14),
-            _buildPriceDetailsSection(cart),
+            _buildPriceDetailsSection(),
           ],
         );
       case 1:
@@ -510,7 +568,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             const SizedBox(height: 14),
             _buildPromoWalletSection(),
             const SizedBox(height: 14),
-            _buildPriceDetailsSection(cart),
+            _buildPriceDetailsSection(),
             const SizedBox(height: 14),
             _buildTermsSection(),
           ],
@@ -603,13 +661,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  Widget _buildPriceDetailsSection(CartService cart) {
+  Widget _buildPriceDetailsSection() {
     return SectionCard(
       title: "Price Details",
       icon: Icons.request_quote_outlined,
       child: Column(
         children: [
-          SummaryRow(label: "Subtotal", value: "₹${cart.totalPrice}"),
+          SummaryRow(
+  label: "Subtotal",
+  value: "₹${_subTotal.toStringAsFixed(2)}",
+),
           SummaryRow(
             label: _deliveryOptionIndex == 0
                 ? "Delivery (Standard)"

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/backend/models/client/cartModel/cartItem.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-
 class OrderSummarySection extends StatelessWidget {
-  final CartService cart;
+final List<CartItemModel> item;
 
-  const OrderSummarySection({
-    super.key,
-    required this.cart,
-  });
+const OrderSummarySection({
+  super.key,
+  required this.item,
+});
 
   @override
   Widget build(BuildContext context) {
-    final items = cart.items;
+    final items = item;
 
     if (items.isEmpty) {
       return const Padding(

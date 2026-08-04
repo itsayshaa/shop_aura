@@ -1,31 +1,31 @@
 import 'package:mongo_dart/mongo_dart.dart';
 
 import '../database/mongo_service.dart';
-import './../models/client/productModel.dart';
+import '../models/client/productModel.dart';
 
 class ProductServices {
-  static Future<List<ProductModel>> getProducts() async {
+  static Future<List<ProductsModel>> getProducts() async {
     final data = await MongoService.products.find().toList();
 
     return data
-        .map((e) => ProductModel.fromJson(e))
+        .map((e) => ProductsModel.fromJson(e))
         .toList();
   }
 
 
 
-  static Future<List<ProductModel>> getProductsByCategory(
+  static Future<List<ProductsModel>> getProductsByCategory(
     
       ObjectId categoryId) async {
     final data = await MongoService.products.find().toList();
     return data
-        .map((e) => ProductModel.fromJson(e))
+        .map((e) => ProductsModel.fromJson(e))
         .toList();
   }
 
 
 
-  static Future<ProductModel?> getProductById(
+  static Future<ProductsModel?> getProductById(
       ObjectId id) async {
     final data = await MongoService.products.findOne(
       where.id(id),
@@ -33,15 +33,15 @@ class ProductServices {
 
     if (data == null) return null;
 
-    return ProductModel.fromJson(data);
+    return ProductsModel.fromJson(data);
   }
 
-  static Future<List<ProductModel>> searchProducts(
+  static Future<List<ProductsModel>> searchProducts(
       String keyword) async {
     final products = await getProducts();
 
     return products.where((product) {
-      return product.name
+      return product.productName
               .toLowerCase()
               .contains(keyword.toLowerCase()) ||
           product.brand
@@ -52,7 +52,7 @@ class ProductServices {
 
 
   static Future<void> addProduct(
-      ProductModel product) async {
+      ProductsModel product) async {
     await MongoService.products.insertOne(
       product.toJson(),
     );
@@ -60,7 +60,7 @@ class ProductServices {
 
 
   static Future<void> updateProduct(
-      ProductModel product) async {
+      ProductsModel product) async {
     await MongoService.products.replaceOne(
       where.id(product.id!),
       product.toJson(),

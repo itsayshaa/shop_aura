@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shop_aura/backend/database/mongo_service.dart';
@@ -36,6 +37,7 @@ Future<Response> registerUser(Request request)async{
     address: [],
     wishList: [],
     profileImage: "",
+    isActive: "Active",
     isBlocked: false,
     isVerified: false,
     createdAt: DateTime.now().toUtc().toIso8601String(),
@@ -118,7 +120,7 @@ print("user founded");
       "message": "Login success",
       "token": token,
       "user": {
-        "id": user["_id"].toString(),
+        "id": user["_id"].toHexString(),
         "name": user["name"],
         "email": user["email"],
         "phone": user["phone"],
@@ -196,10 +198,25 @@ Future<Response> updateProfile(Request request) async {
       );
     }
   }
+  String formatDate(String date){
+    final dateTime = DateTime.parse(date);
+    return DateFormat("MMMM d, yyyy").format(dateTime);
+  }
 Future<Response> getUser(Request request)async{
   final users = await MongoService.users.find().toList();
+  final userList = users.where((user)=> user["role"] == "user").map((user)=>{
+    "name":user["name"],
+    "email":user["email"],
+    "phone":user["phone"],
+    "joinedAt":formatDate(user["createdAt"]),
+    "address":user["address"],
+    "status":user["status"],
+    "isVerified":user["isVerified"],
+    "isBlocked":user["isBlocked"],
+    "role":user["role"]
+  }).toList();
   return Response.ok(
-    jsonEncode(users),
+    jsonEncode(userList),
     headers: {"Content-Type":"application/json"}
   );
 }

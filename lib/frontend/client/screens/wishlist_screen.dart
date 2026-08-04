@@ -139,14 +139,6 @@ class WishlistScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Text(
-                                "₹${item.oldPrice}",
-                                style: TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: AppColors.textSoft,
-                                  fontSize: 11,
-                                ),
-                              ),
                             ],
                           ),
                         ],
@@ -159,13 +151,13 @@ class WishlistScreen extends StatelessWidget {
                         IconButton(
                           tooltip: "Add to cart",
                           onPressed: () {
-                            CartService.instance.addToCart(
-                              image: item.image,
-                              category: item.category,
-                              name: item.name,
-                              price: item.price,
-                              oldPrice: item.oldPrice,
-                            );
+                            // CartService.addToCart(
+                            //   image: item.image,
+                            //   category: item.category,
+                            //   name: item.name,
+                            //   price: item.price,
+                            //   oldPrice: item.oldPrice,
+                            // );
 
                             ScaffoldMessenger.of(
                               context,

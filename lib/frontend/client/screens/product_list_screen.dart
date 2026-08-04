@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/models/product_model.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 import 'package:shop_aura/frontend/providers/product_provider.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/product/product_grid.dart';
@@ -45,38 +45,45 @@ class _ProductListScreenState
     await context.read<ProductProvider>().refresh();
   }
 
-  void _openProduct(ProductModel product) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ProductScreen(
-          productName: product.name,
-          category: product.category,
-          image: product.image,
-          price: product.price,
-          oldPrice: product.oldPrice,
-          rating: product.rating,
-          reviews: product.reviews,
-        ),
+void _openProduct(ProductsModel product) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ProductScreen(
+        productId: product.id?.toHexString() ?? "",
+        productName: product.productName,
+        category: product.categoryName,
+        image: product.productImage.isNotEmpty
+            ? product.productImage.first
+            : "",
+        price: product.price,
+        oldPrice: product.discountPrice,
+        rating: product.rating,
+        reviews: product.reviews,
       ),
-    );
-  }
-
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     return Consumer<ProductProvider>(
       builder: (context, provider, child) {
+print("Total Products: ${provider.products.length}");
 
-        List<ProductModel> products =
-            provider.products.where((product) {
+for (final p in provider.products) {
+  print("${p.productName} -> ${p.categoryName}");
+}
 
-          return product.category
-              .toLowerCase()
-              .contains(
-                widget.category.toLowerCase(),
-              );
+print("Selected Category: ${widget.category}");
+List<ProductsModel> products = provider.products.where((product) {
+  return product.categoryName.toLowerCase() ==
+      widget.category.toLowerCase();
+}).toList();
+print("Selected Category: ${widget.category}");
 
-        }).toList();
+for (final p in provider.products) {
+  print("${p.productName} -> ${p.categoryName}");
+}
                 return Scaffold(
           backgroundColor: AppColors.background,
 
@@ -250,7 +257,7 @@ class _ProductListScreenState
                                 .showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  "${product.name} added to Wishlist",
+                                  "${product.productName} added to Wishlist",
                                 ),
                                 duration: const Duration(
                                   seconds: 1,

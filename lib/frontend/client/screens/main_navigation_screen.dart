@@ -34,7 +34,7 @@ class _MainNavigationScreenState
 
     pages = const [
       HomeScreen(),
-      CategoryScreen(),
+      // CategoryScreen(),
       WishlistScreen(),
       CartScreen(),
       OrdersScreen(),
@@ -42,7 +42,7 @@ class _MainNavigationScreenState
 
     // Fetch data from backend on startup if logged in
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      CartService.instance.fetchCartFromServer();
+      // CartService.instance.fetchCartFromServer();
       WishlistService.instance.fetchWishlistFromServer();
       OrderService.instance.loadOrders();
     });

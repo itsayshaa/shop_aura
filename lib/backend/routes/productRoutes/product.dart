@@ -11,11 +11,13 @@ class ProductRoutes {
 
     router.get('/', getProducts);
 
-    router.get('/<id>', getProduct);
+    router.get('/<id>', getProducts);
 
     router.get('/category/<categoryId>', getProductsByCategory);
 
     router.post('/add', addProduct);
+
+    router.get("/search/<query>", searchProducts);
 
     router.get('/<ignored|.*>', (Request request) async {
       return Response(

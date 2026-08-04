@@ -1,206 +1,126 @@
+import 'package:shop_aura/main.dart';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop_aura/frontend/models/cart_item_model.dart';
-import 'package:shop_aura/frontend/services/authService.dart';
+import 'package:flutter/material.dart';
+import 'package:shop_aura/backend/models/client/cartModel/cartModel.dart';
 
 class CartService extends ChangeNotifier {
-  CartService._internal();
+  String? get baseUrl => Apiconfig.baseUrl;
+
+
   static final CartService instance = CartService._internal();
 
-  final List<CartItem> _items = [];
+  CartService._internal();
 
-  List<CartItem> get items => List.unmodifiable(_items);
 
-  int get itemCount =>
-      _items.fold(0, (sum, item) => sum + item.quantity);
-
-  int get totalPrice =>
-      _items.fold(0, (sum, item) => sum + (item.price * item.quantity));
-
-  bool isInCart(String name) => _items.any((item) => item.name == name);
-
-  Future<void> fetchCartFromServer() async {
-    try {
-      final token = await Authservice.getToken();
-      if (token == null) {
-        _items.clear();
-        notifyListeners();
-        return;
-      }
-      final response = await http.get(
-        Uri.parse("${Authservice.instance.baseurl}/cart/"),
-        headers: {
-          "Authorization": "Bearer $token",
-          "Content-Type": "application/json",
-        },
-      );
-      if (response.statusCode == 200) {
-        final List decoded = jsonDecode(response.body);
-        _items.clear();
-        _items.addAll(decoded.map((item) => CartItem.fromJson(item)).toList());
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint("Error fetching cart: $e");
-    }
-  }
 
   Future<void> addToCart({
-    required String image,
-    required String category,
-    required String name,
-    required int price,
-    required int oldPrice,
+    required String userId,
+    required String productId,
+    required int quantity,
   }) async {
-    final existingIndex = _items.indexWhere((item) => item.name == name);
+    final response = await http.post(
+      Uri.parse("$baseUrl/cart/add"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "userId": userId,
+        "productId": productId,
+        "quantity": quantity,
+      }),
+    );
 
-    if (existingIndex != -1) {
-      _items[existingIndex].quantity += 1;
-    } else {
-      _items.add(
-        CartItem(
-          image: image,
-          category: category,
-          name: name,
-          price: price,
-          oldPrice: oldPrice,
-          quantity: 1,
-        ),
-      );
-    }
-    notifyListeners();
-
-    try {
-      final token = await Authservice.getToken();
-      if (token != null) {
-        await http.post(
-          Uri.parse("${Authservice.instance.baseurl}/cart/add"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          },
-          body: jsonEncode({
-            "image": image,
-            "category": category,
-            "name": name,
-            "price": price,
-            "oldPrice": oldPrice,
-            "quantity": 1
-          }),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error adding item to cart: $e");
+    if (response.statusCode != 200) {
+      throw Exception("Failed to add cart");
     }
   }
+  // Future<void> fetchCartFromServer() async {
+  //   try {
+  //     final token = await Authservice.getToken();
+  //     if (token == null) {
+  //       _items.clear();
+  //       notifyListeners();
+  //       return;
+  //     }
+  //     final response = await http.get(
+  //       Uri.parse("${Authservice.instance.baseurl}/cart/"),
+  //       headers: {
+  //         "Authorization": "Bearer $token",
+  //         "Content-Type": "application/json",
+  //       },
+  //     );
+  //     if (response.statusCode == 200) {
+  //       final List decoded = jsonDecode(response.body);
+  //       _items.clear();
+  //       _items.addAll(decoded.map((item) => CartItem.fromJson(item)).toList());
+  //       notifyListeners();
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error fetching cart: $e");
+  //   }
+  // }
 
-  Future<void> increaseQuantity(int index) async {
-    if (index < 0 || index >= _items.length) return;
-    final item = _items[index];
-    item.quantity += 1;
-    notifyListeners();
+  Future<CartModel> getCart(String userId) async {
+    final response = await http.get(Uri.parse("$baseUrl/cart/$userId"));
 
-    try {
-      final token = await Authservice.getToken();
-      if (token != null) {
-        await http.post(
-          Uri.parse("${Authservice.instance.baseurl}/cart/update"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          },
-          body: jsonEncode({
-            "name": item.name,
-            "quantity": item.quantity,
-          }),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error increasing quantity on server: $e");
+    print("BODY => ${response.body}");
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+
+      return CartModel.fromJson(data);
     }
+
+    throw Exception("Cart loading failed");
   }
 
-  Future<void> decreaseQuantity(int index) async {
-    if (index < 0 || index >= _items.length) return;
-    final item = _items[index];
-    final String name = item.name;
-    final int newQty = item.quantity - 1;
-
-    if (item.quantity > 1) {
-      item.quantity -= 1;
-    } else {
-      _items.removeAt(index);
+  Future<void> increaseQuantity({
+    required String userId,
+    required String productId,
+  }) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/cart/increase"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"userId": userId, "productId": productId}),
+    );
+    print(response.body);
+    if (response.statusCode != 200) {
+      throw Exception("Failed to increase quantity");
     }
+
     notifyListeners();
-
-    try {
-      final token = await Authservice.getToken();
-      if (token != null) {
-        await http.post(
-          Uri.parse("${Authservice.instance.baseurl}/cart/update"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          },
-          body: jsonEncode({
-            "name": name,
-            "quantity": newQty,
-          }),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error decreasing quantity on server: $e");
-    }
   }
 
-  Future<void> removeItem(int index) async {
-    if (index < 0 || index >= _items.length) return;
-    final item = _items[index];
-    _items.removeAt(index);
-    notifyListeners();
+  Future<void> decreaseQuantity({
+    required String userId,
+    required String productId,
+  }) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/cart/decrease"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"userId": userId, "productId": productId}),
+    );
 
-    try {
-      final token = await Authservice.getToken();
-      if (token != null) {
-        await http.post(
-          Uri.parse("${Authservice.instance.baseurl}/cart/remove"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          },
-          body: jsonEncode({
-            "name": item.name,
-          }),
-        );
-      }
-    } catch (e) {
-      debugPrint("Error removing item on server: $e");
+    if (response.statusCode != 200) {
+      throw Exception("Failed to decrease quantity");
     }
+
+    notifyListeners();
   }
 
-  Future<void> clearCart() async {
-    _items.clear();
-    notifyListeners();
+  Future<void> removeItem({
+    required String userId,
+    required String productId,
+  }) async {
+    final response = await http.delete(
+      Uri.parse("$baseUrl/cart/remove"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"userId": userId, "productId": productId}),
+    );
 
-    try {
-      final token = await Authservice.getToken();
-      if (token != null) {
-        await http.post(
-          Uri.parse("${Authservice.instance.baseurl}/cart/clear"),
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer $token",
-          },
-        );
-      }
-    } catch (e) {
-      debugPrint("Error clearing cart on server: $e");
+    if (response.statusCode != 200) {
+      throw Exception("Failed to remove item");
     }
-  }
 
-  void clearCartLocal() {
-    _items.clear();
     notifyListeners();
   }
 }

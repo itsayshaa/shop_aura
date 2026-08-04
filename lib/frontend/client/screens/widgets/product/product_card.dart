@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../models/product_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_aura/backend/models/client/productModel.dart';
 import '../../../../theme/app_colors.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
@@ -7,7 +8,7 @@ import 'package:shop_aura/frontend/client/screens/cart_screen.dart';
 import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 
 class ProductCard extends StatefulWidget {
-  final ProductModel product;
+  final ProductsModel product;
   final VoidCallback? onTap;
   final VoidCallback? onFavourite;
 
@@ -54,16 +55,18 @@ class _ProductCardState extends State<ProductCard> {
                       top: Radius.circular(18),
                     ),
                     child: Hero(
-                      tag: product.id,
+                      tag: product.id?.toHexString() ?? "",
                       child: Image.network(
-                        product.image,
+                        product.productImage.isNotEmpty
+                            ? product.productImage.first
+                            : "",
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
                     ),
                   ),
 
-                  if (product.discount > 0)
+                  if (product.discountPrice > 0)
                     Positioned(
                       top: 10,
                       left: 10,
@@ -77,7 +80,7 @@ class _ProductCardState extends State<ProductCard> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          "-${product.discount}%",
+                          "-${product.discountPrice}%",
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -93,18 +96,20 @@ class _ProductCardState extends State<ProductCard> {
                     child: ListenableBuilder(
                       listenable: WishlistService.instance,
                       builder: (context, _) {
-                        final isWishlisted = WishlistService.instance.isWishlisted(product.name);
+                        final isWishlisted = WishlistService.instance
+                            .isWishlisted(product.productName);
                         return InkWell(
                           onTap: () {
                             WishlistService.instance.toggle(
-                              image: product.image,
-                              category: product.category,
-                              name: product.name,
+                              image: product.productImage.isNotEmpty
+                                  ? product.productImage.first
+                                  : "",
+                              category: product.categoryName,
+                              name: product.productName,
                               rating: product.rating,
                               reviews: product.reviews,
                               price: product.price.toInt(),
-                              oldPrice: product.oldPrice.toInt(),
-                              discount: product.discount,
+                              discount: product.discountPrice,
                             );
                             Navigator.push(
                               context,
@@ -120,7 +125,9 @@ class _ProductCardState extends State<ProductCard> {
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
-                              isWishlisted ? Icons.favorite : Icons.favorite_border,
+                              isWishlisted
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
                               size: 20,
                               color: Colors.red,
                             ),
@@ -151,7 +158,7 @@ class _ProductCardState extends State<ProductCard> {
                     const SizedBox(height: 2),
 
                     Text(
-                      product.name,
+                      product.productName,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -162,13 +169,21 @@ class _ProductCardState extends State<ProductCard> {
 
                     const SizedBox(height: 4),
 
+                    Text(
+                      product.productName,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    const Spacer(),
+
                     Row(
                       children: [
-                        const Icon(
-                          Icons.star,
-                          color: Colors.orange,
-                          size: 14,
-                        ),
+                        const Icon(Icons.star, color: Colors.orange, size: 14),
                         const SizedBox(width: 3),
                         Text(
                           product.rating.toString(),
@@ -201,16 +216,7 @@ class _ProductCardState extends State<ProductCard> {
                           ),
                         ),
 
-                        const SizedBox(width: 6),
-
-                        Text(
-                          "₹${product.oldPrice.toStringAsFixed(0)}",
-                          style: const TextStyle(
-                            decoration: TextDecoration.lineThrough,
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                        ),
+                        const SizedBox(width: 8),
                       ],
                     ),
 
@@ -220,10 +226,16 @@ class _ProductCardState extends State<ProductCard> {
                       width: double.infinity,
                       height: 32,
                       child: ElevatedButton.icon(
-                        icon: const Icon(Icons.shopping_cart_outlined, size: 14),
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 14,
+                        ),
                         label: const Text(
                           "Add to Cart",
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
@@ -234,14 +246,18 @@ class _ProductCardState extends State<ProductCard> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: () {
-                          CartService.instance.addToCart(
-                            image: product.image,
-                            category: product.category,
-                            name: product.name,
-                            price: product.price.toInt(),
-                            oldPrice: product.oldPrice.toInt(),
+                        onPressed: () async {
+                          final prefs = await SharedPreferences.getInstance();
+                          final userId = prefs.getString("userId");
+
+                          if (userId == null) return;
+
+                          await CartService.instance.addToCart(
+                            userId: userId,
+                            productId: product.id!.toHexString(),
+                            quantity: 1,
                           );
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(

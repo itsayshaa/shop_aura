@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class CategorySection extends StatefulWidget {
-  final List<Map<String, dynamic>> categories;
+  final List<CategoryModel> categories;
   final int selectedIndex;
   final Function(int) onCategoryTap;
 
@@ -56,7 +57,7 @@ class _CategorySectionState extends State<CategorySection> {
                     ),
                   ),
                   child: Icon(
-                    category["icon"],
+                    Icons.category,
                     color: isSelected
                         ? Colors.white
                         : AppColors.primary,
@@ -69,7 +70,7 @@ class _CategorySectionState extends State<CategorySection> {
                 SizedBox(
                   width: 72,
                   child: Text(
-                    category["title"],
+                    category.categoriesName,
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

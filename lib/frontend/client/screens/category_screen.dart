@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:shop_aura/frontend/models/category_model.dart';
-import 'package:shop_aura/frontend/providers/category_provider.dart';
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/category/category_banner.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/category/category_card.dart';
@@ -11,6 +10,7 @@ import 'package:shop_aura/frontend/client/screens/widgets/category/category_sear
 import 'package:shop_aura/frontend/client/screens/widgets/category/featured_collection.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/category/brand_card.dart';
 import 'package:shop_aura/frontend/client/screens/widgets/category/section_title.dart';
+import 'package:shop_aura/frontend/providers/category_provider.dart';
 
 import 'product_list_screen.dart';
 
@@ -36,7 +36,6 @@ void initState() {
     context.read<CategoryProvider>().loadCategories();
   });
 }
-
   @override
   void dispose() {
     _scrollController.dispose();
@@ -44,11 +43,11 @@ void initState() {
     super.dispose();
   }
 
-  void _openProducts(CategoryModel category) {
+  void _openProducts(CategoryModel category) {  
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ProductListScreen(category: category.name),
+        builder: (_) => ProductListScreen(category: category.categoriesName),
       ),
     );
   }

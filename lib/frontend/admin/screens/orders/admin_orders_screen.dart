@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 import 'package:shop_aura/frontend/services/order_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
@@ -34,13 +34,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           if (_selectedFilter == 'Refund Requests') {
             return order.refundStatus != null;
           } else if (_selectedFilter == 'Processing') {
-            return order.status.toLowerCase() == 'processing';
+            return order.orderStatus.toLowerCase() == 'processing';
           } else if (_selectedFilter == 'Shipped') {
-            return order.status.toLowerCase() == 'shipped';
+            return order.orderStatus.toLowerCase() == 'shipped';
           } else if (_selectedFilter == 'Delivered') {
-            return order.status.toLowerCase() == 'delivered';
+            return order.orderStatus.toLowerCase() == 'delivered';
           } else if (_selectedFilter == 'Cancelled') {
-            return order.status.toLowerCase() == 'cancelled';
+            return order.orderStatus.toLowerCase() == 'cancelled';
           }
           return true;
         }).toList();
@@ -62,19 +62,33 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                   _buildFilterChip(
                     'Processing',
-                    allOrders.where((o) => o.status.toLowerCase() == 'processing').length,
+                    allOrders
+                        .where(
+                          (o) => o.orderStatus.toLowerCase() == 'processing',
+                        )
+                        .length,
                   ),
                   _buildFilterChip(
                     'Shipped',
-                    allOrders.where((o) => o.status.toLowerCase() == 'shipped').length,
+                    allOrders
+                        .where((o) => o.orderStatus.toLowerCase() == 'shipped')
+                        .length,
                   ),
                   _buildFilterChip(
                     'Delivered',
-                    allOrders.where((o) => o.status.toLowerCase() == 'delivered').length,
+                    allOrders
+                        .where(
+                          (o) => o.orderStatus.toLowerCase() == 'delivered',
+                        )
+                        .length,
                   ),
                   _buildFilterChip(
                     'Cancelled',
-                    allOrders.where((o) => o.status.toLowerCase() == 'cancelled').length,
+                    allOrders
+                        .where(
+                          (o) => o.orderStatus.toLowerCase() == 'cancelled',
+                        )
+                        .length,
                   ),
                 ],
               ),
@@ -86,7 +100,11 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.shopping_bag_outlined, size: 64, color: Colors.grey.shade400),
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            size: 64,
+                            color: Colors.grey.shade400,
+                          ),
                           const SizedBox(height: 12),
                           Text(
                             "No ${_selectedFilter == 'All' ? 'orders' : _selectedFilter.toLowerCase()} found",
@@ -127,7 +145,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.white : (badgeColor ?? AppColors.accent),
+                color: isSelected
+                    ? Colors.white
+                    : (badgeColor ?? AppColors.accent),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
@@ -171,7 +191,7 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.date);
+    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt);
 
     return Card(
       elevation: 3,
@@ -189,12 +209,17 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
             onTap: () => setState(() => _expanded = !_expanded),
             child: Container(
               padding: const EdgeInsets.all(16),
-              color: order.refundStatus != null ? Colors.amber.shade50.withOpacity(0.5) : Colors.white,
+              color: order.refundStatus != null
+                  ? Colors.amber.shade50.withOpacity(0.5)
+                  : Colors.white,
               child: Row(
                 children: [
                   CircleAvatar(
                     backgroundColor: AppColors.accent.withOpacity(0.1),
-                    child: const Icon(Icons.receipt_long_rounded, color: AppColors.accent),
+                    child: const Icon(
+                      Icons.receipt_long_rounded,
+                      color: AppColors.accent,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -204,19 +229,19 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                         Row(
                           children: [
                             Text(
-                              "Order #${order.id.substring(0, order.id.length > 10 ? 10 : order.id.length).toUpperCase()}",
+                              "Order #${order.id?.toHexString().substring(0, 10) ?? ""}",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                               ),
                             ),
                             const SizedBox(width: 8),
-                            _AdminStatusBadge(status: order.status),
+                            _AdminStatusBadge(status: order.orderStatus),
                           ],
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "$dateStr • ${order.name}",
+                          "$dateStr • ${order.shippingAddress.fullName}",
                           style: const TextStyle(
                             color: Colors.grey,
                             fontSize: 12.5,
@@ -237,7 +262,9 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                         ),
                       ),
                       Icon(
-                        _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        _expanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         color: Colors.grey,
                       ),
                     ],
@@ -255,7 +282,10 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // SECTION 1: CUSTOMER INFORMATION
-                  _buildSectionHeader(Icons.person_outline, "1. CUSTOMER INFORMATION"),
+                  _buildSectionHeader(
+                    Icons.person_outline,
+                    "1. CUSTOMER INFORMATION",
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
@@ -269,18 +299,27 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Name: ${order.name}",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                          "Name: ${order.shippingAddress.fullName}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.5,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Phone: ${order.phone}",
-                          style: const TextStyle(fontSize: 13, color: AppColors.textDark),
+                          "Phone: ${order.shippingAddress.phone}",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textDark,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Shipping Address: ${order.address}",
-                          style: const TextStyle(fontSize: 13, color: AppColors.textDark),
+                          "Shipping Address: ${order.shippingAddress.address}",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textDark,
+                          ),
                         ),
                       ],
                     ),
@@ -288,7 +327,10 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                   const SizedBox(height: 16),
 
                   // SECTION 2: ORDER INFORMATION
-                  _buildSectionHeader(Icons.shopping_bag_outlined, "2. ORDER INFORMATION"),
+                  _buildSectionHeader(
+                    Icons.shopping_bag_outlined,
+                    "2. ORDER INFORMATION",
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
@@ -304,26 +346,58 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Order Status:", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                            const Text(
+                              "Order Status:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
                             DropdownButton<String>(
-                              value: ['processing', 'shipped', 'delivered', 'cancelled']
-                                      .contains(order.status.toLowerCase())
-                                  ? order.status.toLowerCase()
+                              value:
+                                  [
+                                    'processing',
+                                    'shipped',
+                                    'delivered',
+                                    'cancelled',
+                                  ].contains(order.orderStatus.toLowerCase())
+                                  ? order.orderStatus.toLowerCase()
                                   : 'processing',
                               isDense: true,
                               underline: const SizedBox.shrink(),
                               items: const [
-                                DropdownMenuItem(value: 'processing', child: Text('Processing')),
-                                DropdownMenuItem(value: 'shipped', child: Text('Shipped')),
-                                DropdownMenuItem(value: 'delivered', child: Text('Delivered')),
-                                DropdownMenuItem(value: 'cancelled', child: Text('Cancelled')),
+                                DropdownMenuItem(
+                                  value: 'processing',
+                                  child: Text('Processing'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'shipped',
+                                  child: Text('Shipped'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'delivered',
+                                  child: Text('Delivered'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'cancelled',
+                                  child: Text('Cancelled'),
+                                ),
                               ],
                               onChanged: (newStatus) {
                                 if (newStatus != null) {
-                                  final capitalized = newStatus[0].toUpperCase() + newStatus.substring(1);
-                                  OrderService.instance.updateOrderStatus(order.id, capitalized);
+                                  final capitalized =
+                                      newStatus[0].toUpperCase() +
+                                      newStatus.substring(1);
+                                  OrderService.instance.updateOrderStatus(
+                                    order.id!.toHexString(),
+                                    capitalized,
+                                  );
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Order status updated to $capitalized")),
+                                    SnackBar(
+                                      content: Text(
+                                        "Order status updated to $capitalized",
+                                      ),
+                                    ),
                                   );
                                 }
                               },
@@ -331,15 +405,30 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        Text("Order ID: ${order.id}", style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
-                        Text("Order Date: $dateStr", style: const TextStyle(fontSize: 12.5, color: Colors.grey)),
+                        Text(
+                          "Order ID: ${order.id}",
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          "Order Date: $dateStr",
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
 
                   // SECTION 3: PRODUCT DETAILS
-                  _buildSectionHeader(Icons.inventory_2_outlined, "3. PRODUCT DETAILS"),
+                  _buildSectionHeader(
+                    Icons.inventory_2_outlined,
+                    "3. PRODUCT DETAILS",
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
@@ -350,10 +439,11 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                     child: ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: order.items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFEBEBEB)),
+                      itemCount: order.products.length,
+                      separatorBuilder: (_, __) =>
+                          const Divider(height: 1, color: Color(0xFFEBEBEB)),
                       itemBuilder: (context, idx) {
-                        final item = order.items[idx];
+                        final item = order.products[idx];
                         return Padding(
                           padding: const EdgeInsets.all(10),
                           child: Row(
@@ -369,7 +459,10 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                     width: 42,
                                     height: 42,
                                     color: Colors.grey.shade200,
-                                    child: const Icon(Icons.image_not_supported, size: 20),
+                                    child: const Icon(
+                                      Icons.image_not_supported,
+                                      size: 20,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -382,18 +475,27 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                       item.name,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                     Text(
                                       "Qty: ${item.quantity} x ₹${item.price}",
-                                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ],
                                 ),
                               ),
                               Text(
                                 "₹${(item.price * item.quantity).toStringAsFixed(2)}",
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
@@ -404,7 +506,10 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                   const SizedBox(height: 16),
 
                   // SECTION 4: PAYMENT DETAILS
-                  _buildSectionHeader(Icons.payment_outlined, "4. PAYMENT DETAILS"),
+                  _buildSectionHeader(
+                    Icons.payment_outlined,
+                    "4. PAYMENT DETAILS",
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
@@ -416,15 +521,19 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                     ),
                     child: Column(
                       children: [
-                        _buildDetailRow("Payment Method", order.paymentMethod.toUpperCase()),
                         _buildDetailRow(
-                          "Payment Status",
-                          order.paymentStatus ?? (order.paymentMethod.toLowerCase() == 'cod' ? 'Pending' : 'Paid'),
+                          "Payment Method",
+                          order.paymentMethod.toUpperCase(),
                         ),
-                        _buildDetailRow("Total Amount", "₹${order.totalAmount.toStringAsFixed(2)}", isBold: true),
+                        _buildDetailRow("Payment Status", order.paymentStatus),
+                        _buildDetailRow(
+                          "Total Amount",
+                          "₹${order.totalAmount.toStringAsFixed(2)}",
+                          isBold: true,
+                        ),
                         _buildDetailRow(
                           "Transaction ID",
-                          order.transactionId ?? "TXN_${order.id.substring(0, order.id.length > 8 ? 8 : order.id.length)}",
+                          "TXN_${order.id?.toHexString().substring(0, 8).toUpperCase() ?? "N/A"}",
                         ),
                       ],
                     ),
@@ -432,16 +541,23 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                   const SizedBox(height: 16),
 
                   // SECTION 5: REFUND SECTION
-                  _buildSectionHeader(Icons.replay_outlined, "5. REFUND SECTION"),
+                  _buildSectionHeader(
+                    Icons.replay_outlined,
+                    "5. REFUND SECTION",
+                  ),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: order.refundStatus != null ? Colors.amber.shade50 : const Color(0xFFF9F9FB),
+                      color: order.refundStatus != null
+                          ? Colors.amber.shade50
+                          : const Color(0xFFF9F9FB),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: order.refundStatus != null ? Colors.amber.shade300 : const Color(0xFFEBEBEB),
+                        color: order.refundStatus != null
+                            ? Colors.amber.shade300
+                            : const Color(0xFFEBEBEB),
                       ),
                     ),
                     child: Column(
@@ -450,19 +566,28 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Refund Status:", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                            const Text(
+                              "Refund Status:",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: order.refundStatus == 'Approved'
                                     ? Colors.blue.shade100
                                     : order.refundStatus == 'Refunded'
-                                        ? Colors.green.shade100
-                                        : order.refundStatus == 'Rejected'
-                                            ? Colors.red.shade100
-                                            : order.refundStatus == 'Requested'
-                                                ? Colors.amber.shade100
-                                                : Colors.grey.shade200,
+                                    ? Colors.green.shade100
+                                    : order.refundStatus == 'Rejected'
+                                    ? Colors.red.shade100
+                                    : order.refundStatus == 'Requested'
+                                    ? Colors.amber.shade100
+                                    : Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -473,26 +598,33 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                   color: order.refundStatus == 'Approved'
                                       ? Colors.blue.shade900
                                       : order.refundStatus == 'Refunded'
-                                          ? Colors.green.shade900
-                                          : order.refundStatus == 'Rejected'
-                                              ? Colors.red.shade900
-                                              : order.refundStatus == 'Requested'
-                                                  ? Colors.amber.shade900
-                                                  : Colors.grey.shade800,
+                                      ? Colors.green.shade900
+                                      : order.refundStatus == 'Rejected'
+                                      ? Colors.red.shade900
+                                      : order.refundStatus == 'Requested'
+                                      ? Colors.amber.shade900
+                                      : Colors.grey.shade800,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        if (order.refundReason != null && order.refundReason!.isNotEmpty) ...[
+                        if (order.refundReason != null &&
+                            order.refundReason!.isNotEmpty) ...[
                           const SizedBox(height: 8),
-                          Text("Reason: ${order.refundReason}", style: const TextStyle(fontSize: 13)),
+                          Text(
+                            "Reason: ${order.refundReason}",
+                            style: const TextStyle(fontSize: 13),
+                          ),
                         ],
-                        if (order.refundRequestedAt != null) ...[
+                        if (order.refundDate != null) ...[
                           const SizedBox(height: 4),
                           Text(
-                            "Requested At: ${DateFormat('dd MMM yyyy, hh:mm a').format(order.refundRequestedAt!)}",
-                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            "Requested At: ${DateFormat('dd MMM yyyy, hh:mm a').format(order.refundDate!)}",
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                         const SizedBox(height: 12),
@@ -505,13 +637,22 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.blue.shade700,
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                   onPressed: () async {
-                                    await OrderService.instance.processRefund(order.id, 'approve');
+                                    await OrderService.instance.processRefund(
+                                      order.id!.toHexString(),
+                                      'approve',
+                                    );
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Refund Approved")),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Refund Approved"),
+                                        ),
                                       );
                                     }
                                   },
@@ -524,13 +665,22 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red.shade600,
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                   onPressed: () async {
-                                    await OrderService.instance.processRefund(order.id, 'reject');
+                                    await OrderService.instance.processRefund(
+                                      order.id!.toHexString(),
+                                      'reject',
+                                    );
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Refund Rejected")),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Refund Rejected"),
+                                        ),
                                       );
                                     }
                                   },
@@ -540,18 +690,32 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                             ] else if (order.refundStatus == 'Approved') ...[
                               Expanded(
                                 child: ElevatedButton.icon(
-                                  icon: const Icon(Icons.check_circle_outline, size: 18),
+                                  icon: const Icon(
+                                    Icons.check_circle_outline,
+                                    size: 18,
+                                  ),
                                   label: const Text("Process Refund Payment"),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.green.shade700,
                                     foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                   onPressed: () async {
-                                    await OrderService.instance.processRefund(order.id, 'refund');
+                                    await OrderService.instance.processRefund(
+                                      order.id!.toHexString(),
+                                      'refund',
+                                    );
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Refund payment processed successfully!")),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "Refund payment processed successfully!",
+                                          ),
+                                        ),
                                       );
                                     }
                                   },
@@ -560,9 +724,20 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                             ] else if (order.refundStatus == 'Refunded') ...[
                               const Row(
                                 children: [
-                                  Icon(Icons.verified, color: Colors.green, size: 18),
+                                  Icon(
+                                    Icons.verified,
+                                    color: Colors.green,
+                                    size: 18,
+                                  ),
                                   SizedBox(width: 6),
-                                  Text("Refund Completed & Settled", style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  Text(
+                                    "Refund Completed & Settled",
+                                    style: TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ] else ...[
@@ -572,13 +747,24 @@ class _AdminOrderCardState extends State<_AdminOrderCard> {
                                   label: const Text("Initiate Admin Refund"),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.accent,
-                                    side: const BorderSide(color: AppColors.accent),
+                                    side: const BorderSide(
+                                      color: AppColors.accent,
+                                    ),
                                   ),
                                   onPressed: () async {
-                                    await OrderService.instance.requestRefund(order.id, "Initiated by Admin");
+                                    await OrderService.instance.requestRefund(
+                                      order.id!.toHexString(),
+                                      "Initiated by Admin",
+                                    );
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Refund process initiated by Admin")),
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "Refund process initiated by Admin",
+                                          ),
+                                        ),
                                       );
                                     }
                                   },
