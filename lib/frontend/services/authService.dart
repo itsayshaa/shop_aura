@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shop_aura/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 class Authservice extends ChangeNotifier {
   Authservice._internal();
   static final Authservice instance = Authservice._internal();
@@ -98,14 +99,14 @@ static Future<String?> getToken()async{
     }
   }
 
-  static Future<void> logOut()async{
+  static Future<void> logOut(BuildContext context)async{
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove("jwt_token");
     await prefs.remove("user_name");
     await prefs.remove("user_email");
     await prefs.remove("user_phone");
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ShopAuraApp()));
   }
-
 
   static Future<bool> updateProfile({
   required String name,

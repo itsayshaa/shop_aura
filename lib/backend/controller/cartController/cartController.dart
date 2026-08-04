@@ -96,7 +96,8 @@
   );
 }
   }
- Future<Response> getCart(Request request, String id) async {
+ Future<Response> getCarts(Request request, String id) async {
+  print("DB State: ${MongoService.db.state}");
   try {
 
     final userId = ObjectId.fromHexString(id);
