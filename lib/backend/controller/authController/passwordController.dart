@@ -22,7 +22,7 @@ Future<Response> changePassword(Request request) async {
         headers: {"Content-Type": "application/json"},
       );
     }
-    if (newPassword == null || newPassword.isEmpty) {
+    if (newPassword.isEmpty) {
       return Response.badRequest(
         body: jsonEncode({
           "success": false,

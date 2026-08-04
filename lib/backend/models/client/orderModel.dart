@@ -10,6 +10,7 @@ class OrderItemModel {
   int quantity;
   double subtotal;
 
+  
   OrderItemModel({
     required this.productId,
     required this.name,
@@ -147,7 +148,53 @@ class OrderModel {
     required this.createdAt,
     required this.updatedAt,
   });
-
+OrderModel copyWith({
+  ObjectId? id,
+  ObjectId? userId,
+  int? orderNumber,
+  List<OrderItemModel>? products,
+  String? paymentMethod,
+  String? paymentStatus,
+  String? orderStatus,
+  ObjectId? couponApplied,
+  double? subTotal,
+  double? discount,
+  double? tax,
+  double? shipping,
+  double? totalAmount,
+  ShippingAddressModel? shippingAddress,
+  DateTime? shipDate,
+  bool? refundRequested,
+  String? refundStatus,
+  String? refundReason,
+  DateTime? refundDate,
+  DateTime? createdAt,
+  DateTime? updatedAt,
+}) {
+  return OrderModel(
+    id: id ?? this.id,
+    userId: userId ?? this.userId,
+    orderNumber: orderNumber ?? this.orderNumber,
+    products: products ?? this.products,
+    paymentMethod: paymentMethod ?? this.paymentMethod,
+    paymentStatus: paymentStatus ?? this.paymentStatus,
+    orderStatus: orderStatus ?? this.orderStatus,
+    couponApplied: couponApplied ?? this.couponApplied,
+    subTotal: subTotal ?? this.subTotal,
+    discount: discount ?? this.discount,
+    tax: tax ?? this.tax,
+    shipping: shipping ?? this.shipping,
+    totalAmount: totalAmount ?? this.totalAmount,
+    shippingAddress: shippingAddress ?? this.shippingAddress,
+    shipDate: shipDate ?? this.shipDate,
+    refundRequested: refundRequested ?? this.refundRequested,
+    refundStatus: refundStatus ?? this.refundStatus,
+    refundReason: refundReason ?? this.refundReason,
+    refundDate: refundDate ?? this.refundDate,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+}
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
       id: json["_id"] as ObjectId?,

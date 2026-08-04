@@ -54,10 +54,10 @@ class Authservice extends ChangeNotifier {
       }
       final message = body["message"] ?? "Invalid email or password";
       throw Exception(message);
-    }catch(e,stackTrace){
-      print("error $e");
+    }catch(e){
+      debugPrint("error $e");
       rethrow;
-        }
+    }
   }
 
 static Future<bool> isLogged()async{

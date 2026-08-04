@@ -8,6 +8,9 @@ import 'orders_screen.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/bottom_nav_bar.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
+import 'package:shop_aura/frontend/services/cart_service.dart';
+import 'package:shop_aura/frontend/services/wishlist_service.dart';
+import 'package:shop_aura/frontend/services/order_service.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   final int initialIndex;
@@ -36,6 +39,13 @@ class _MainNavigationScreenState
       CartScreen(),
       OrdersScreen(),
     ];
+
+    // Fetch data from backend on startup if logged in
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // CartService.instance.fetchCartFromServer();
+      WishlistService.instance.fetchWishlistFromServer();
+      OrderService.instance.loadOrders();
+    });
   }
 
   @override

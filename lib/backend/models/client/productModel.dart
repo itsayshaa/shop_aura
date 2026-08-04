@@ -29,10 +29,11 @@ class ProductsModel {
 
   bool isTrending;
   bool isDeleted;
-
+  bool? isActive = true;
   ProductsModel({
     this.id,
     this.categoryId,
+    this.isActive,
     required this.productName,
     required this.categoryName,
     required this.brand,
@@ -59,6 +60,7 @@ factory ProductsModel.fromJson(Map<String, dynamic> json) {
     ? ObjectId.fromHexString(json["_id"])
     : null,
     categoryId: null,
+    isActive: true,
     categoryName: json["category"] ?? "",
     productName: json["name"] ?? "",
     brand: json["brand"] ?? "",
@@ -103,6 +105,7 @@ Map<String, dynamic> toJson() {
     "size": size,
     "status": status,
     "weight": weight,
+    "isActive":isActive,
     "createdAt": createdAt.toIso8601String(),
     "updatedAt": updatedAt.toIso8601String(),
     "isDeleted": isDeleted,

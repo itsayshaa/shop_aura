@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -124,18 +125,10 @@ class ProductCard extends StatelessWidget {
                                       discount: discount,
                                     );
 
-                                ScaffoldMessenger.of(
+                                Navigator.push(
                                   context,
-                                ).hideCurrentSnackBar();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      nowWishlisted
-                                          ? "$name added to wishlist"
-                                          : "$name removed from wishlist",
-                                    ),
-                                    duration: const Duration(seconds: 1),
-                                    behavior: SnackBarBehavior.floating,
+                                  MaterialPageRoute(
+                                    builder: (_) =>  WishlistScreen(),
                                   ),
                                 );
                               },
@@ -249,7 +242,7 @@ class ProductCard extends StatelessWidget {
                           }
 
                           try {
-                            await CartService().addToCart(
+                            await CartService.instance.addToCart(
                               userId: userId,
                               productId: productId,
                               quantity: 1,

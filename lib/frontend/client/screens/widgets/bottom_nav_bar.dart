@@ -15,6 +15,8 @@ class BottomNavBar extends StatelessWidget {
 
   void _handleDestinationSelected(BuildContext context, int index) {
     if (index == 3) {
+      if (currentIndex == 3) return; // already on Orders, do nothing
+
       // Orders tab -> push OrdersScreen directly
       Navigator.push(
         context,

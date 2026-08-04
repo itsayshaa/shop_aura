@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shop_aura/backend/models/client/orderModel.dart';
+import 'package:shop_aura/frontend/admin/screens/categories/category_screen.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
-import 'package:shop_aura/frontend/client/screens/category_screen.dart';
 import 'package:shop_aura/frontend/client/screens/orders_screen.dart';
 
 class SuccessScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class SuccessScreen extends StatelessWidget {
   void _handleContinueShopping(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => CategoryScreen()),
+      MaterialPageRoute(builder: (_) => CategoriesScreen()),
       (route) => false,
     );
   }
@@ -32,8 +32,19 @@ class SuccessScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        foregroundColor: AppColors.primary,
+        title: const Text(
+          'Order Confirmed',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -117,7 +128,7 @@ class SuccessScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "#${order.id}",
+                                  "#${order.id?.toHexString() ?? "N/A"}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13.5,
@@ -371,21 +382,21 @@ class SuccessScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Action Buttons
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
+            const SizedBox(height: 16),
+            Text(
+              'Order ID: ${order.id?.toHexString() ?? "N/A"}',
+              style: const TextStyle(color: AppColors.textSoft),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Total: ₹${order.totalAmount.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
               ),
-              child: Column(
+            ),
+            Column(
                 children: [
                   ElevatedButton(
                     onPressed: () => _handleContinueShopping(context),
@@ -430,6 +441,18 @@ class SuccessScreen extends StatelessWidget {
                   ),
                 ],
               ),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary, width: 1.5),
+                minimumSize: const Size(double.infinity, 48),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: () => _handleViewOrders(context),
+              child: const Text('View My Orders'),
             ),
           ],
         ),

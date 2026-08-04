@@ -168,7 +168,7 @@ Future<void> getUserId()async{
                   ),
 
                   onPressed: ()async{
-                    await CartService().addToCart(userId: userId,productId: widget.productId,quantity: quantity);
+                    await CartService.instance.addToCart(userId: userId,productId: widget.productId,quantity: quantity);
                   },
                   child: const Text(
                     "Add to Cart",
