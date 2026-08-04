@@ -194,7 +194,6 @@ class _ProductListScreenState
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 10),
                                         if (provider.isLoading)
                       const Padding(
