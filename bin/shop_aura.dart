@@ -11,14 +11,11 @@ import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
 import 'package:shop_aura/backend/routes/productRoutes/admin_product.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/admin_category.dart';
 import 'package:shop_aura/backend/routes/brandRoutes/admin_brand.dart';
-import 'package:shop_aura/backend/routes/cartRoutes/cart.dart';
 import 'package:shop_aura/backend/routes/wishlistRoutes/wishlist.dart';
 
 import 'package:shop_aura/backend/routes/orderRoutes/order.dart';
 
 import 'package:shop_aura/backend/routes/order_routes.dart';
-import 'package:shop_aura/backend/routes/refund_routes.dart';
-import 'package:shop_aura/backend/database/mongo_service.dart';
 
 Future<void> main() async {
   await MongoService.connect();
@@ -40,15 +37,11 @@ Future<void> main() async {
       .addMiddleware(corsHeader())
       .addHandler(router.call);
 
-  final server = await shelf_io.serve(
-    handler,
-    InternetAddress.anyIPv4,
-    5000,
-  );
-
+  final server = await shelf_io.serve(handler, InternetAddress.anyIPv4, 5000);
   print("Server running on http://${server.address.host}:${server.port}");
 }
-Middleware corsHeader(){
+
+Middleware corsHeader() {
   return createMiddleware(
     requestHandler: (Request request) {
       if (request.method == "OPTIONS") {
@@ -58,8 +51,7 @@ Middleware corsHeader(){
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Headers':
                 'Origin, Content-Type, Accept, Authorization',
-            'Access-Control-Allow-Methods':
-                'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           },
         );
       }
@@ -71,8 +63,7 @@ Middleware corsHeader(){
           ...response.headers,
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Headers': 'Origin, Content-Type, Accept',
-          'Access-Control-Allow-Methods':
-              'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         },
       );
     },
