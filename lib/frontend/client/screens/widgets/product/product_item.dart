@@ -12,7 +12,7 @@ class ProductItem extends StatelessWidget {
   final double price;
   final double oldPrice;
   final int discount;
-
+  final String productId;
   const ProductItem({
     super.key,
     required this.image,
@@ -23,6 +23,7 @@ class ProductItem extends StatelessWidget {
     required this.price,
     required this.oldPrice,
     required this.discount,
+    required this.productId
   });
 
   @override
@@ -34,6 +35,7 @@ class ProductItem extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => ProductScreen(
+              productId: productId,
               image: image,
               productName: name,
               category: category,

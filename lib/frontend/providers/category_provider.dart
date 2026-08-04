@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '/frontend/models/category_model.dart';
+import '/backend/models/client/categoryModel.dart';
 import '../services/category_service.dart';
 
 class CategoryProvider extends ChangeNotifier {
-  final CategoryService _service = CategoryService.instance;
+final CategoryService _service = CategoryService();
 
   List<CategoryModel> _categories = [];
   List<CategoryModel> _featuredCategories = [];
@@ -40,28 +40,26 @@ class CategoryProvider extends ChangeNotifier {
 
   String get searchText => _searchText;
 
-  Future<void> loadCategories() async {
-    try {
-      _isLoading = true;
-      _error = '';
-      notifyListeners();
+Future<void> loadCategories() async {
+  try {
+    _isLoading = true;
+    _error = '';
+    notifyListeners();
 
-      _categories = await _service.getCategories();
+    _categories = await _service.getCategories();
 
-      _featuredCategories =
-          await _service.getFeaturedCategories();
+   _featuredCategories = List.from(_categories);
 
-      _popularBrands =
-          await _service.getPopularBrands();
+    _popularBrands = [];
 
-      _searchResults = List.from(_categories);
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    _searchResults = List.from(_categories);
+  } catch (e) {
+    _error = e.toString();
+  } finally {
+    _isLoading = false;
+    notifyListeners();
   }
+}
 
   void searchCategory(String keyword) {
     _searchText = keyword.trim();
@@ -69,31 +67,27 @@ class CategoryProvider extends ChangeNotifier {
     if (_searchText.isEmpty) {
       _searchResults = List.from(_categories);
     } else {
-      _searchResults = _categories.where((category) {
-        return category.name
-                .toLowerCase()
-                .contains(_searchText.toLowerCase()) ||
-            category.productCount
-                .toString()
-                .contains(_searchText);
-      }).toList();
+_searchResults = _categories.where((category) {
+  return category.categoriesName
+      .toLowerCase()
+      .contains(_searchText.toLowerCase());
+}).toList();
     }
 
     notifyListeners();
   }
 
-  Future<void> refresh() async {
-    _isRefreshing = true;
-    notifyListeners();
+Future<void> refresh() async {
+  _isRefreshing = true;
+  notifyListeners();
 
-    try {
-      await _service.refreshCategories();
-      await loadCategories();
-    } finally {
-      _isRefreshing = false;
-      notifyListeners();
-    }
+  try {
+    await loadCategories();
+  } finally {
+    _isRefreshing = false;
+    notifyListeners();
   }
+}
 
   void selectCategory(CategoryModel category) {
     _selectedCategory = category;
@@ -112,18 +106,16 @@ class CategoryProvider extends ChangeNotifier {
   }
 
   List<CategoryModel> getFeaturedOnly() {
-    return _categories
-        .where((category) => category.isFeatured)
-        .toList();
+    return  List.from(_categories);
   }
 
   void sortAZ() {
     _categories.sort(
-      (a, b) => a.name.compareTo(b.name),
+      (a, b) => a.categoriesName.compareTo(b.categoriesName)
     );
 
     _searchResults.sort(
-      (a, b) => a.name.compareTo(b.name),
+      (a, b) =>a.categoriesName.compareTo(b.categoriesName)
     );
 
     notifyListeners();
@@ -131,29 +123,29 @@ class CategoryProvider extends ChangeNotifier {
 
   void sortZA() {
     _categories.sort(
-      (a, b) => b.name.compareTo(a.name),
+      (a, b) => b.categoriesName.compareTo(a.categoriesName)
     );
 
     _searchResults.sort(
-      (a, b) => b.name.compareTo(a.name),
+      (a, b) => b.categoriesName.compareTo(a.categoriesName),
     );
 
     notifyListeners();
   }
 
-  void sortProductCount() {
-    _categories.sort(
-      (a, b) =>
-          b.productCount.compareTo(a.productCount),
-    );
+  // void sortProductCount() {
+  //   _categories.sort(
+  //     (a, b) =>
+  //         b.productCount.compareTo(a.productCount),
+  //   );
 
-    _searchResults.sort(
-      (a, b) =>
-          b.productCount.compareTo(a.productCount),
-    );
+  //   _searchResults.sort(
+  //     (a, b) =>
+  //         b.productCount.compareTo(a.productCount),
+  //   );
 
-    notifyListeners();
-  }
+  //   notifyListeners();
+  // }
   void reset() {
     _categories.clear();
     _featuredCategories.clear();

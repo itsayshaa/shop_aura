@@ -1,186 +1,356 @@
-import 'dart:convert';
-import 'package:mongo_dart/mongo_dart.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shop_aura/backend/database/mongo_service.dart';
-import 'package:shop_aura/backend/services/jwtService.dart';
+  import 'package:shelf/shelf.dart';
+  import 'dart:convert';
+  import 'package:mongo_dart/mongo_dart.dart';
+  import 'package:shop_aura/backend/database/mongo_service.dart';
 
-Future<Response> getCart(Request request) async {
-  try {
-    final userId = Jwtservice.getUserIdFromRequest(request);
-    if (userId == null) {
-      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
-    }
+  Future<Response> addToCart(Request request) async {
+    try {
+      final body = await request.readAsString();
+      final data = jsonDecode(body);
+      print(data);
+      final userId =ObjectId.fromHexString(data["userId"]);
+      final productId =ObjectId.fromHexString(data["productId"]);
+      
+      final quantity = data["quantity"];
 
-    final cart = await MongoService.cart.findOne(where.eq("userId", userId));
-    final items = cart != null ? cart["items"] ?? [] : [];
+      final product = await MongoService.products.findOne(
+        where.id(productId),
+      );
 
-    return Response.ok(jsonEncode(items), headers: {"Content-Type": "application/json"});
-  } catch (e) {
-    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
-  }
-}
+      if (product == null) {
+        return Response.notFound("Product not found");
+      }
 
-Future<Response> addToCart(Request request) async {
-  try {
-    final userId = Jwtservice.getUserIdFromRequest(request);
-    if (userId == null) {
-      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
-    }
-
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-
-    final String image = data["image"] ?? "";
-    final String category = data["category"] ?? "";
-    final String name = data["name"] ?? "";
-    final int price = data["price"] ?? 0;
-    final int oldPrice = data["oldPrice"] ?? 0;
-    final int quantity = data["quantity"] ?? 1;
-
-    if (name.isEmpty) {
-      return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
-    }
-
-    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
-
-    if (cart == null) {
-      // Create new cart
-      final newCart = {
-        "userId": userId,
-        "items": [
-          {
-            "image": image,
-            "category": category,
-            "name": name,
-            "price": price,
-            "oldPrice": oldPrice,
-            "quantity": quantity
-          }
-        ]
-      };
-      await MongoService.cart.insertOne(newCart);
-    } else {
-      List items = List.from(cart["items"] ?? []);
-      final existingIndex = items.indexWhere((item) => item["name"] == name);
-
-      if (existingIndex != -1) {
-        items[existingIndex]["quantity"] = (items[existingIndex]["quantity"] ?? 1) + quantity;
-      } else {
-        items.add({
-          "image": image,
-          "category": category,
-          "name": name,
-          "price": price,
-          "oldPrice": oldPrice,
-          "quantity": quantity
+      final cart = await MongoService.cart.findOne(
+        where.eq("userId", userId),
+      );
+      final productid = product["_id"] as ObjectId;
+      if (cart == null) {
+        await MongoService.cart.insertOne({
+          "userId": userId,
+          "products": [
+            {
+              "productId": productid,
+              "name": product["name"],
+              "image": product["images"][0]["url"],
+              "price": product["price"],
+              "quantity": quantity,
+              "subtotal": product["price"] * quantity,
+            }
+          ]
         });
-      }
-
-      await MongoService.cart.updateOne(
-        where.eq("userId", userId),
-        modify.set("items", items),
-      );
-    }
-
-    return Response.ok(jsonEncode({"success": true, "message": "Item added to cart successfully"}), headers: {"Content-Type": "application/json"});
-  } catch (e) {
-    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
-  }
-}
-
-Future<Response> updateQuantity(Request request) async {
-  try {
-    final userId = Jwtservice.getUserIdFromRequest(request);
-    if (userId == null) {
-      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
-    }
-
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-
-    final String name = data["name"] ?? "";
-    final int quantity = data["quantity"] ?? 0;
-
-    if (name.isEmpty) {
-      return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
-    }
-
-    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
-    if (cart == null) {
-      return Response(404, body: jsonEncode({"success": false, "message": "Cart not found"}), headers: {"Content-Type": "application/json"});
-    }
-
-    List items = List.from(cart["items"] ?? []);
-    final index = items.indexWhere((item) => item["name"] == name);
-
-    if (index != -1) {
-      if (quantity <= 0) {
-        items.removeAt(index);
       } else {
-        items[index]["quantity"] = quantity;
+        List products = cart["products"];
+
+        bool found = false;
+
+        for (var item in products) {
+          if (item["productId"] as ObjectId == productId) {
+            item["quantity"] += quantity;
+            item["subtotal"] =
+                item["quantity"] * item["price"];
+
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          products.add({
+            "productId": productid,
+            "name": product["name"],
+            "image": product["images"][0]["url"],
+            "price": product["price"],
+            "quantity": quantity,
+            "subtotal": product["price"] * quantity,
+          });
+        }
+
+        await MongoService.cart.updateOne(
+          where.eq("userId", userId),
+          modify.set("products", products),
+        );
       }
 
-      await MongoService.cart.updateOne(
-        where.eq("userId", userId),
-        modify.set("items", items),
+      return Response.ok(
+        jsonEncode({
+          "success": true,
+          "message": "Added to cart"
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
       );
-      return Response.ok(jsonEncode({"success": true, "message": "Quantity updated"}), headers: {"Content-Type": "application/json"});
-    } else {
-      return Response(404, body: jsonEncode({"success": false, "message": "Item not found in cart"}), headers: {"Content-Type": "application/json"});
-    }
-  } catch (e) {
-    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
-  }
+    } catch (e, stackTrace) {
+  print("ERROR: $e");
+  print(stackTrace);
+
+  return Response.internalServerError(
+    body: jsonEncode({
+      "success": false,
+      "message": e.toString(),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
 }
-
-Future<Response> removeFromCart(Request request) async {
+  }
+ Future<Response> getCart(Request request, String id) async {
   try {
-    final userId = Jwtservice.getUserIdFromRequest(request);
-    if (userId == null) {
-      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
+
+    final userId = ObjectId.fromHexString(id);
+
+    final cart = await MongoService.cart.findOne(
+      where.eq("userId", userId),
+    );
+
+    print("CART DATA => $cart");
+
+    if(cart == null){
+      return Response.ok(
+        jsonEncode({
+          "success":true,
+          "products":[],
+          "subtotal":0
+        }),
+        headers:{
+          "Content-Type":"application/json"
+        }
+      );
     }
 
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-    final String name = data["name"] ?? "";
 
-    if (name.isEmpty) {
-      return Response(400, body: jsonEncode({"success": false, "message": "Product name is required"}), headers: {"Content-Type": "application/json"});
+    double subtotal = 0;
+
+    for(final item in cart["products"]){
+      subtotal += (item["subtotal"] ?? 0).toDouble();
     }
 
-    var cart = await MongoService.cart.findOne(where.eq("userId", userId));
+
+    cart["subtotal"] = subtotal;
+
+
+    return Response.ok(
+      jsonEncode(cart),
+      headers:{
+        "Content-Type":"application/json"
+      }
+    );
+
+
+ } catch (e, stackTrace) {
+  print("ERROR: $e");
+  print(stackTrace);
+
+  return Response.internalServerError(
+    body: jsonEncode({
+      "success": false,
+      "message": e.toString(),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+}
+}
+Future<Response> getAll(Request request)async{
+  final cart = await MongoService.cart.find().toList();
+  return Response.ok(
+    jsonEncode(cart),
+    headers: {"Content-Type":"application/json"}
+  );
+}
+Future<Response> increaseQuantity(Request request) async {
+  try {
+    final body = jsonDecode(await request.readAsString());
+
+    final userId = ObjectId.fromHexString(body["userId"]);
+    final productId = ObjectId.fromHexString(body["productId"]);
+
+    final cart = await MongoService.cart.findOne(
+      where.eq("userId", userId),
+    );
+
     if (cart == null) {
-      return Response(404, body: jsonEncode({"success": false, "message": "Cart not found"}), headers: {"Content-Type": "application/json"});
+      return Response.notFound(
+        jsonEncode({
+          "success": false,
+          "message": "Cart not found",
+        }),
+      );
     }
 
-    List items = List.from(cart["items"] ?? []);
-    items.removeWhere((item) => item["name"] == name);
+    List products = cart["products"];
+
+    bool found = false;
+
+    for (var item in products) {
+      if (item["productId"] == productId) {
+        item["quantity"] += 1;
+        item["subtotal"] =
+            item["price"] * item["quantity"];
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      return Response.notFound(
+        jsonEncode({
+          "success": false,
+          "message": "Product not found in cart",
+        }),
+      );
+    }
 
     await MongoService.cart.updateOne(
       where.eq("userId", userId),
-      modify.set("items", items),
+      modify.set("products", products),
     );
 
-    return Response.ok(jsonEncode({"success": true, "message": "Item removed from cart"}), headers: {"Content-Type": "application/json"});
-  } catch (e) {
-    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
-  }
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Quantity increased",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+  } catch (e, stackTrace) {
+  print("ERROR: $e");
+  print(stackTrace);
+
+  return Response.internalServerError(
+    body: jsonEncode({
+      "success": false,
+      "message": e.toString(),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+}
+}
+Future<Response> decreaseQuantity(Request request) async {
+  try {
+    final body = jsonDecode(await request.readAsString());
+
+    final userId = ObjectId.fromHexString(body["userId"]);
+    final productId = ObjectId.fromHexString(body["productId"]);
+
+    final cart = await MongoService.cart.findOne(
+      where.eq("userId", userId),
+    );
+
+    if (cart == null) {
+      return Response.notFound(
+        jsonEncode({
+          "success": false,
+          "message": "Cart not found",
+        }),
+      );
+    }
+
+    List products = cart["products"];
+
+    products.removeWhere((item) {
+      if (item["productId"] == productId) {
+        item["quantity"]--;
+
+        if (item["quantity"] <= 0) {
+          return true;
+        }
+
+        item["subtotal"] =
+            item["price"] * item["quantity"];
+      }
+      return false;
+    });
+
+    await MongoService.cart.updateOne(
+      where.eq("userId", userId),
+      modify.set("products", products),
+    );
+
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Quantity decreased",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+  } catch (e, stackTrace) {
+  print("ERROR: $e");
+  print(stackTrace);
+
+  return Response.internalServerError(
+    body: jsonEncode({
+      "success": false,
+      "message": e.toString(),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+}
 }
 
-Future<Response> clearCart(Request request) async {
+Future<Response> removeItem(Request request) async {
   try {
-    final userId = Jwtservice.getUserIdFromRequest(request);
-    if (userId == null) {
-      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
+    final body = jsonDecode(await request.readAsString());
+
+    final userId = ObjectId.fromHexString(body["userId"]);
+    final productId = ObjectId.fromHexString(body["productId"]);
+
+    final cart = await MongoService.cart.findOne(
+      where.eq("userId", userId),
+    );
+
+    if (cart == null) {
+      return Response.notFound(
+        jsonEncode({
+          "success": false,
+          "message": "Cart not found",
+        }),
+      );
     }
+
+    List products = cart["products"];
+
+    products.removeWhere(
+      (item) => item["productId"] == productId,
+    );
 
     await MongoService.cart.updateOne(
       where.eq("userId", userId),
-      modify.set("items", []),
+      modify.set("products", products),
     );
 
-    return Response.ok(jsonEncode({"success": true, "message": "Cart cleared successfully"}), headers: {"Content-Type": "application/json"});
-  } catch (e) {
-    return Response.internalServerError(body: jsonEncode({"success": false, "message": e.toString()}), headers: {"Content-Type": "application/json"});
-  }
+    return Response.ok(
+      jsonEncode({
+        "success": true,
+        "message": "Item removed",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+  } catch (e, stackTrace) {
+  print("ERROR: $e");
+  print(stackTrace);
+
+  return Response.internalServerError(
+    body: jsonEncode({
+      "success": false,
+      "message": e.toString(),
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  );
+}
 }

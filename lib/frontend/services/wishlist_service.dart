@@ -51,8 +51,7 @@ class WishlistService extends ChangeNotifier {
     required double rating,
     required int reviews,
     required int price,
-    required int oldPrice,
-    required int discount,
+    required double discount,
   }) {
     final existingIndex = _items.indexWhere((item) => item.name == name);
     bool added = false;
@@ -69,7 +68,6 @@ class WishlistService extends ChangeNotifier {
           rating: rating,
           reviews: reviews,
           price: price,
-          oldPrice: oldPrice,
           discount: discount,
         ),
       );
@@ -85,7 +83,7 @@ class WishlistService extends ChangeNotifier {
       rating: rating,
       reviews: reviews,
       price: price,
-      oldPrice: oldPrice,
+      // oldPrice: oldPrice,
       discount: discount,
     );
 
@@ -99,8 +97,7 @@ class WishlistService extends ChangeNotifier {
     required double rating,
     required int reviews,
     required int price,
-    required int oldPrice,
-    required int discount,
+    required double discount,
   }) async {
     try {
       final token = await Authservice.getToken();
@@ -118,7 +115,7 @@ class WishlistService extends ChangeNotifier {
             "rating": rating,
             "reviews": reviews,
             "price": price,
-            "oldPrice": oldPrice,
+            // "oldPrice": oldPrice,
             "discount": discount,
           }),
         );

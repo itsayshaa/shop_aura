@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
-import 'package:shop_aura/frontend/services/authService.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 import 'package:shop_aura/main.dart';
+import 'package:shop_aura/frontend/services/authService.dart';
 
 class OrderService extends ChangeNotifier {
   OrderService._internal();
@@ -18,7 +18,9 @@ class OrderService extends ChangeNotifier {
 
   List<OrderModel> get orders {
     final sorted = List<OrderModel>.from(_orders);
-    sorted.sort((a, b) => b.date.compareTo(a.date)); // newest first
+    sorted.sort(
+  (a,b)=> b.createdAt.compareTo(a.createdAt)
+); // newest first
     return List.unmodifiable(sorted);
   }
 
@@ -41,7 +43,7 @@ class OrderService extends ChangeNotifier {
       };
 
       final response = await http.get(Uri.parse(url), headers: headers);
-      if (response.statusCode == 200) {
+      if(response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> decoded = jsonDecode(response.body) as List<dynamic>;
         _orders
           ..clear()
@@ -70,7 +72,7 @@ class OrderService extends ChangeNotifier {
         Uri.parse("$_baseUrl/order/admin/all"),
         headers: {"Content-Type": "application/json"},
       );
-      if (response.statusCode == 200) {
+      if(response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> decoded = jsonDecode(response.body) as List<dynamic>;
         _orders
           ..clear()
@@ -123,11 +125,13 @@ class OrderService extends ChangeNotifier {
         },
         body: jsonEncode(order.toJson()),
       );
-      if (response.statusCode == 200) {
+      if(response.statusCode == 200 || response.statusCode == 201) {
         final body = jsonDecode(response.body);
         if (body["order"] != null) {
           final serverOrder = OrderModel.fromJson(Map<String, dynamic>.from(body["order"]));
-          final idx = _orders.indexWhere((o) => o.id == order.id);
+          final idx = _orders.indexWhere(
+  (o) => o.id?.toHexString() == order.id?.toHexString(),
+);
           if (idx != -1) {
             _orders[idx] = serverOrder;
           }
@@ -139,13 +143,15 @@ class OrderService extends ChangeNotifier {
     }
   }
 
-  OrderModel? getOrderById(String id) {
-    try {
-      return _orders.firstWhere((o) => o.id == id);
-    } catch (_) {
-      return null;
-    }
+OrderModel? getOrderById(String id) {
+  try {
+    return _orders.firstWhere(
+      (o) => o.id?.toHexString() == id,
+    );
+  } catch (_) {
+    return null;
   }
+}
 
   Future<void> _persist() async {
     try {
@@ -159,12 +165,12 @@ class OrderService extends ChangeNotifier {
 
   /// Request a refund for a given order
   Future<void> requestRefund(String orderId, String reason) async {
-    final index = _orders.indexWhere((o) => o.id == orderId);
+    final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
       _orders[index] = _orders[index].copyWith(
         refundStatus: 'Requested',
         refundReason: reason,
-        refundRequestedAt: DateTime.now(),
+        refundDate: DateTime.now(),
       );
       notifyListeners();
       await _persist();
@@ -183,9 +189,9 @@ class OrderService extends ChangeNotifier {
 
   /// Update order delivery status (Admin action)
   Future<void> updateOrderStatus(String orderId, String newStatus) async {
-    final index = _orders.indexWhere((o) => o.id == orderId);
+    final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
-      _orders[index] = _orders[index].copyWith(status: newStatus);
+      _orders[index] = _orders[index].copyWith(orderStatus: newStatus);
       notifyListeners();
       await _persist();
     }
@@ -203,7 +209,7 @@ class OrderService extends ChangeNotifier {
 
   /// Process refund action: 'approve', 'reject', or 'refund' (Admin action)
   Future<void> processRefund(String orderId, String action) async {
-    final index = _orders.indexWhere((o) => o.id == orderId);
+    final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
       String refundStatus;
       String paymentStatus;
@@ -222,9 +228,8 @@ class OrderService extends ChangeNotifier {
       _orders[index] = _orders[index].copyWith(
         refundStatus: refundStatus,
         paymentStatus: paymentStatus,
-        transactionId: _orders[index].transactionId ?? 'TXN_${DateTime.now().millisecondsSinceEpoch}',
       );
-      notifyListeners();
+      notifyListeners();  
       await _persist();
     }
 

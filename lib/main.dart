@@ -9,7 +9,6 @@ import 'frontend/providers/category_provider.dart';
 import 'frontend/providers/product_provider.dart';
 import 'frontend/providers/search_provider.dart';
 
-
 void main()async {
   WidgetsFlutterBinding.ensureInitialized();
 

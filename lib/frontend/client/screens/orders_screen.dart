@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
-import 'package:shop_aura/frontend/models/order_model.dart';
+import 'package:shop_aura/backend/models/client/orderModel.dart';
 import 'package:shop_aura/frontend/services/order_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/home_screen.dart';
@@ -133,7 +133,8 @@ class _OrderCardState extends State<_OrderCard> {
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final dateStr = DateFormat('dd MMM yyyy, hh:mm a').format(order.date);
+    final dateStr =
+    DateFormat('dd MMM yyyy, hh:mm a').format(order.createdAt);
 
     return Card(
       elevation: 2,
@@ -154,13 +155,13 @@ class _OrderCardState extends State<_OrderCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Order #${order.id.substring(0, 8).toUpperCase()}",
+                      "Order #${order.orderNumber}",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
                       ),
                     ),
-                    _StatusChip(status: order.status),
+                    _StatusChip(status: order.orderStatus),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -176,7 +177,7 @@ class _OrderCardState extends State<_OrderCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${order.items.length} ${order.items.length == 1 ? 'Item' : 'Items'}",
+                      "${order.products.length} ${order.products.length == 1 ? 'Item' : 'products'}",
                       style: const TextStyle(
                         color: AppColors.textSoft,
                         fontSize: 13.5,
@@ -205,7 +206,7 @@ class _OrderCardState extends State<_OrderCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "ITEMS ORDERED",
+                    "products ORDERED",
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -217,10 +218,10 @@ class _OrderCardState extends State<_OrderCard> {
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: order.items.length,
+                    itemCount: order.products.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, idx) {
-                      final item = order.items[idx];
+                      final item = order.products[idx];
                       return Row(
                         children: [
                           ClipRRect(
@@ -285,18 +286,22 @@ class _OrderCardState extends State<_OrderCard> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    order.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-                  ),
-                  Text(
-                    "Phone: ${order.phone}",
-                    style: const TextStyle(color: AppColors.textSoft, fontSize: 12.5),
-                  ),
-                  Text(
-                    order.address,
-                    style: const TextStyle(color: AppColors.textSoft, fontSize: 12.5),
-                  ),
+Text(
+  order.shippingAddress.fullName,
+  style: const TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 13,
+  ),
+),
+Text(
+  "Phone: ${order.shippingAddress.phone}",
+),
+Text(
+  "${order.shippingAddress.address}, "
+  "${order.shippingAddress.city}, "
+  "${order.shippingAddress.state} - "
+  "${order.shippingAddress.pincode}",
+),
                   const Divider(height: 24, color: AppColors.border),
                   const Text(
                     "PAYMENT METHOD",
@@ -457,7 +462,7 @@ class _OrderCardState extends State<_OrderCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Order #${order.id.substring(0, 8).toUpperCase()}",
+                      "Order #${order.id}",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textSoft),
                     ),
                     const SizedBox(height: 12),
@@ -503,7 +508,7 @@ class _OrderCardState extends State<_OrderCard> {
                         (notesController.text.trim().isNotEmpty
                             ? " - ${notesController.text.trim()}"
                             : "");
-                    await OrderService.instance.requestRefund(order.id, reasonStr);
+                    await OrderService.instance.requestRefund(order.id!.toHexString(), reasonStr);
                     if (context.mounted) {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(

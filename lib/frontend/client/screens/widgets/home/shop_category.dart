@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import 'package:shop_aura/frontend/client/screens/product_list_screen.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class ShopCategory extends StatelessWidget {
-  final List<Map<String, String>> categories;
+  final List<CategoryModel> categories;
 
   const ShopCategory({super.key, required this.categories});
-
   @override
   Widget build(BuildContext context) {
+  print(categories);
     return SizedBox(
       height: 130,
       child: ListView.separated(
@@ -27,7 +28,7 @@ class ShopCategory extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) => ProductListScreen(
-                    category: item["title"]!,
+                    category: item.categoriesName,
                   ),
                 ),
               );
@@ -53,7 +54,7 @@ class ShopCategory extends StatelessWidget {
                         top: Radius.circular(18),
                       ),
                       child: Image.network(
-                        item["image"]!,
+                        item.categoriesImage[0],
                         width: double.infinity,
                         fit: BoxFit.cover,
                       ),
@@ -66,7 +67,7 @@ class ShopCategory extends StatelessWidget {
                       horizontal: 6,
                     ),
                     child: Text(
-                      item["title"]!,
+                      item.categoriesName,
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

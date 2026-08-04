@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/services/product_service.dart';
-import 'package:shop_aura/frontend/models/product_model.dart';
 import 'package:shop_aura/frontend/client/screens/product_screen.dart';
-
+import 'package:shop_aura/backend/models/client/productModel.dart';
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -13,11 +12,11 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
+  final ProductService _service = ProductService();
   final TextEditingController controller = TextEditingController();
 
-  final ProductService _service = ProductService.instance;
 
-  List<ProductModel> products = [];
+  List<ProductsModel> products = [];
 
   bool isLoading = true;
 
@@ -104,12 +103,14 @@ class _SearchScreenState extends State<SearchScreen> {
                             const EdgeInsets.all(10),
 
                         leading: Hero(
-                          tag: product.id,
+                         tag: product.id?.toHexString() ?? "",
                           child: ClipRRect(
                             borderRadius:
                                 BorderRadius.circular(12),
                             child: Image.network(
-                              product.image,
+                              product.productImage.isNotEmpty
+    ? product.productImage.first
+    : "",
                               width: 70,
                               height: 70,
                               fit: BoxFit.cover,
@@ -118,7 +119,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
 
                         title: Text(
-                          product.name,
+                          product.productName,
                           style: const TextStyle(
                             fontWeight:
                                 FontWeight.bold,
@@ -129,7 +130,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           crossAxisAlignment:
                               CrossAxisAlignment.start,
                           children: [
-                            Text(product.category),
                             const SizedBox(height: 5),
                             Text(
                               "₹${product.price.toStringAsFixed(0)}",
@@ -154,21 +154,18 @@ class _SearchScreenState extends State<SearchScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  ProductScreen(
-                                productName:
-                                    product.name,
-                                category:
-                                    product.category,
-                                image: product.image,
-                                price:
-                                    product.price,
-                                oldPrice:
-                                    product.oldPrice,
-                                rating:
-                                    product.rating,
-                                reviews:
-                                    product.reviews,
-                              ),
+                                 ProductScreen(
+  productId: product.id?.toHexString() ?? "",
+  productName: product.productName,
+  category: product.categoryName ?? "",
+  image: product.productImage.isNotEmpty
+      ? product.productImage.first
+      : "",
+  price: product.price,
+  oldPrice: product.discountPrice,
+  rating: product.rating,
+  reviews: product.reviews,
+),
                             ),
                           );
                         },

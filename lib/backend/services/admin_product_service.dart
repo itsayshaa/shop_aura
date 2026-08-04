@@ -5,18 +5,18 @@ import '../models/client/productModel.dart';
 
 class AdminProductService {
   // Get all products for the Admin Panel
-  static Future<List<ProductModel>> getAllProducts() async {
+  static Future<List<ProductsModel>> getAllProducts() async {
     final data = await MongoService.products.find().toList();
 
     return data
         .map(
-          (product) => ProductModel.fromJson(product),
+          (product) => ProductsModel.fromJson(product),
         )
         .toList();
   }
 
   // Get one product by ID
-  static Future<ProductModel?> getProductById(
+  static Future<ProductsModel?> getProductById(
     ObjectId id,
   ) async {
     final data = await MongoService.products.findOne(
@@ -27,12 +27,12 @@ class AdminProductService {
       return null;
     }
 
-    return ProductModel.fromJson(data);
+    return ProductsModel.fromJson(data);
   }
 
   // Add a new product
   static Future<ObjectId?> addProduct(
-    ProductModel product,
+    ProductsModel product,
   ) async {
     final result = await MongoService.products.insertOne(
       product.toJson(),
@@ -43,7 +43,7 @@ class AdminProductService {
 
   // Update an existing product
   static Future<void> updateProduct(
-    ProductModel product,
+    ProductsModel product,
   ) async {
     if (product.id == null) {
       throw Exception(
@@ -81,7 +81,7 @@ class AdminProductService {
   }
 
   // Search products by name or brand
-  static Future<List<ProductModel>> searchProducts(
+  static Future<List<ProductsModel>> searchProducts(
     String keyword,
   ) async {
     final products = await getAllProducts();
@@ -96,7 +96,7 @@ class AdminProductService {
 
     return products.where(
       (product) {
-        return product.name
+        return product.productName
                 .toLowerCase()
                 .contains(searchText) ||
             product.brand

@@ -8,11 +8,12 @@ class MongoService {
   static late DbCollection password;
   static late DbCollection categories;
   static late DbCollection products;
-  static late DbCollection brands;
+  static late DbCollection orders;
   static late DbCollection cart;
   static late DbCollection wishlists;
-  static late DbCollection orders;
   static late DbCollection refunds;
+  static late DbCollection brands;
+
 
   static Future<void> connect() async {
     final env = DotEnv()..load();
@@ -32,6 +33,7 @@ class MongoService {
     wishlists = db.collection('wishlists');
     orders = db.collection('orders');
     refunds = db.collection('refunds');
+    brands = db.collection('brands');
 
     print("MongoDB Atlas Connected via MongoDBService");
   }
