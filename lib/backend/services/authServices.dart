@@ -68,6 +68,7 @@ class Authservices {
     await prefs.remove("user_name");
     await prefs.remove("user_email");
     await prefs.remove("user_phone");
+    await prefs.remove("user_role");
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ShopAuraApp()));
   }
 }

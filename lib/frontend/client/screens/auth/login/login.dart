@@ -38,11 +38,19 @@ Future<void> _handleLogin() async {
       final prefs = await SharedPreferences.getInstance();
       final role = prefs.getString("user_role");
 
-      if(role == "admin"){
-        if(!mounted) return;
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> AdminApp()));
-        return;
-      }
+if (role == "admin") {
+  if (!mounted) return;
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const AdminApp(),
+    ),
+    (route) => false,
+  );
+
+  return;
+}
       if(!context.mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(

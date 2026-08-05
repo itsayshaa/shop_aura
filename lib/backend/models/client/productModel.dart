@@ -29,10 +29,11 @@ class ProductsModel {
 
   bool isTrending;
   bool isDeleted;
-
+  bool isActive;
   ProductsModel({
     this.id,
     this.categoryId,
+    required this.isActive,
     required this.productName,
     required this.categoryName,
     required this.brand,
@@ -72,6 +73,7 @@ factory ProductsModel.fromJson(Map<String, dynamic> json) {
     stock: json["stock"] ?? 0,
     discountPrice: (json["discountPrice"] as num?)?.toDouble() ?? 0,
     isTrending: json["isTrending"] ?? false,
+    isActive: json["isActive"] ?? true,
     isDeleted: json["isDeleted"] ?? false,
     color: List<String>.from(json["color"] ?? []),
     size: List<String>.from(json["size"] ?? []),

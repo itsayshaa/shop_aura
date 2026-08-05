@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shelf/shelf.dart';
 import 'package:shop_aura/main.dart';
 import 'dart:convert';
 
@@ -39,7 +38,7 @@ class _DashboardState extends State<DashboardPage> {
   Future<void> _getProducts() async {
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/product/"),
+        Uri.parse("$baseUrl/product"),
         headers: {"Content-Type": "application/json"},
       );
       if (response.statusCode == 200) {

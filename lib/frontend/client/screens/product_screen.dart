@@ -44,7 +44,7 @@ String? get baseUrl => Apiconfig.baseUrl;
 Future<void> getProduct()async{
   try{
     final response = await http.get(
-      Uri.parse("$baseUrl/product/"),
+      Uri.parse("$baseUrl/product"),
       headers:{"Content-Type":"application/json"}
     );
 

@@ -10,12 +10,12 @@ import 'package:shop_aura/backend/routes/productRoutes/product.dart';
 import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
 Future<void> main() async {
   await MongoService.connect();
-
+  print(MongoService.db.isConnected);
   final router = Router();
 
   router.mount('/auth/', AuthRoutes().router.call);
   router.mount('/category/', CategoryRoutes().router.call);
-  router.mount('/product', ProductRoutes().router.call);
+  router.mount('/product/', ProductRoutes().router.call);
   router.mount('/orders/', Ordersroute().router.call);
   router.mount('/cart/', Cartroutes().router.call);
 
