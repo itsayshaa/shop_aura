@@ -316,7 +316,7 @@ Future<void> loadUser() async {
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () async {
-                              await Authservices.logOut(context);
+                              await Authservice.logOut(context);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.danger,

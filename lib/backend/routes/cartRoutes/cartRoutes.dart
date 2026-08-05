@@ -4,7 +4,7 @@ class Cartroutes{
   Router get router{
     final router = Router();
     router.post("/add", addToCart);
-    router.get("/<userId>",getCart);
+    router.get("/<userId>",getCarts);
     router.get("/",getAll);
     router.put("/increase",increaseQuantity);
     router.put("/decrease", decreaseQuantity);

@@ -13,13 +13,13 @@ class MongoService {
   static late DbCollection wishlists;
   static late DbCollection refunds;
   static late DbCollection brands;
-
+  static late DbCollection banners;
 
   static Future<void> connect() async {
     final env = DotEnv()..load();
     final mongoUrl = env['MONGO_URL'];
-    if (mongoUrl == null || mongoUrl.isEmpty) {
-      throw Exception("MONGO_URL not found in environment variables");
+    if (mongoUrl == null) {
+      throw Exception("MONGO_URL not found");
     }
 
     db = await Db.create(mongoUrl);
@@ -34,7 +34,8 @@ class MongoService {
     orders = db.collection('orders');
     refunds = db.collection('refunds');
     brands = db.collection('brands');
+    banners = db.collection('banners');
 
-    print("MongoDB Atlas Connected via MongoDBService");
+    print("Mongo Db Connected");
   }
 }
