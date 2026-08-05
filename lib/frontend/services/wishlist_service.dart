@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:shop_aura/backend/models/client/wishlist/wishlist_item.dart';
+import 'package:shop_aura/frontend/models/wishlist_item_model.dart';
 import 'package:shop_aura/frontend/services/authService.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class WishlistService extends ChangeNotifier {
   WishlistService._internal();
@@ -21,18 +20,23 @@ class WishlistService extends ChangeNotifier {
 
   Future<void> fetchWishlistFromServer() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("userId");
+      final token = await Authservice.getToken();
+      if (token == null) {
+        _items.clear();
+        notifyListeners();
+        return;
+      }
       final response = await http.get(
-        Uri.parse("${Authservice.instance.baseurl}/wishlist/$userId"),
-        headers: {"Content-Type": "application/json"},
+        Uri.parse("${Authservice.instance.baseurl}/wishlist/"),
+        headers: {
+          "Authorization": "Bearer $token",
+          "Content-Type": "application/json",
+        },
       );
       if (response.statusCode == 200) {
         final List decoded = jsonDecode(response.body);
         _items.clear();
-        _items.addAll(
-          decoded.map((item) => WishlistItem.fromJson(item)).toList(),
-        );
+        _items.addAll(decoded.map((item) => WishlistItem.fromJson(item)).toList());
         notifyListeners();
       }
     } catch (e) {
@@ -96,19 +100,15 @@ class WishlistService extends ChangeNotifier {
     required double discount,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("userId");
-      if (userId != null) {
+      final token = await Authservice.getToken();
+      if (token != null) {
         await http.post(
-          Uri.parse(
-            "${Authservice.instance.baseurl}/wishlist/toggle",
-            
-            ),
+          Uri.parse("${Authservice.instance.baseurl}/wishlist/toggle"),
           headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
           },
           body: jsonEncode({
-            "userId":userId,
             "image": image,
             "category": category,
             "name": name,
@@ -132,15 +132,15 @@ class WishlistService extends ChangeNotifier {
     notifyListeners();
 
     try {
-            final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("userId");
-      if (userId != null) {
+      final token = await Authservice.getToken();
+      if (token != null) {
         await http.post(
           Uri.parse("${Authservice.instance.baseurl}/wishlist/remove"),
           headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
           },
-          body: jsonEncode({"userId":userId,"name": item.name}),
+          body: jsonEncode({"name": item.name}),
         );
       }
     } catch (e) {
@@ -153,15 +153,15 @@ class WishlistService extends ChangeNotifier {
     notifyListeners();
 
     try {
-            final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("userId");
-      if (userId != null) {
+      final token = await Authservice.getToken();
+      if (token != null) {
         await http.post(
           Uri.parse("${Authservice.instance.baseurl}/wishlist/remove"),
           headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
           },
-          body: jsonEncode({"userId":userId,"name": name}),
+          body: jsonEncode({"name": name}),
         );
       }
     } catch (e) {
@@ -174,17 +174,14 @@ class WishlistService extends ChangeNotifier {
     notifyListeners();
 
     try {
-            final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString("userId");
-      if (userId != null) {
+      final token = await Authservice.getToken();
+      if (token != null) {
         await http.post(
           Uri.parse("${Authservice.instance.baseurl}/wishlist/clear"),
           headers: {
             "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
           },
-          body: jsonEncode({
-            "userId":userId
-          })
         );
       }
     } catch (e) {

@@ -1,60 +1,43 @@
-import 'package:mongo_dart/mongo_dart.dart';
+// import 'package:mongo_dart/mongo_dart.dart';
 
-class CartItemModel {
-  ObjectId productId;
-  String name;
-  String image;
-  String color;
-  String size;
-  double price;
-  double originalPrice;
-  int quantity;
-  int stock;
-  double subtotal;
+// class CartItemModel {
+//   ObjectId productId;
+//   String name;
+//   String image;
+//   String color;
+//   String size;
+//   double price;
+//   double originalPrice;
+//   int quantity;
+//   int stock;
+//   double subtotal;
 
-  CartItemModel({
-    required this.productId,
-    required this.name,
-    required this.image,
-    required this.color,
-    required this.size,
-    required this.price,
-    required this.originalPrice,
-    required this.quantity,
-    required this.stock,
-    required this.subtotal,
-  });
+//   CartItemModel({
+//     required this.productId,
+//     required this.name,
+//     required this.image,
+//     required this.color,
+//     required this.size,
+//     required this.price,
+//     required this.oldPrice,
+//     required this.quantity,
+//   });
 
-  factory CartItemModel.fromJson(Map<String, dynamic> json) {
-    return CartItemModel(
-      productId: json["productId"] is ObjectId
-          ? json["productId"]
-          : ObjectId.fromHexString(json["productId"]),
+//   Map<String, dynamic> toJson() => {
+//         'image': image,
+//         'category': category,
+//         'name': name,
+//         'price': price,
+//         'oldPrice': oldPrice,
+//         'quantity': quantity,
+//       };
 
-      name: json["name"] ?? "",
-      image: json["image"] ?? "",
-      color: json["color"] ?? "",
-      size: json["size"] ?? "",
-      price: (json["price"] ?? 0).toDouble(),
-      originalPrice: (json["originalPrice"] ?? 0).toDouble(),
-      quantity: json["quantity"] ?? 1,
-      stock: json["stock"] ?? 0,
-      subtotal: (json["subtotal"] ?? 0).toDouble(),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      "productId": productId,
-      "name": name,
-      "image": image,
-      "color": color,
-      "size": size,
-      "price": price,
-      "originalPrice": originalPrice,
-      "quantity": quantity,
-      "stock": stock,
-      "subtotal": subtotal,
-    };
-  }
-}
+//   factory CartItem.fromJson(Map<String, dynamic> json) => CartItem(
+//         image: json['image'] as String,
+//         category: json['category'] as String,
+//         name: json['name'] as String,
+//         price: json['price'] as int,
+//         oldPrice: json['oldPrice'] as int,
+//         quantity: json['quantity'] as int,
+//       );
+// }

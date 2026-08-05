@@ -60,6 +60,7 @@ factory ProductsModel.fromJson(Map<String, dynamic> json) {
     ? ObjectId.fromHexString(json["_id"])
     : null,
     categoryId: null,
+    isActive: true,
     categoryName: json["category"] ?? "",
     productName: json["name"] ?? "",
     brand: json["brand"] ?? "",
@@ -73,7 +74,6 @@ factory ProductsModel.fromJson(Map<String, dynamic> json) {
     stock: json["stock"] ?? 0,
     discountPrice: (json["discountPrice"] as num?)?.toDouble() ?? 0,
     isTrending: json["isTrending"] ?? false,
-    isActive: json["isActive"] ?? true,
     isDeleted: json["isDeleted"] ?? false,
     color: List<String>.from(json["color"] ?? []),
     size: List<String>.from(json["size"] ?? []),
@@ -105,6 +105,7 @@ Map<String, dynamic> toJson() {
     "size": size,
     "status": status,
     "weight": weight,
+    "isActive":isActive,
     "createdAt": createdAt.toIso8601String(),
     "updatedAt": updatedAt.toIso8601String(),
     "isDeleted": isDeleted,

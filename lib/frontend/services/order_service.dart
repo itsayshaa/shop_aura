@@ -20,7 +20,7 @@ class OrderService extends ChangeNotifier {
     final sorted = List<OrderModel>.from(_orders);
     sorted.sort(
   (a,b)=> b.createdAt.compareTo(a.createdAt)
-);
+); // newest first
     return List.unmodifiable(sorted);
   }
 
@@ -62,6 +62,7 @@ class OrderService extends ChangeNotifier {
     }
   }
 
+  /// Explicitly loads all orders for the Admin screen from MongoDB.
   Future<void> loadAdminOrders() async {
     _isLoading = true;
     notifyListeners();
@@ -162,6 +163,7 @@ OrderModel? getOrderById(String id) {
     }
   }
 
+  /// Request a refund for a given order
   Future<void> requestRefund(String orderId, String reason) async {
     final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
@@ -185,6 +187,7 @@ OrderModel? getOrderById(String id) {
     }
   }
 
+  /// Update order delivery status (Admin action)
   Future<void> updateOrderStatus(String orderId, String newStatus) async {
     final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
@@ -204,6 +207,7 @@ OrderModel? getOrderById(String id) {
     }
   }
 
+  /// Process refund action: 'approve', 'reject', or 'refund' (Admin action)
   Future<void> processRefund(String orderId, String action) async {
     final index = _orders.indexWhere((o) => o.id?.toHexString() == orderId);
     if (index != -1) {
@@ -237,6 +241,18 @@ OrderModel? getOrderById(String id) {
       );
     } catch (e) {
       debugPrint('OrderService: processRefund server call error — $e');
+    }
+  }
+
+  /// Optional: clear all orders (e.g. on logout)
+  Future<void> clearOrders() async {
+    _orders.clear();
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_storageKey);
+    } catch (e) {
+      debugPrint('OrderService: failed to clear orders — $e');
     }
   }
 }

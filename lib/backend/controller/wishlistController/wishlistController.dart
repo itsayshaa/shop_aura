@@ -2,10 +2,14 @@ import 'dart:convert';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shop_aura/backend/database/mongo_service.dart';
+import 'package:shop_aura/backend/services/jwtService.dart';
 
-Future<Response> getWishlist(Request request,String id) async {
+Future<Response> getWishlist(Request request) async {
   try {
-    final userId = ObjectId.fromHexString(id);
+    final userId = Jwtservice.getUserIdFromRequest(request);
+    if (userId == null) {
+      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
+    }
 
     final wishlist = await MongoService.wishlists.findOne(where.eq("userId", userId));
     final items = wishlist != null ? wishlist["items"] ?? [] : [];
@@ -18,12 +22,13 @@ Future<Response> getWishlist(Request request,String id) async {
 
 Future<Response> toggleWishlist(Request request) async {
   try {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-    final userId = data["userId"];
+    final userId = Jwtservice.getUserIdFromRequest(request);
     if (userId == null) {
       return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
     }
+
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
 
     final String image = data["image"] ?? "";
     final String category = data["category"] ?? "";
@@ -104,13 +109,13 @@ Future<Response> toggleWishlist(Request request) async {
 
 Future<Response> removeFromWishlist(Request request) async {
   try {
-        final body = await request.readAsString();
-    final data = jsonDecode(body);
-    final userId = data["userId"];
+    final userId = Jwtservice.getUserIdFromRequest(request);
     if (userId == null) {
       return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
     }
 
+    final body = await request.readAsString();
+    final data = jsonDecode(body);
     final String name = data["name"] ?? "";
 
     if (name.isEmpty) {
@@ -138,9 +143,10 @@ Future<Response> removeFromWishlist(Request request) async {
 
 Future<Response> clearWishlist(Request request) async {
   try {
-    final body = await request.readAsString();
-    final data = jsonDecode(body);
-    final userId = data["userId"];
+    final userId = Jwtservice.getUserIdFromRequest(request);
+    if (userId == null) {
+      return Response(401, body: jsonEncode({"success": false, "message": "Unauthorized"}), headers: {"Content-Type": "application/json"});
+    }
 
     await MongoService.wishlists.updateOne(
       where.eq("userId", userId),

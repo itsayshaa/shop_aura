@@ -23,7 +23,7 @@ class _CartScreenState extends State<CartScreen> {
   Future<void>loadCart()async{
     await getUserId();
     setState(() {
-      cartFuture = CartService().getCart(userId);
+      cartFuture = CartService.instance.getCart(userId);
     });
   }
   String? get baseUrl => Apiconfig.baseUrl;
@@ -193,9 +193,9 @@ class _CartScreenState extends State<CartScreen> {
                                           _QtyButton(
                                             icon: Icons.remove,
                                             onTap: ()async{
-                                              await CartService().decreaseQuantity(userId: userId, productId: item.productId.oid);
+                                              await CartService.instance.decreaseQuantity(userId: userId, productId: item.productId.oid);
                                               setState(() {
-                                                cartFuture = CartService().getCart(userId);
+                                                cartFuture = CartService.instance.getCart(userId);
                                               });
                                             }
                                           ),
@@ -212,9 +212,9 @@ class _CartScreenState extends State<CartScreen> {
                                           _QtyButton(
                                             icon: Icons.add,
                                             onTap:()async{
-                                              await CartService().increaseQuantity(userId: userId,productId: item.productId.oid);
+                                              await CartService.instance.increaseQuantity(userId: userId,productId: item.productId.oid);
                                               setState(() {
-                                                cartFuture = CartService().getCart(userId);
+                                                cartFuture = CartService.instance.getCart(userId);
                                               });
                                             }
                                           ),
@@ -222,9 +222,9 @@ class _CartScreenState extends State<CartScreen> {
                                       ),
                                       TextButton.icon(
                                         onPressed: ()async{
-                                          await CartService().removeItem(userId: userId, productId: item.productId.oid);
+                                          await CartService.instance.removeItem(userId: userId, productId: item.productId.oid);
                                           setState(() {
-                                            cartFuture = CartService().getCart(userId);
+                                            cartFuture = CartService.instance.getCart(userId);
                                           });
                                         },
                                         style: TextButton.styleFrom(
