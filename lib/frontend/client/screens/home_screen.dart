@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_aura/backend/database/mongo_service.dart';
 import 'package:shop_aura/backend/models/client/categoryModel.dart';
+import 'package:shop_aura/frontend/admin/dashboard.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 import 'package:shop_aura/frontend/client/screens/widgets/home/home_header.dart';
@@ -28,10 +31,26 @@ class _HomeScreenState extends State<HomeScreen> {
   List<ProductsModel> products = [];
 
   final ProductService service = ProductService();
-
+  Future<void> findAdmin() async{
+    if(!mounted) return;
+      final prefs = await SharedPreferences.getInstance();
+      final role = prefs.getString("user_role");
+      print("admin $role");
+      if(role == "admin"){
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AdminApp()
+            ),
+            (route) => false
+        );
+        return;
+      }
+  }
   @override
   void initState() {
     super.initState();
+    findAdmin();
     loadData();
   }
 
@@ -118,6 +137,7 @@ List<ProductsModel> filteredProducts = products;
 
                   return ProductCard(
                     product: ProductsModel(
+                      isActive: product.isActive,
                       categoryName: product.categoryName,
                       id: product.id,
                       categoryId: product.categoryId,

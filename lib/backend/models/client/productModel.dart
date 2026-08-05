@@ -29,11 +29,11 @@ class ProductsModel {
 
   bool isTrending;
   bool isDeleted;
-  bool? isActive = true;
+  bool isActive;
   ProductsModel({
     this.id,
     this.categoryId,
-    this.isActive,
+    required this.isActive,
     required this.productName,
     required this.categoryName,
     required this.brand,
