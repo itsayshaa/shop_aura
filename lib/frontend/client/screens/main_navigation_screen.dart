@@ -34,7 +34,7 @@ class _MainNavigationScreenState
 
     pages = const [
       HomeScreen(),
-      // CategoryScreen(),
+      CategoryScreen(),
       WishlistScreen(),
       CartScreen(),
       OrdersScreen(),

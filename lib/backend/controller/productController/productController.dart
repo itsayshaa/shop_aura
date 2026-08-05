@@ -9,7 +9,12 @@ import 'package:shop_aura/backend/models/client/productModel.dart';
 
 Future<Response> getProducts(Request request) async {
   try {
-    final products = await MongoService.products.find().toList();
+
+    print("Connected: ${MongoService.db.isConnected}");
+
+final products = await MongoService.products.find().take(1).toList();
+
+print(products);
     return Response.ok(
       jsonEncode(products),
       headers: {"Content-Type": "application/json"},
@@ -89,6 +94,7 @@ Future<Response> addProduct(Request request) async {
     final body = await request.readAsString();
     final data = jsonDecode(body);
     final product = ProductsModel(
+      isActive: data["isActive"],
       categoryId: ObjectId.fromHexString(data["categoryId"]),
       categoryName: data["categoryName"],
       productName: data["name"],

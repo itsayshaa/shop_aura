@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:shop_aura/frontend/services/cart_service.dart';
 import 'package:shop_aura/frontend/services/wishlist_service.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/client/screens/cart_screen.dart';

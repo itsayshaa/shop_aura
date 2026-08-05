@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/backend/services/authServices.dart';
 import 'package:shop_aura/frontend/theme/app_colors.dart';
 
 class AdminDrawer extends StatefulWidget {
@@ -92,6 +93,9 @@ static const items = [['Dashboard', Icons.grid_view_rounded],['Products', Icons.
                   fontWeight: FontWeight.w600
                 ),
               ),
+              onTap: ()async{
+                await Authservices.logOut(context);
+              },
             ),
             SizedBox(height: 8,)
           ]
