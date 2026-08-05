@@ -19,7 +19,7 @@ import 'package:shop_aura/backend/routes/order_routes.dart';
 
 Future<void> main() async {
   await MongoService.connect();
-  print(MongoService.db.isConnected);
+  print(MongoService.db!.isConnected);
   final router = Router();
 
   router.mount('/auth/', AuthRoutes().router.call);
