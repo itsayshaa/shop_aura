@@ -11,6 +11,7 @@ import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
 import 'package:shop_aura/backend/routes/productRoutes/admin_product.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/admin_category.dart';
 import 'package:shop_aura/backend/routes/brandRoutes/admin_brand.dart';
+import 'package:shop_aura/backend/routes/bannerRoutes/admin_banner.dart';
 import 'package:shop_aura/backend/routes/wishlistRoutes/wishlist.dart';
 
 import 'package:shop_aura/backend/routes/orderRoutes/order.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
   router.mount('/admin/product/', AdminProductRoutes().router.call);
   router.mount('/admin/category/', AdminCategoryRoutes().router.call);
   router.mount('/admin/brand/', AdminBrandRoutes().router.call);
+  router.mount('/admin/banner/', adminBannerRouter.call);
   router.mount('/cart/', Cartroutes().router.call);
   router.mount('/wishlist/', WishlistRoutes().router.call);
   router.mount('/order/', OrderRoutes().router.call);

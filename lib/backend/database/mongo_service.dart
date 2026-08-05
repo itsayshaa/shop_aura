@@ -13,6 +13,7 @@ class MongoService {
   static late DbCollection wishlists;
   static late DbCollection refunds;
   static late DbCollection brands;
+  static late DbCollection banners;
 
   static Future<void> connect() async {
     final env = DotEnv()..load();
@@ -33,6 +34,7 @@ class MongoService {
     orders = db.collection('orders');
     refunds = db.collection('refunds');
     brands = db.collection('brands');
+    banners = db.collection('banners');
 
     print("Mongo Db Connected");
   }
