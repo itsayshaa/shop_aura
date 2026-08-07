@@ -14,10 +14,12 @@ class MongoService {
   static late DbCollection refunds;
   static late DbCollection brands;
   static late DbCollection banners;
-
+  static late DbCollection coupons;
   static Future<void> connect() async {
+
     final env = DotEnv()..load();
     final mongoUrl = env['MONGO_URL'];
+
     if (mongoUrl == null) {
       throw Exception("MONGO_URL not found");
     }
@@ -35,7 +37,7 @@ class MongoService {
     refunds = db.collection('refunds');
     brands = db.collection('brands');
     banners = db.collection('banners');
-
-    print("Mongo Db Connected");
+    coupons = db.collection('coupons');
+    print("MongoDB Connected");
   }
 }

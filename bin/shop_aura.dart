@@ -5,6 +5,7 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/category.dart';
+import 'package:shop_aura/backend/routes/couponRoutes/coupon.dart';
 import 'package:shop_aura/backend/routes/ordersRoutes/ordersRoute.dart';
 import 'package:shop_aura/backend/routes/productRoutes/product.dart';
 import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
@@ -34,6 +35,7 @@ Future<void> main() async {
   router.mount('/wishlist/', WishlistRoutes().router.call);
   router.mount('/order/', OrderRoutes().router.call);
   router.mount('/orders/', Ordersroute().router.call);
+  router.mount('/coupon/', CouponRoutes().router.call);
   final handler = Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeader())

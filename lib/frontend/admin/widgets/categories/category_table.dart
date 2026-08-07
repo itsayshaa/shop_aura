@@ -32,14 +32,12 @@ class CategoryTable extends StatelessWidget {
           color: Colors.grey.shade200,
         ),
       ),
-      child: ClipRRect(
+      child: ClipRRect( 
         borderRadius: BorderRadius.circular(16),
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: 950,
-            ),
+          child:SizedBox(
+            width: 970,
             child: Column(
               children: [
                 _buildHeader(),
@@ -53,61 +51,47 @@ class CategoryTable extends StatelessWidget {
                 ),
               ],
             ),
-          ),
+          )
         ),
       ),
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      height: 60,
-      color: const Color(0xFFF8F8FA),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-      ),
-      child: const Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: _TableHeaderText(
-              text: 'CATEGORY',
-            ),
+Widget _buildHeader() {
+  return Container(
+    width: double.infinity, // 320 + 180 + 150 + 150 + 130
+    height: 60,
+    color: const Color(0xFFF8F8FA),
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    child: const Row(
+      children: [
+        SizedBox(
+          width: 320,
+          child: _TableHeaderText(text: 'CATEGORY'),
+        ),
+        SizedBox(
+          width: 180,
+          child: _TableHeaderText(text: 'PARENT CATEGORY'),
+        ),
+        SizedBox(
+          width: 150,
+          child: _TableHeaderText(text: 'PRODUCTS'),
+        ),
+        SizedBox(
+          width: 150,
+          child: _TableHeaderText(text: 'STATUS'),
+        ),
+        SizedBox(
+          width: 130,
+          child: _TableHeaderText(
+            text: 'ACTIONS',
+            textAlign: TextAlign.center,
           ),
-
-          Expanded(
-            flex: 2,
-            child: _TableHeaderText(
-              text: 'PARENT CATEGORY',
-            ),
-          ),
-
-          Expanded(
-            flex: 2,
-            child: _TableHeaderText(
-              text: 'PRODUCTS',
-            ),
-          ),
-
-          Expanded(
-            flex: 2,
-            child: _TableHeaderText(
-              text: 'STATUS',
-            ),
-          ),
-
-          SizedBox(
-            width: 130,
-            child: _TableHeaderText(
-              text: 'ACTIONS',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
+        ),
+      ],
+    ),
+  );
+}
   Widget _buildCategoryRow(
     CategoryModel category,
   ) {
@@ -125,15 +109,15 @@ class CategoryTable extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            flex: 3,
+          SizedBox(
+            width: 320,
             child: _buildCategoryInfo(
               category,
             ),
           ),
 
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width: 180,
             child: Text(
               category.parentName == 'No Parent'
                   ? '—'
@@ -153,8 +137,8 @@ class CategoryTable extends StatelessWidget {
             ),
           ),
 
-          Expanded(
-            flex: 2,
+            SizedBox(
+            width: 150,
             child: Row(
               children: [
                 Container(
@@ -192,8 +176,8 @@ class CategoryTable extends StatelessWidget {
             ),
           ),
 
-          Expanded(
-            flex: 2,
+          SizedBox(
+            width:150,
             child: CategoryStatusBadge(
               isActive: category.isActive,
             ),

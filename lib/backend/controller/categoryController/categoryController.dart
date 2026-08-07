@@ -6,7 +6,7 @@ import 'package:shop_aura/backend/models/client/categoryModel.dart';
 import '../../database/mongo_service.dart';
 
 Future<Response> getCategories(Request request) async {
-print("Connected: ${MongoService.db.isConnected}");
+print("Connected: ${MongoService.db?.isConnected}");
   final categories = await MongoService.categories.find().toList();
 
   return Response.ok(

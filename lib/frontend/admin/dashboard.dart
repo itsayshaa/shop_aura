@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/admin/screens/coupon/coupon.dart';
 import 'package:shop_aura/frontend/admin/widgets/bottombar.dart';
 import 'package:shop_aura/frontend/admin/widgets/drawer.dart';
 import 'package:shop_aura/frontend/admin/widgets/income.dart';
@@ -104,6 +105,8 @@ class _DashboardScreen extends State<DashboardScreen> {
           ? const BrandsScreen()
           : selectedIndex == 11
           ? const BannersScreen()
+          : selectedIndex == 8
+          ? const CouponFormScreen()
           : const Center(child: Text('Page not found')),
     );
   }

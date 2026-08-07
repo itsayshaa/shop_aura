@@ -7,7 +7,6 @@
     try {
       final body = await request.readAsString();
       final data = jsonDecode(body);
-      print(data);
       final userId =ObjectId.fromHexString(data["userId"]);
       final productId =ObjectId.fromHexString(data["productId"]);
       
@@ -97,7 +96,7 @@
 }
   }
  Future<Response> getCarts(Request request, String id) async {
-  print("DB State: ${MongoService.db.state}");
+  print("DB State: ${MongoService.db?.state}");
   try {
 
     final userId = ObjectId.fromHexString(id);

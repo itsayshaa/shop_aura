@@ -10,7 +10,7 @@ import 'package:shop_aura/backend/models/client/productModel.dart';
 Future<Response> getProducts(Request request) async {
   try {
 
-    print("Connected: ${MongoService.db.isConnected}");
+    print("Connected: ${MongoService.db?.isConnected}");
 
 final products = await MongoService.products.find().take(1).toList();
 
