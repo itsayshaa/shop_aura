@@ -26,16 +26,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   final TextEditingController _searchController = TextEditingController();
 
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (!mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
 
-    context.read<CategoryProvider>().loadCategories();
-  });
-}
+      context.read<CategoryProvider>().loadCategories();
+    });
+  }
+
+
   @override
   void dispose() {
     _scrollController.dispose();

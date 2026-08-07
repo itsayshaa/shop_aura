@@ -6,7 +6,7 @@ import 'dart:convert';
 
 class CategoryService extends ChangeNotifier{
   String? get baseUrl => Apiconfig.baseUrl;
-
+  
   Future<List<CategoryModel>> getCategories()async{
     final response = await http.get(
       Uri.parse("$baseUrl/category/")

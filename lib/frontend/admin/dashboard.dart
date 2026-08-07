@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_aura/frontend/admin/screens/coupon/coupon.dart';
 import 'package:shop_aura/frontend/admin/widgets/bottombar.dart';
 import 'package:shop_aura/frontend/admin/widgets/drawer.dart';
 import 'package:shop_aura/frontend/admin/widgets/income.dart';
@@ -6,8 +7,8 @@ import 'package:shop_aura/frontend/theme/app_colors.dart';
 import 'package:shop_aura/frontend/admin/screens/products/products_screen.dart';
 import 'package:shop_aura/frontend/admin/screens/categories/category_screen.dart';
 import 'package:shop_aura/frontend/admin/screens/brands/brands_screen.dart';
+import 'package:shop_aura/frontend/admin/screens/banners/banners_screen.dart';
 import 'package:shop_aura/frontend/admin/screens/orders/admin_orders_screen.dart';
-
 
 class AdminApp extends StatelessWidget {
   const AdminApp({super.key});
@@ -96,23 +97,17 @@ class _DashboardScreen extends State<DashboardScreen> {
           ? const ProductsScreen()
           : selectedIndex == 2
           ? const CategoriesScreen()
-          
           : selectedIndex == 3
-          ? const AdminOrdersScreen(
-              initialRefundsFilter: false,
-            )
-            
+          ? const AdminOrdersScreen(initialRefundsFilter: false)
           : selectedIndex == 4
-          ? const AdminOrdersScreen(
-              initialRefundsFilter: true,
-            )
-
+          ? const AdminOrdersScreen(initialRefundsFilter: true)
           : selectedIndex == 5
           ? const BrandsScreen()
-
-          : const Center(
-            child: Text('Page not found')
-            ),
+          : selectedIndex == 11
+          ? const BannersScreen()
+          : selectedIndex == 8
+          ? const CouponFormScreen()
+          : const Center(child: Text('Page not found')),
     );
   }
 }

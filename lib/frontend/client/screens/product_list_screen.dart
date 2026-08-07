@@ -201,7 +201,6 @@ for (final p in provider.products) {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 10),
                                         if (provider.isLoading)
                       const Padding(

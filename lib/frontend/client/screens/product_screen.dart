@@ -10,9 +10,6 @@ import 'package:shop_aura/frontend/client/screens/wishlist_screen.dart';
 import 'package:shop_aura/main.dart';
 import 'package:http/http.dart' as http;
 
-
-
-
 class ProductScreen extends StatefulWidget {
   final String productName;
   final String category;
@@ -37,27 +34,28 @@ class ProductScreen extends StatefulWidget {
   });
 
   @override
-  State<ProductScreen> createState() =>
-      _ProductScreenState();
+  State<ProductScreen> createState() => _ProductScreenState();
 }
+
 String? get baseUrl => Apiconfig.baseUrl;
-Future<void> getProduct()async{
-  try{
+Future<void> getProduct() async {
+  try {
     final response = await http.get(
+
       Uri.parse("$baseUrl/product"),
       headers:{"Content-Type":"application/json"}
+
     );
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
     }
-  }catch(e){
+  } catch (e) {
     print(e);
   }
 }
-class _ProductScreenState
-    extends State<ProductScreen> {
 
+class _ProductScreenState extends State<ProductScreen> {
   int selectedImage = 0;
 
   int quantity = 1;
@@ -77,49 +75,37 @@ class _ProductScreenState
     Colors.green,
   ];
 
-  final List<String> sizes = [
-    "S",
-    "M",
-    "L",
-    "XL",
-  ];
+  final List<String> sizes = ["S", "M", "L", "XL"];
 
+  String userId = "";
 
-String userId = "";
+  Future<void> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userid = prefs.getString("userId") ?? "";
+    // if(userid.isEmpty){
+    //  if(!mounted) return;
+    //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
+    //  return;
+    // }
 
+    setState(() {
+      userId = userid;
+    });
+    print(userid);
+  }
 
-Future<void> getUserId()async{
-  final prefs = await SharedPreferences.getInstance();
-  final userid = prefs.getString("userId") ?? "";
-  // if(userid.isEmpty){
-  //  if(!mounted) return;
-  //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginPage()));
-  //  return;
-  // }
-
-  setState(() {
-    userId = userid;
-  });
-  print(userid);
-}
   @override
   void initState() {
     super.initState();
     favourite = WishlistService.instance.isWishlisted(widget.productName);
 
-    images.addAll([
-      widget.image,
-      widget.image,
-      widget.image,
-      widget.image,
-    ]);
+    images.addAll([widget.image, widget.image, widget.image, widget.image]);
     getUserId();
     getProduct();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.background,
 
@@ -127,13 +113,10 @@ Future<void> getUserId()async{
         child: Container(
           padding: const EdgeInsets.all(16),
 
-          decoration: const BoxDecoration(
-            color: Colors.white,
-          ),
+          decoration: const BoxDecoration(color: Colors.white),
 
           child: Row(
             children: [
-
               // Expanded(
               //   child: OutlinedButton(
               //     onPressed: () {
@@ -156,25 +139,25 @@ Future<void> getUserId()async{
               //     ),
               //   ),
               // ),
-
               const SizedBox(width: 12),
 
               Expanded(
                 flex: 2,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.primary,
+                    backgroundColor: AppColors.primary,
                   ),
 
-                  onPressed: ()async{
-                    await CartService.instance.addToCart(userId: userId,productId: widget.productId,quantity: quantity);
+                  onPressed: () async {
+                    await CartService.instance.addToCart(
+                      userId: userId,
+                      productId: widget.productId,
+                      quantity: quantity,
+                    );
                   },
                   child: const Text(
                     "Add to Cart",
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -185,7 +168,7 @@ Future<void> getUserId()async{
 
       body: CustomScrollView(
         slivers: [
-                    SliverAppBar(
+          SliverAppBar(
             expandedHeight: 420,
             pinned: true,
             backgroundColor: Colors.white,
@@ -196,10 +179,7 @@ Future<void> getUserId()async{
               child: CircleAvatar(
                 backgroundColor: Colors.white,
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                  ),
+                  icon: const Icon(Icons.arrow_back, color: Colors.black),
                   onPressed: () {
                     Navigator.pop(context);
                   },
@@ -214,7 +194,11 @@ Future<void> getUserId()async{
                   backgroundColor: Colors.white,
                   child: IconButton(
                     onPressed: () {
-                      final discount = (((widget.oldPrice - widget.price) / widget.oldPrice) * 100).round();
+                      final discount =
+                          (((widget.oldPrice - widget.price) /
+                                      widget.oldPrice) *
+                                  100)
+                              .round();
                       WishlistService.instance.toggle(
                         image: widget.image,
                         category: widget.category,
@@ -225,7 +209,9 @@ Future<void> getUserId()async{
                         discount: discount.toDouble(),
                       );
                       setState(() {
-                        favourite = WishlistService.instance.isWishlisted(widget.productName);
+                        favourite = WishlistService.instance.isWishlisted(
+                          widget.productName,
+                        );
                       });
                       Navigator.push(
                         context,
@@ -235,9 +221,7 @@ Future<void> getUserId()async{
                       );
                     },
                     icon: Icon(
-                      favourite
-                          ? Icons.favorite
-                          : Icons.favorite_border,
+                      favourite ? Icons.favorite : Icons.favorite_border,
                       color: Colors.red,
                     ),
                   ),
@@ -248,7 +232,6 @@ Future<void> getUserId()async{
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 children: [
-
                   Hero(
                     tag: widget.productName,
                     child: Container(
@@ -284,8 +267,7 @@ Future<void> getUserId()async{
                         ),
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
                           "30% OFF",
@@ -302,37 +284,21 @@ Future<void> getUserId()async{
                     left: 0,
                     right: 0,
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
-                      children: List.generate(
-                        images.length,
-                        (index) {
-                          return AnimatedContainer(
-                            duration:
-                                const Duration(
-                              milliseconds: 250,
-                            ),
-                            margin:
-                                const EdgeInsets.symmetric(
-                              horizontal: 4,
-                            ),
-                            width: selectedImage == index
-                                ? 22
-                                : 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color:
-                                  selectedImage == index
-                                      ? AppColors.primary
-                                      : Colors.grey.shade300,
-                              borderRadius:
-                                  BorderRadius.circular(
-                                20,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(images.length, (index) {
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: selectedImage == index ? 22 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: selectedImage == index
+                                ? AppColors.primary
+                                : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        );
+                      }),
                     ),
                   ),
                 ],
@@ -344,10 +310,9 @@ Future<void> getUserId()async{
             child: Padding(
               padding: const EdgeInsets.all(18),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                                    Text(
+                  Text(
                     widget.category.toUpperCase(),
                     style: const TextStyle(
                       color: AppColors.primary,
@@ -378,18 +343,15 @@ Future<void> getUserId()async{
                         ),
                         decoration: BoxDecoration(
                           color: Colors.green,
-                          borderRadius:
-                              BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
                           children: [
                             Text(
-                              widget.rating
-                                  .toStringAsFixed(1),
+                              widget.rating.toStringAsFixed(1),
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontWeight:
-                                    FontWeight.bold,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(width: 4),
@@ -417,10 +379,8 @@ Future<void> getUserId()async{
                   const SizedBox(height: 20),
 
                   Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-
                       Text(
                         "₹${widget.price.toStringAsFixed(0)}",
                         style: const TextStyle(
@@ -437,8 +397,7 @@ Future<void> getUserId()async{
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 18,
-                          decoration:
-                              TextDecoration.lineThrough,
+                          decoration: TextDecoration.lineThrough,
                         ),
                       ),
 
@@ -460,23 +419,16 @@ Future<void> getUserId()async{
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.green.shade50,
-                      borderRadius:
-                          BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: Row(
                       children: [
-                        const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                        ),
+                        const Icon(Icons.check_circle, color: Colors.green),
                         const SizedBox(width: 10),
                         const Expanded(
                           child: Text(
                             "In Stock • Ready for Delivery",
-                            style: TextStyle(
-                              fontWeight:
-                                  FontWeight.w600,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ),
                       ],
@@ -489,15 +441,11 @@ Future<void> getUserId()async{
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade50,
-                      borderRadius:
-                          BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                     child: const Row(
                       children: [
-                        Icon(
-                          Icons.local_shipping,
-                          color: Colors.orange,
-                        ),
+                        Icon(Icons.local_shipping, color: Colors.orange),
                         SizedBox(width: 10),
                         Expanded(
                           child: Text(
@@ -512,125 +460,95 @@ Future<void> getUserId()async{
 
                   const Text(
                     "Description",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 10),
 
                   const Text(
                     "Premium quality product designed with modern style and durable materials. Perfect for everyday use with excellent comfort, elegant design, and long-lasting performance. Carefully selected to provide the best shopping experience for Shop Aura customers.",
-                    style: TextStyle(
-                      height: 1.6,
-                      color: Colors.black87,
-                    ),
+                    style: TextStyle(height: 1.6, color: Colors.black87),
                   ),
 
                   const SizedBox(height: 24),
-                                    const Text(
+                  const Text(
                     "Available Colors",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 14),
 
                   Row(
-                    children: List.generate(
-                      colors.length,
-                      (index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedColor = index;
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(
-                              milliseconds: 250,
-                            ),
-                            margin: const EdgeInsets.only(
-                              right: 12,
-                            ),
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: selectedColor == index
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                                width: 2,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 16,
-                              backgroundColor: colors[index],
+                    children: List.generate(colors.length, (index) {
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedColor = index;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selectedColor == index
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                              width: 2,
                             ),
                           ),
-                        );
-                      },
-                    ),
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: colors[index],
+                          ),
+                        ),
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 24),
 
                   const Text(
                     "Select Size",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 14),
 
                   Wrap(
                     spacing: 10,
-                    children: List.generate(
-                      sizes.length,
-                      (index) {
-                        final selected =
-                            selectedSize == index;
+                    children: List.generate(sizes.length, (index) {
+                      final selected = selectedSize == index;
 
-                        return ChoiceChip(
-                          label: Text(sizes[index]),
-                          selected: selected,
-                          onSelected: (_) {
-                            setState(() {
-                              selectedSize = index;
-                            });
-                          },
-                          selectedColor:
-                              AppColors.primary,
-                          labelStyle: TextStyle(
-                            color: selected
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                        );
-                      },
-                    ),
+                      return ChoiceChip(
+                        label: Text(sizes[index]),
+                        selected: selected,
+                        onSelected: (_) {
+                          setState(() {
+                            selectedSize = index;
+                          });
+                        },
+                        selectedColor: AppColors.primary,
+                        labelStyle: TextStyle(
+                          color: selected ? Colors.white : Colors.black,
+                        ),
+                      );
+                    }),
                   ),
 
                   const SizedBox(height: 24),
 
                   const Text(
                     "Quantity",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 14),
 
                   Row(
                     children: [
-
                       IconButton(
                         onPressed: () {
                           if (quantity > 1) {
@@ -639,21 +557,17 @@ Future<void> getUserId()async{
                             });
                           }
                         },
-                        icon: const Icon(
-                          Icons.remove_circle_outline,
-                        ),
+                        icon: const Icon(Icons.remove_circle_outline),
                       ),
 
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 10,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
-                          borderRadius:
-                              BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           quantity.toString(),
@@ -670,9 +584,7 @@ Future<void> getUserId()async{
                             quantity++;
                           });
                         },
-                        icon: const Icon(
-                          Icons.add_circle_outline,
-                        ),
+                        icon: const Icon(Icons.add_circle_outline),
                       ),
                     ],
                   ),
@@ -681,10 +593,7 @@ Future<void> getUserId()async{
 
                   const Text(
                     "Specifications",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 14),
@@ -693,23 +602,18 @@ Future<void> getUserId()async{
                     elevation: 0,
                     color: Colors.grey.shade100,
                     shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: const [
-
                           Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   "Brand",
-                                  style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ),
                               Text("Shop Aura"),
@@ -723,10 +627,7 @@ Future<void> getUserId()async{
                               Expanded(
                                 child: Text(
                                   "Category",
-                                  style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ),
                               Text("Fashion"),
@@ -740,16 +641,12 @@ Future<void> getUserId()async{
                               Expanded(
                                 child: Text(
                                   "Warranty",
-                                  style: TextStyle(
-                                    fontWeight:
-                                        FontWeight.w600,
-                                  ),
+                                  style: TextStyle(fontWeight: FontWeight.w600),
                                 ),
                               ),
                               Text("1 Year"),
                             ],
                           ),
-
                         ],
                       ),
                     ),
@@ -759,10 +656,7 @@ Future<void> getUserId()async{
 
                   const Text(
                     "Customer Reviews",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 15),
@@ -772,14 +666,11 @@ Future<void> getUserId()async{
                   const ReviewCard(),
 
                   const SizedBox(height: 40),
-                                    const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
                   const Text(
                     "You May Also Like",
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
 
                   const SizedBox(height: 15),
@@ -795,8 +686,7 @@ Future<void> getUserId()async{
                           margin: const EdgeInsets.only(right: 14),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius:
-                                BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(.05),
@@ -806,15 +696,12 @@ Future<void> getUserId()async{
                             ],
                           ),
                           child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-
                               Expanded(
                                 flex: 6,
                                 child: ClipRRect(
-                                  borderRadius:
-                                      const BorderRadius.vertical(
+                                  borderRadius: const BorderRadius.vertical(
                                     top: Radius.circular(16),
                                   ),
                                   child: Image.network(
@@ -828,21 +715,17 @@ Future<void> getUserId()async{
                               Expanded(
                                 flex: 4,
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.all(10),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-
                                       Text(
                                         widget.productName,
                                         maxLines: 2,
-                                        overflow:
-                                            TextOverflow.ellipsis,
+                                        overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontWeight:
-                                              FontWeight.bold,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
 
@@ -851,14 +734,11 @@ Future<void> getUserId()async{
                                       Text(
                                         "₹${widget.price.toStringAsFixed(0)}",
                                         style: const TextStyle(
-                                          color:
-                                              AppColors.primary,
-                                          fontWeight:
-                                              FontWeight.bold,
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.bold,
                                           fontSize: 18,
                                         ),
                                       ),
-
                                     ],
                                   ),
                                 ),

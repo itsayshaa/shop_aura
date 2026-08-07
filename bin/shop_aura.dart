@@ -5,12 +5,14 @@ import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:shelf/shelf.dart';
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/category.dart';
+import 'package:shop_aura/backend/routes/couponRoutes/coupon.dart';
 import 'package:shop_aura/backend/routes/ordersRoutes/ordersRoute.dart';
 import 'package:shop_aura/backend/routes/productRoutes/product.dart';
 import 'package:shop_aura/backend/routes/cartRoutes/cartRoutes.dart';
 import 'package:shop_aura/backend/routes/productRoutes/admin_product.dart';
 import 'package:shop_aura/backend/routes/categoryRoutes/admin_category.dart';
 import 'package:shop_aura/backend/routes/brandRoutes/admin_brand.dart';
+import 'package:shop_aura/backend/routes/bannerRoutes/admin_banner.dart';
 import 'package:shop_aura/backend/routes/wishlistRoutes/wishlist.dart';
 
 import 'package:shop_aura/backend/routes/orderRoutes/order.dart';
@@ -19,7 +21,7 @@ import 'package:shop_aura/backend/routes/order_routes.dart';
 
 Future<void> main() async {
   await MongoService.connect();
-  print(MongoService.db!.isConnected);
+  print(MongoService.db.isConnected);
   final router = Router();
 
   router.mount('/auth/', AuthRoutes().router.call);
@@ -28,10 +30,12 @@ Future<void> main() async {
   router.mount('/admin/product/', AdminProductRoutes().router.call);
   router.mount('/admin/category/', AdminCategoryRoutes().router.call);
   router.mount('/admin/brand/', AdminBrandRoutes().router.call);
+  router.mount('/admin/banner/', adminBannerRouter.call);
   router.mount('/cart/', Cartroutes().router.call);
   router.mount('/wishlist/', WishlistRoutes().router.call);
   router.mount('/order/', OrderRoutes().router.call);
   router.mount('/orders/', Ordersroute().router.call);
+  router.mount('/coupon/', CouponRoutes().router.call);
   final handler = Pipeline()
       .addMiddleware(logRequests())
       .addMiddleware(corsHeader())
